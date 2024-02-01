@@ -1,0 +1,64 @@
+<launch>
+
+  <!-- args corresponding to environment variables -->
+  <arg name="UAV_NAME" default="$(optenv UAV_NAME)" />
+  <arg name="LOGGER_DEBUG" default="$(optenv LOGGER_DEBUG false)" />
+  <arg name="RUN_TYPE" default="$(optenv RUN_TYPE uav)" />
+
+    <!-- other args -->
+  <arg name="debug" default="false" />
+  <arg name="bond" default="$(optenv BOND true)" />
+  <arg name="nodelet_manager_name" default="$(optenv NODELET_MANAGER)" />
+  <arg name="custom_config" default="" />
+
+  <arg if="$(eval arg('nodelet_manager_name') != '')" name="standalone" value="false" />
+  <arg if="$(eval arg('nodelet_manager_name') == '')" name="standalone" value="true" />
+
+  <env name="ROSCONSOLE_CONFIG_FILE" if="$(eval arg('LOGGER_DEBUG'))" value="$(find mrs_uav_hw_api)/config/debug_verbosity.yaml" />
+
+  <arg     if="$(arg bond)" name="bond_suffix" value="" />
+  <arg unless="$(arg bond)" name="bond_suffix" value="--no-bond" />
+
+  <arg     if="$(eval arg('standalone') or arg('debug'))" name="nodelet" value="standalone" />
+  <arg unless="$(eval arg('standalone') or arg('debug'))" name="nodelet" value="load" />
+  <arg     if="$(eval arg('standalone') or arg('debug'))" name="nodelet_manager" value="" />
+  <arg unless="$(eval arg('standalone') or arg('debug'))" name="nodelet_manager" value="$(arg nodelet_manager_name)" />
+
+  <arg     if="$(arg debug)" name="launch_prefix" value="debug_roslaunch" />
+  <arg unless="$(arg debug)" name="launch_prefix" value="" />
+
+  <group ns="$(arg UAV_NAME)">
+
+    <node pkg="nodelet" type="nodelet" name="hw_api" args="$(arg nodelet) mrs_uav_hw_api/HwApiManager $(arg nodelet_manager) $(arg bond_suffix)" output="screen" launch-prefix="$(arg launch_prefix)">
+
+      <rosparam file="$(find mrs_uav_hw_api)/config/hw_api.yaml" />
+      <rosparam file="$(find mrs_uav_unreal_simulation)/config/hw_api.yaml" />
+
+        <!-- Load a user param file -->
+      <rosparam if="$(eval not arg('custom_config') == '')" file="$(arg custom_config)" />
+
+        <!-- Parameters -->
+      <param name="topic_prefix" type="string" value="/$(arg UAV_NAME)/" />
+      <param name="uav_name" type="string" value="$(arg UAV_NAME)" />
+      <param name="simulation" type="bool" value="$(eval arg('RUN_TYPE') == 'simulation')" />
+
+        <!-- custom remaps -->
+      <remap from="~simulator_imu_in" to="/unreal_simulator/$(arg UAV_NAME)/imu" />
+      <remap from="~simulator_odom_in" to="/unreal_simulator/$(arg UAV_NAME)/odom" />
+      <remap from="~simulator_rangefinder_in" to="/unreal_simulator/$(arg UAV_NAME)/rangefinder" />
+      <remap from="~simulator_actuators_cmd_out" to="/unreal_simulator/$(arg UAV_NAME)/actuators_cmd" />
+      <remap from="~simulator_control_group_cmd_out" to="/unreal_simulator/$(arg UAV_NAME)/control_group_cmd" />
+      <remap from="~simulator_attitude_rate_cmd_out" to="/unreal_simulator/$(arg UAV_NAME)/attitude_rate_cmd" />
+      <remap from="~simulator_attitude_cmd_out" to="/unreal_simulator/$(arg UAV_NAME)/attitude_cmd" />
+      <remap from="~simulator_acceleration_hdg_rate_cmd_out" to="/unreal_simulator/$(arg UAV_NAME)/acceleration_hdg_rate_cmd" />
+      <remap from="~simulator_acceleration_hdg_cmd_out" to="/unreal_simulator/$(arg UAV_NAME)/acceleration_hdg_cmd" />
+      <remap from="~simulator_velocity_hdg_rate_cmd_out" to="/unreal_simulator/$(arg UAV_NAME)/velocity_hdg_rate_cmd" />
+      <remap from="~simulator_velocity_hdg_cmd_out" to="/unreal_simulator/$(arg UAV_NAME)/velocity_hdg_cmd" />
+      <remap from="~simulator_position_cmd_out" to="/unreal_simulator/$(arg UAV_NAME)/position_cmd" />
+      <remap from="~simulator_tracker_cmd_out" to="/unreal_simulator/$(arg UAV_NAME)/tracker_cmd" />
+
+    </node>
+
+  </group>
+
+</launch>

@@ -1,0 +1,11 @@
+uav_names: [
+  "uav1",
+]
+
+uav1:
+  type: "x500"
+  spawn:
+    x: 10.0
+    y: 15.0
+    z: 0.0
+    heading: 3.14
