@@ -44,7 +44,6 @@ windows:
         - waitForHw; roslaunch ./mapplan.launch
           config_octomap_server:=./config/octomap_server.yaml
           config_octomap_planner:=./config/octomap_planner.yaml
-          config_pcl_filter_ouster:=./config/ouster_filter_mapping.yaml
   - rviz:
       layout: tiled
       panes:
