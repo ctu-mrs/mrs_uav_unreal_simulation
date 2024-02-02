@@ -11,6 +11,7 @@
 
 #include <mrs_lib/param_loader.h>
 #include <mrs_lib/publisher_handler.h>
+#include <mrs_lib/scope_timer.h>
 
 #include <dynamic_reconfigure/server.h>
 #include <mrs_uav_unreal_simulation/unreal_simulatorConfig.h>
@@ -111,6 +112,8 @@ private:
   std::mutex mutex_ueds_;
 
   std::vector<ueds_connector::Coordinates> ueds_world_origins_;
+
+  void updateUnrealPoses(void);
 };
 
 //}
@@ -287,39 +290,6 @@ void UnrealSimulator::timerMain([[maybe_unused]] const ros::WallTimerEvent& even
     uavs_[i]->makeStep(simulation_step_size);
   }
 
-  // | ------------ set each UAV's position in unreal ----------- |
-
-  {
-    std::scoped_lock lock(mutex_ueds_);
-
-    for (size_t i = 0; i < uavs_.size(); i++) {
-
-      mrs_multirotor_simulator::MultirotorModel::State state = uavs_[i]->getState();
-
-      auto [roll, pitch, yaw] = mrs_lib::AttitudeConverter(state.R).getExtrinsicRPY();
-
-      ueds_connector::Coordinates pos;
-
-      pos.x = ueds_world_origins_[i].x + state.x.x() * 100.0;
-      pos.y = ueds_world_origins_[i].y - state.x.y() * 100.0;
-      pos.z = ueds_world_origins_[i].z + state.x.z() * 100.0;
-
-      ueds_connector::Rotation rot;
-
-      rot.pitch = -pitch / (M_PI * 180.0);
-      rot.roll  = roll / (M_PI * 180.0);
-      rot.yaw   = -yaw / (M_PI * 180.0);
-
-      const auto [res, teleportedTo, rotatedTo, isHit, impactPoint] = ueds_connectors_[i]->SetLocationAndRotation(pos, rot);
-
-      if (isHit) {
-        if (!uavs_[i]->hasCrashed()) {
-          uavs_[i]->crash();
-        }
-      }
-    }
-  }
-
   publishPoses();
 
   // | ---------------------- publish time ---------------------- |
@@ -371,6 +341,8 @@ void UnrealSimulator::timerLidar([[maybe_unused]] const ros::TimerEvent& event) 
     return;
   }
 
+  mrs_lib::ScopeTimer timer = mrs_lib::ScopeTimer("timerLidar()");
+
   auto drs_params = mrs_lib::get_mutexed(mutex_drs_params_, drs_params_);
 
   if (!drs_params_.lidar_enabled) {
@@ -378,17 +350,23 @@ void UnrealSimulator::timerLidar([[maybe_unused]] const ros::TimerEvent& event) 
     return;
   }
 
+  updateUnrealPoses();
+
   for (size_t i = 0; i < uavs_.size(); i++) {
 
     bool                                   res;
     std::vector<ueds_connector::LidarData> lidarData;
     ueds_connector::Coordinates            start;
 
+    timer.checkpoint("before_getting_data");
+
     {
       std::scoped_lock lock(mutex_ueds_);
 
       std::tie(res, lidarData, start) = ueds_connectors_[i]->GetLidarData();
     }
+
+    timer.checkpoint("after_getting_data");
 
     if (!res) {
       ROS_ERROR("[UnrealSimulator]: [uav%d] - ERROR getLidarData", int(i));
@@ -455,6 +433,8 @@ void UnrealSimulator::timerRgb([[maybe_unused]] const ros::TimerEvent& event) {
     return;
   }
 
+  mrs_lib::ScopeTimer timer = mrs_lib::ScopeTimer("timerRgb()");
+
   auto drs_params = mrs_lib::get_mutexed(mutex_drs_params_, drs_params_);
 
   if (!drs_params_.rgb_enabled) {
@@ -462,17 +442,23 @@ void UnrealSimulator::timerRgb([[maybe_unused]] const ros::TimerEvent& event) {
     return;
   }
 
+  updateUnrealPoses();
+
   for (size_t i = 0; i < uavs_.size(); i++) {
 
     bool                       res;
     std::vector<unsigned char> cameraData;
     uint32_t                   size;
 
+    timer.checkpoint("before_getting_data");
+
     {
       std::scoped_lock lock(mutex_ueds_);
 
       std::tie(res, cameraData, size) = ueds_connectors_[i]->GetCameraData();
     }
+
+    timer.checkpoint("after_getting_data");
 
     // ROS_WARN("Unreal: send camera msg");
     sensor_msgs::CompressedImage img_msg;
@@ -517,6 +503,12 @@ void UnrealSimulator::callbackDrs(mrs_uav_unreal_simulation::unreal_simulatorCon
 
   timer_main_.setPeriod(ros::WallDuration(1.0 / (_simulation_rate_ * config.realtime_factor)), true);
 
+  // | ------------------ set the camera rates ------------------ |
+
+  timer_rgb_.setPeriod(ros::Duration(1.0 / config.rgb_rate));
+
+  timer_lidar_.setPeriod(ros::Duration(1.0 / config.lidar_rate));
+
   ROS_INFO("[UnrealSimulator]: DRS updated params");
 }
 
@@ -550,6 +542,45 @@ void UnrealSimulator::publishPoses(void) {
   }
 
   ph_poses_.publish(pose_array);
+}
+
+//}
+
+/* updateUnrealPoses() //{ */
+
+void UnrealSimulator::updateUnrealPoses(void) {
+
+  // | ------------ set each UAV's position in unreal ----------- |
+
+  {
+    std::scoped_lock lock(mutex_ueds_);
+
+    for (size_t i = 0; i < uavs_.size(); i++) {
+
+      mrs_multirotor_simulator::MultirotorModel::State state = uavs_[i]->getState();
+
+      auto [roll, pitch, yaw] = mrs_lib::AttitudeConverter(state.R).getExtrinsicRPY();
+
+      ueds_connector::Coordinates pos;
+
+      pos.x = ueds_world_origins_[i].x + state.x.x() * 100.0;
+      pos.y = ueds_world_origins_[i].y - state.x.y() * 100.0;
+      pos.z = ueds_world_origins_[i].z + state.x.z() * 100.0;
+
+      ueds_connector::Rotation rot;
+      rot.pitch = 180.0 * (-pitch / M_PI);
+      rot.roll  = 180.0 * (roll / M_PI);
+      rot.yaw   = 180.0 * (-yaw / M_PI);
+
+      const auto [res, teleportedTo, rotatedTo, isHit, impactPoint] = ueds_connectors_[i]->SetLocationAndRotation(pos, rot);
+
+      if (isHit) {
+        if (!uavs_[i]->hasCrashed()) {
+          uavs_[i]->crash();
+        }
+      }
+    }
+  }
 }
 
 //}

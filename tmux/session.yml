@@ -38,10 +38,17 @@ windows:
           custom_config:=./config/custom_config.yaml
           world_config:=./config/world_config.yaml
           network_config:=./config/network_config.yaml
+  - mapping:
+      layout: tiled
+      panes:
+        - waitForHw; roslaunch ./mapplan.launch
+          config_octomap_server:=./config/octomap_server.yaml
+          config_octomap_planner:=./config/octomap_planner.yaml
+          config_pcl_filter_ouster:=./config/ouster_filter_mapping.yaml
   - rviz:
       layout: tiled
       panes:
-        - waitForControl; roslaunch mrs_uav_core rviz.launch
+        - waitForControl; rosrun rviz rviz -d ./rviz.rviz
         - waitForControl; roslaunch mrs_rviz_plugins load_robot.launch
         - waitForControl; waitForControl; roslaunch mrs_rviz_plugins rviz_interface.launch
   - layout:
