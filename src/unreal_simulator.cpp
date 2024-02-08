@@ -27,7 +27,17 @@
 #include <ueds_connector/ueds_connector.h>
 #include <ueds_connector/game-mode-controller.h>
 
+#include <pcl_ros/transforms.h>
+#include <pcl/point_types.h>
+#include <pcl/conversions.h>
+#include <pcl/io/pcd_io.h>
+#include <pcl_conversions/pcl_conversions.h>
+#include <pcl/common/transforms.h>
+
 //}
+
+using PCLPoint      = pcl::PointXYZ;
+using PCLPointCloud = pcl::PointCloud<PCLPoint>;
 
 namespace mrs_uav_unreal_simulation
 {
@@ -308,7 +318,7 @@ void UnrealSimulator::timerMain([[maybe_unused]] const ros::WallTimerEvent& even
 
 //}
 
-/* timeStatus() //{ */
+/* timerStatus() //{ */
 
 void UnrealSimulator::timerStatus([[maybe_unused]] const ros::WallTimerEvent& event) {
 
@@ -333,7 +343,7 @@ void UnrealSimulator::timerStatus([[maybe_unused]] const ros::WallTimerEvent& ev
 
 //}
 
-/* timeLidar() //{ */
+/* timerLidar() //{ */
 
 void UnrealSimulator::timerLidar([[maybe_unused]] const ros::TimerEvent& event) {
 
@@ -354,19 +364,29 @@ void UnrealSimulator::timerLidar([[maybe_unused]] const ros::TimerEvent& event) 
 
   for (size_t i = 0; i < uavs_.size(); i++) {
 
+    mrs_multirotor_simulator::MultirotorModel::State state = uavs_[i]->getState();
+
     bool                                   res;
     std::vector<ueds_connector::LidarData> lidarData;
+    ueds_connector::LidarConfig            lidarConfig;
     ueds_connector::Coordinates            start;
 
-    timer.checkpoint("before_getting_data");
+    {
+      std::scoped_lock lock(mutex_ueds_);
+
+      std::tie(res, lidarConfig) = ueds_connectors_[i]->GetLidarConfig();
+    }
+
+    if (!res) {
+      ROS_ERROR("[UnrealSimulator]: [uav%d] - ERROR getLidarConfig", int(i));
+      continue;
+    }
 
     {
       std::scoped_lock lock(mutex_ueds_);
 
       std::tie(res, lidarData, start) = ueds_connectors_[i]->GetLidarData();
     }
-
-    timer.checkpoint("after_getting_data");
 
     if (!res) {
       ROS_ERROR("[UnrealSimulator]: [uav%d] - ERROR getLidarData", int(i));
@@ -386,8 +406,8 @@ void UnrealSimulator::timerLidar([[maybe_unused]] const ros::TimerEvent& event) 
 
     pcl_msg.header.frame_id = "uav1/world_origin";
 
-    pcl_msg.height   = 1;                 // unordered 1D data array points cloud
-    pcl_msg.width    = lidarData.size();  // 360; //num_of_points
+    pcl_msg.height   = lidarConfig.BeamVertRays;
+    pcl_msg.width    = lidarConfig.BeamHorRays;
     pcl_msg.is_dense = true;
 
     // Total number of bytes per point
@@ -419,13 +439,33 @@ void UnrealSimulator::timerLidar([[maybe_unused]] const ros::TimerEvent& event) 
       ++iterIntensity;
     }
 
+    PCLPointCloud::Ptr pc = boost::make_shared<PCLPointCloud>();
+
+    pcl::fromROSMsg(pcl_msg, *pc);
+
+    Eigen::Matrix4f worldToSensor;
+
+    geometry_msgs::TransformStamped worldToSensorTf;
+
+    worldToSensorTf.transform.translation.x = state.x[0];
+    worldToSensorTf.transform.translation.y = state.x[1];
+    worldToSensorTf.transform.translation.z = state.x[2];
+
+    worldToSensorTf.transform.rotation = mrs_lib::AttitudeConverter(state.R);
+
+    pcl_ros::transformAsMatrix(worldToSensorTf.transform, worldToSensor);
+
+    pcl::transformPointCloud(*pc, *pc, worldToSensor);
+
+    pcl::toROSMsg(*pc, pcl_msg);
+
     ph_lidars_[i].publish(pcl_msg);
   }
 }
 
 //}
 
-/* timeRgb() //{ */
+/* timerRgb() //{ */
 
 void UnrealSimulator::timerRgb([[maybe_unused]] const ros::TimerEvent& event) {
 
