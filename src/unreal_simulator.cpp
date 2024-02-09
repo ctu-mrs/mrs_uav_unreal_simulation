@@ -401,10 +401,8 @@ void UnrealSimulator::timerLidar([[maybe_unused]] const ros::TimerEvent& event) 
     modifier.setPointCloud2Fields(4, "x", 1, sensor_msgs::PointField::FLOAT32, "y", 1, sensor_msgs::PointField::FLOAT32, "z", 1,
                                   sensor_msgs::PointField::FLOAT32, "intensity", 1, sensor_msgs::PointField::FLOAT32);
     // Msg header
-    pcl_msg.header       = std_msgs::Header();
-    pcl_msg.header.stamp = ros::Time::now();
-
-    pcl_msg.header.frame_id = "uav1/world_origin";
+    pcl_msg.header.stamp    = ros::Time::now();
+    pcl_msg.header.frame_id = "uav1/fcu";
 
     pcl_msg.height   = lidarConfig.BeamVertRays;
     pcl_msg.width    = lidarConfig.BeamHorRays;
@@ -413,7 +411,7 @@ void UnrealSimulator::timerLidar([[maybe_unused]] const ros::TimerEvent& event) 
     // Total number of bytes per point
     pcl_msg.point_step = 16;
     pcl_msg.row_step   = pcl_msg.point_step * pcl_msg.width;
-    pcl_msg.data.resize(pcl_msg.row_step);
+    pcl_msg.data.resize(pcl_msg.row_step * pcl_msg.height);
 
     sensor_msgs::PointCloud2Iterator<float> iterX(pcl_msg, "x");
     sensor_msgs::PointCloud2Iterator<float> iterY(pcl_msg, "y");
@@ -423,14 +421,12 @@ void UnrealSimulator::timerLidar([[maybe_unused]] const ros::TimerEvent& event) 
     for (const ueds_connector::LidarData& ray : lidarData) {
 
       tf::Vector3 dir = tf::Vector3(ray.directionX, ray.directionY, ray.directionZ);
-      dir             = dir.normalize() * (ray.distance / 100.0);
 
-      tf::Vector3 lidarTransform =
-          tf::Vector3((start.x - ueds_world_origins_[i].x) / 100.0, (start.y - ueds_world_origins_[i].y) / 100.0, (start.z - ueds_world_origins_[i].z) / 100.0);
+      dir = dir.normalized() * (ray.distance / 100.0);
 
-      *iterX         = lidarTransform.x() + dir.x();
-      *iterY         = -lidarTransform.y() - dir.y();  // convert left-hand to right-hand coordinates
-      *iterZ         = lidarTransform.z() + dir.z();
+      *iterX         = dir.x();
+      *iterY         = -dir.y();  // convert left-hand to right-hand coordinates
+      *iterZ         = dir.z();
       *iterIntensity = ray.distance;
 
       ++iterX;
@@ -439,27 +435,26 @@ void UnrealSimulator::timerLidar([[maybe_unused]] const ros::TimerEvent& event) 
       ++iterIntensity;
     }
 
-    PCLPointCloud::Ptr pc = boost::make_shared<PCLPointCloud>();
-
-    pcl::fromROSMsg(pcl_msg, *pc);
-
-    Eigen::Matrix4f worldToSensor;
-
-    geometry_msgs::TransformStamped worldToSensorTf;
-
-    worldToSensorTf.transform.translation.x = state.x[0];
-    worldToSensorTf.transform.translation.y = state.x[1];
-    worldToSensorTf.transform.translation.z = state.x[2];
-
-    worldToSensorTf.transform.rotation = mrs_lib::AttitudeConverter(state.R);
-
-    pcl_ros::transformAsMatrix(worldToSensorTf.transform, worldToSensor);
-
-    pcl::transformPointCloud(*pc, *pc, worldToSensor);
-
-    pcl::toROSMsg(*pc, pcl_msg);
-
     ph_lidars_[i].publish(pcl_msg);
+
+    /* PCLPointCloud::Ptr pc = boost::make_shared<PCLPointCloud>(); */
+
+    /* pcl::fromROSMsg(pcl_msg, *pc); */
+
+    /* Eigen::Matrix4f tf_matrix; */
+
+    /* geometry_msgs::TransformStamped tf; */
+
+    /* tf.transform.rotation = mrs_lib::AttitudeConverter(0, 0, 0).setHeading(0); */
+
+    /* pcl_ros::transformAsMatrix(tf.transform, tf_matrix); */
+
+    /* pcl::transformPointCloud(*pc, *pc, tf_matrix); */
+
+    /* pcl::toROSMsg(*pc, pcl_msg); */
+
+    /* ph_lidars_[i].publish(pcl_msg); */
+
   }
 }
 
