@@ -190,11 +190,17 @@ void UnrealSimulator::onInit() {
 
   ueds_game_controller_ = std::make_unique<ueds_connector::GameModeController>(LOCALHOST, 8000);
 
-  bool connect_result = ueds_game_controller_->Connect();
+  while (true) {
 
-  if (connect_result != 1) {
-    ROS_ERROR("[UnrealSimulator]: Error connecting to Unreal's game mode controller, connect_result was %d", connect_result);
-    ros::shutdown();
+    bool connect_result = ueds_game_controller_->Connect();
+
+    if (connect_result != 1) {
+      ROS_ERROR("[UnrealSimulator]: Error connecting to Unreal's game mode controller, connect_result was %d", connect_result);
+    } else {
+      break;
+    }
+
+    ros::Duration(1.0).sleep();
   }
 
   for (size_t i = 0; i < uav_names.size(); i++) {
@@ -351,7 +357,7 @@ void UnrealSimulator::timerLidar([[maybe_unused]] const ros::TimerEvent& event) 
     return;
   }
 
-  mrs_lib::ScopeTimer timer = mrs_lib::ScopeTimer("timerLidar()");
+  /* mrs_lib::ScopeTimer timer = mrs_lib::ScopeTimer("timerLidar()"); */
 
   auto drs_params = mrs_lib::get_mutexed(mutex_drs_params_, drs_params_);
 
@@ -454,7 +460,6 @@ void UnrealSimulator::timerLidar([[maybe_unused]] const ros::TimerEvent& event) 
     /* pcl::toROSMsg(*pc, pcl_msg); */
 
     /* ph_lidars_[i].publish(pcl_msg); */
-
   }
 }
 
@@ -468,7 +473,7 @@ void UnrealSimulator::timerRgb([[maybe_unused]] const ros::TimerEvent& event) {
     return;
   }
 
-  mrs_lib::ScopeTimer timer = mrs_lib::ScopeTimer("timerRgb()");
+  /* mrs_lib::ScopeTimer timer = mrs_lib::ScopeTimer("timerRgb()"); */
 
   auto drs_params = mrs_lib::get_mutexed(mutex_drs_params_, drs_params_);
 
@@ -485,7 +490,7 @@ void UnrealSimulator::timerRgb([[maybe_unused]] const ros::TimerEvent& event) {
     std::vector<unsigned char> cameraData;
     uint32_t                   size;
 
-    timer.checkpoint("before_getting_data");
+    /* timer.checkpoint("before_getting_data"); */
 
     {
       std::scoped_lock lock(mutex_ueds_);
@@ -493,7 +498,7 @@ void UnrealSimulator::timerRgb([[maybe_unused]] const ros::TimerEvent& event) {
       std::tie(res, cameraData, size) = ueds_connectors_[i]->GetCameraData();
     }
 
-    timer.checkpoint("after_getting_data");
+    /* timer.checkpoint("after_getting_data"); */
 
     // ROS_WARN("Unreal: send camera msg");
     sensor_msgs::CompressedImage img_msg;
