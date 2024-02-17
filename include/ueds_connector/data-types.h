@@ -3,16 +3,12 @@
 
 #pragma once
 
-#include <string>
+#include "string"
 
-namespace ueds_connector
-{
-
-struct Coordinates
-{
+namespace ueds_connector {
+struct Coordinates {
   Coordinates() = default;
-  Coordinates(double _x, double _y, double _z) : x(_x), y(_y), z(_z) {
-  }
+  Coordinates(double _x, double _y, double _z) : x(_x), y(_y), z(_z) {}
 
   double x;
   double y;
@@ -23,23 +19,21 @@ struct Coordinates
   }
 };
 
-struct Rotation
-{
+struct Rotation {
   Rotation() = default;
-  Rotation(double _pitch, double _yaw, double _roll) : pitch(_pitch), yaw(_yaw), roll(_roll) {
-  }
+  Rotation(double _pitch, double _yaw, double _roll) : pitch(_pitch), yaw(_yaw), roll(_roll) {}
 
   double pitch;
   double yaw;
   double roll;
 
   std::string toString() const {
-    return "(pitch: " + std::to_string(pitch) + ", yaw: " + std::to_string(yaw) + ", roll: " + std::to_string(roll) + ")";
+    return "(pitch: " + std::to_string(pitch) + ", yaw: " + std::to_string(yaw) + ", roll: " + std::to_string(roll) +
+           ")";
   }
 };
 
-struct LidarData
-{
+struct LidarData {
   LidarData() = default;
 
   double distance;
@@ -48,17 +42,30 @@ struct LidarData
   double directionZ;
 
   std::string toString() const {
-    return "(distance: " + std::to_string(distance) + ", directionX: " + std::to_string(directionX) + ", directionY: " + std::to_string(directionY) +
-           ", directionZ: " + std::to_string(directionZ) + ")";
+    return "(distance: " + std::to_string(distance) + ", directionX: " + std::to_string(directionX) +
+           ", directionY: " + std::to_string(directionY) + ", directionZ: " + std::to_string(directionZ) + ")";
   }
 };
 
-struct LidarConfig
-{
+struct LidarSegData {
+  LidarSegData() = default;
+
+  double distance;
+  double directionX;
+  double directionY;
+  double directionZ;
+  int segmentation;
+  std::string toString() const {
+    return "(distance: " + std::to_string(distance) + ", directionX: " + std::to_string(directionX) +
+           ", directionY: " + std::to_string(directionY) + ", directionZ: " + std::to_string(directionZ) + ", segmentation: " + std::to_string(segmentation) + ")";
+  }
+};
+
+struct LidarConfig {
   LidarConfig() = default;
-  LidarConfig(bool Enable, bool showBeams, double BeamHorRays, double BeamVertRays, double beamLength, double Frequency, const Coordinates offset,
-              const Rotation orientation, double FOVHor, double FOVVert)
-      : Enable(Enable),
+  LidarConfig(bool Enable, bool showBeams, double BeamHorRays, double BeamVertRays, double beamLength,
+      double Frequency, const Coordinates offset, const Rotation orientation, double FOVHor, double FOVVert): 
+        Enable(Enable),
         showBeams(showBeams),
         BeamHorRays(BeamHorRays),
         BeamVertRays(BeamVertRays),
@@ -67,40 +74,37 @@ struct LidarConfig
         offset(offset),
         orientation(orientation),
         FOVHor(FOVHor),
-        FOVVert(FOVVert) {
-  }
+        FOVVert(FOVVert) {}
 
-  bool        Enable;
-  bool        showBeams;
-  double      beamLength;
-  double      BeamHorRays;
-  double      BeamVertRays;
-  double      Frequency;
+  bool Enable;
+  bool showBeams;
+  double beamLength;
+  double BeamHorRays;
+  double BeamVertRays;
+  double Frequency;
   Coordinates offset;
-  Rotation    orientation;
-  double      FOVHor;
-  double      FOVVert;
+  Rotation orientation;
+  double FOVHor;
+  double FOVVert;
 
 
   std::string toString() const {
-    return "(showBeams: " + std::to_string(showBeams) + ", beamLength: " + std::to_string(beamLength) + ", offset: " + offset.toString() +
-           ", orientation: " + orientation.toString() + ")";
+    return "(showBeams: " + std::to_string(showBeams) + 
+           ", beamLength: " + std::to_string(beamLength) + 
+           ", offset: " + offset.toString() + ", orientation: " + orientation.toString() + ")";
   }
 };
 
-enum CameraCaptureModeEnum : unsigned short
-{
-  CAPTURE_ALL_FRAMES  = 0x0,
+enum CameraCaptureModeEnum : unsigned short {
+  CAPTURE_ALL_FRAMES = 0x0,
   CAPTURE_ON_MOVEMENT = 0x1,
-  CAPTURE_ON_DEMAND   = 0x2,
+  CAPTURE_ON_DEMAND = 0x2,
 };
 
-struct CameraConfig
-{
+struct CameraConfig {
   CameraConfig() = default;
   CameraConfig(bool showDebugCamera, double angleFov, const Coordinates offset, const Rotation orientation)
-      : showDebugCamera(showDebugCamera), angleFOV(angleFov), offset(offset), orientation(orientation) {
-  }
+      : showDebugCamera(showDebugCamera), angleFOV(angleFov), offset(offset), orientation(orientation) {}
 
   bool showDebugCamera;
 
@@ -111,9 +115,8 @@ struct CameraConfig
   Rotation orientation;
 
   std::string toString() const {
-    return "(showDebugCamera: " + std::to_string(showDebugCamera) + ", angleFOV: " + std::to_string(angleFOV) + ", offset: " + offset.toString() +
-           ", directionZ: " + orientation.toString() + ")";
+    return "(showDebugCamera: " + std::to_string(showDebugCamera) + ", angleFOV: " + std::to_string(angleFOV) +
+           ", offset: " + offset.toString() + ", directionZ: " + orientation.toString() + ")";
   }
 };
-
 }  // namespace ueds_connector

@@ -10,6 +10,7 @@ using ueds_connector::CameraConfig;
 using ueds_connector::Coordinates;
 using ueds_connector::LidarConfig;
 using ueds_connector::LidarData;
+using ueds_connector::LidarSegData;
 using ueds_connector::Rotation;
 using ueds_connector::UedsConnector;
 
@@ -79,6 +80,32 @@ std::tuple<bool, std::vector<unsigned char>, uint32_t> UedsConnector::GetCameraD
   return std::make_tuple(success, success ? response.imageData : std::vector<unsigned char>(), success ? response.imageData.size() : 0);
 }
 
+//}
+
+/* GetCameraDepth() //{ */
+std::tuple<bool, std::vector<unsigned char>, uint32_t> UedsConnector::GetCameraDepth() {
+  Serializable::Drone::GetCameraDepth::Request request{};
+
+  Serializable::Drone::GetCameraDepth::Response response{};
+  const auto status = Request(request, response);
+  const auto success = status && response.status;
+
+  return std::make_tuple(success, success ? response.imageData : std::vector<unsigned char>(),
+                         success ? response.imageData.size() : 0);
+}
+//}
+
+/* GetCameraSeg() //{ */
+std::tuple<bool, std::vector<unsigned char>, uint32_t> UedsConnector::GetCameraSeg() {
+  Serializable::Drone::GetCameraSeg::Request request{};
+
+  Serializable::Drone::GetCameraSeg::Response response{};
+  const auto status = Request(request, response);
+  const auto success = status && response.status;
+
+  return std::make_tuple(success, success ? response.imageData : std::vector<unsigned char>(),
+                         success ? response.imageData.size() : 0);
+}
 //}
 
 /* getRotation() //{ */
@@ -206,6 +233,37 @@ std::tuple<bool, std::vector<LidarData>, Coordinates> UedsConnector::GetLidarDat
 
 //}
 
+/* getLidarSegData() //{ */
+
+std::tuple<bool, std::vector<LidarSegData>, Coordinates> UedsConnector::GetLidarSegData() {
+  Serializable::Drone::GetLidarSegData::Request request{};
+
+  Serializable::Drone::GetLidarSegData::Response response{};
+  const auto status = Request(request, response);
+  const auto success = status && response.status;
+  std::vector<LidarSegData> lidarSegData;
+  Coordinates start{};
+  if (success) {
+    const auto arrSize = response.lidarSegData.size();
+    lidarSegData.resize(arrSize);
+    for (int i = 0; i < arrSize; i++) {
+      lidarSegData[i] = LidarSegData{};
+      lidarSegData[i].distance = response.lidarSegData[i].distance;
+      lidarSegData[i].directionX = response.lidarSegData[i].directionX;
+      lidarSegData[i].directionY = response.lidarSegData[i].directionY;
+      lidarSegData[i].directionZ = response.lidarSegData[i].directionZ;
+      lidarSegData[i].segmentation = response.lidarSegData[i].segmentation;
+    }
+
+    start.x = response.startX;
+    start.y = response.startY;
+    start.z = response.startZ;
+  }
+  //std::cout << "Get lidar data drone controller: " << success << std::endl;
+  return std::make_tuple(success, lidarSegData, start);
+}
+//}
+
 /* getLidarConfig() //{ */
 
 std::pair<bool, LidarConfig> UedsConnector::GetLidarConfig() {
@@ -217,7 +275,6 @@ std::pair<bool, LidarConfig> UedsConnector::GetLidarConfig() {
   const auto                                    success = status && response.status;
 
   /* bool success = true; */
-  std::cout << "drone controller get lidat config success: " << success << std::endl;
   LidarConfig config{};
 
   if (success) {

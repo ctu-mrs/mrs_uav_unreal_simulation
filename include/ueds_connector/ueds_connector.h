@@ -27,6 +27,10 @@ public:
 
   std::tuple<bool, std::vector<unsigned char>, uint32_t> GetCameraData();
 
+  std::tuple<bool, std::vector<unsigned char>, uint32_t> GetCameraDepth();
+  
+  std::tuple<bool, std::vector<unsigned char>, uint32_t> GetCameraSeg();
+  
   std::pair<bool, Rotation> GetRotation();
 
   std::tuple<bool, Rotation, bool, Coordinates> SetRotation(const Rotation& rotation);
@@ -34,6 +38,8 @@ public:
   std::tuple<bool, Coordinates, Rotation, bool, Coordinates> SetLocationAndRotation(const Coordinates& coordinate, const Rotation& rotation);
 
   std::tuple<bool, std::vector<LidarData>, Coordinates> GetLidarData();
+
+  std::tuple<bool, std::vector<LidarSegData>, Coordinates> GetLidarSegData();
 
   std::pair<bool, LidarConfig> GetLidarConfig();
 

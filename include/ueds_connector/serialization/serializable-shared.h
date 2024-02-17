@@ -64,7 +64,10 @@ enum MessageType : unsigned short {
   get_camera_config = 0x11,
   set_camera_config = 0x12,
   get_move_line_visible = 0x13,
-  set_move_line_visible = 0x14
+  set_move_line_visible = 0x14,
+  get_camera_depth = 0x15,
+  get_camera_seg =  0x16,
+  get_lidar_seg = 0x17,
 };
 
 struct LidarConfig
@@ -189,6 +192,42 @@ struct Response : public Common::NetworkResponse {
   }
 };
 }  // namespace GetCameraData
+
+namespace GetCameraDepth {
+struct Request : public Common::NetworkRequest {
+  Request() : Common::NetworkRequest(static_cast<unsigned short>(MessageType::get_camera_depth)) {}
+};
+
+struct Response : public Common::NetworkResponse {
+  Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::get_camera_depth)) {}
+  explicit Response(bool _status) : Common::NetworkResponse(MessageType::get_camera_depth, _status) {}
+
+  std::vector<unsigned char> imageData;
+
+  template <class Archive>
+  void serialize(Archive& archive) {
+    archive(cereal::base_class<Common::NetworkResponse>(this), imageData);
+  }
+};
+}  // namespace GetCameraDepth
+
+namespace GetCameraSeg {
+struct Request : public Common::NetworkRequest {
+  Request() : Common::NetworkRequest(static_cast<unsigned short>(MessageType::get_camera_seg)) {}
+};
+
+struct Response : public Common::NetworkResponse {
+  Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::get_camera_seg)) {}
+  explicit Response(bool _status) : Common::NetworkResponse(MessageType::get_camera_seg, _status) {}
+
+  std::vector<unsigned char> imageData;
+
+  template <class Archive>
+  void serialize(Archive& archive) {
+    archive(cereal::base_class<Common::NetworkResponse>(this), imageData);
+  }
+};
+}  // namespace GetCameraSeg
 
 namespace GetRotation {
 struct Request : public Common::NetworkRequest {
@@ -320,6 +359,42 @@ struct Response : public Common::NetworkResponse {
   }
 };
 }  // namespace GetLidarData
+
+namespace GetLidarSegData {
+struct LidarSegData {
+  LidarSegData() = default;
+
+  double distance;
+  double directionX;
+  double directionY;
+  double directionZ;
+  int segmentation;
+  template <class Archive>
+  void serialize(Archive& archive) {
+    archive(distance, directionX, directionY, directionZ, segmentation);
+  }
+};
+
+struct Request : public Common::NetworkRequest {
+  Request() : Common::NetworkRequest(static_cast<unsigned short>(MessageType::get_lidar_seg)) {}
+};
+
+struct Response : public Common::NetworkResponse {
+  Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::get_lidar_seg)) {}
+  explicit Response(bool _status) : Common::NetworkResponse(MessageType::get_lidar_seg, _status) {}
+
+  double startX;
+  double startY;
+  double startZ;
+
+  std::vector<LidarSegData> lidarSegData;
+
+  template <class Archive>
+  void serialize(Archive& archive) {
+    archive(cereal::base_class<Common::NetworkResponse>(this), startX, startY, startZ, lidarSegData);
+  }
+};
+}  // namespace GetLidarSegData
 
 namespace GetLidarConfig {
 struct Request : public Common::NetworkRequest {
