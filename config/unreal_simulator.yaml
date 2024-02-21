@@ -12,7 +12,16 @@ sensors:
   lidar:
     enabled: true
     rate: 10.0 # [Hz]
+  lidar_seg:
+    enabled: false
+    rate: 10.0 # [Hz]
   rgb:
+    enabled: true
+    rate: 10.0 # [Hz]
+  depth:
+    enabled: true
+    rate: 10.0 # [Hz]
+  seg:
     enabled: true
     rate: 10.0 # [Hz]
 

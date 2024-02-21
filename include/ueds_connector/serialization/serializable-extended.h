@@ -5,8 +5,8 @@
 
 #include <memory>
 
-#include <ueds_connector/data-types.h>
-#include <ueds_connector/serialization/serializable-shared.h>
+#include "../data-types.h"
+#include "serializable-shared.h"
 
 namespace Serializable::Drone::GetLocation {
   inline std::unique_ptr<ueds_connector::Coordinates> ResponseToCoordinates(std::unique_ptr<Response> response) {
