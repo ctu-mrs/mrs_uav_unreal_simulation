@@ -19,10 +19,10 @@ sensors:
     enabled: true
     rate: 10.0 # [Hz]
   depth:
-    enabled: true
+    enabled: false
     rate: 10.0 # [Hz]
   seg:
-    enabled: true
+    enabled: false
     rate: 10.0 # [Hz]
 
 frames:
