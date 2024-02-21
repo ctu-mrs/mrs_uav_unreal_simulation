@@ -384,7 +384,7 @@ void UnrealSimulator::timerLidar([[maybe_unused]] const ros::TimerEvent& event) 
     }
 
     if (!res) {
-      ROS_ERROR("[UnrealSimulator]: [uav%d] - ERROR getLidarConfig", int(i));
+      ROS_ERROR_THROTTLE(1.0, "[UnrealSimulator]: [uav%d] - ERROR getLidarConfig", int(i));
       continue;
     }
 
@@ -395,11 +395,10 @@ void UnrealSimulator::timerLidar([[maybe_unused]] const ros::TimerEvent& event) 
     }
 
     if (!res) {
-      ROS_ERROR("[UnrealSimulator]: [uav%d] - ERROR getLidarData", int(i));
+      ROS_ERROR_THROTTLE(1.0, "[UnrealSimulator]: [uav%d] - ERROR getLidarData", int(i));
       continue;
     }
 
-    // ROS_INFO("Lidar Start: x[%lf] y[%lf] z[%lf]",start.x, start.y, start.z);
     sensor_msgs::PointCloud2 pcl_msg;
 
     // Modifier to describe what the fields are.
@@ -442,24 +441,6 @@ void UnrealSimulator::timerLidar([[maybe_unused]] const ros::TimerEvent& event) 
     }
 
     ph_lidars_[i].publish(pcl_msg);
-
-    /* PCLPointCloud::Ptr pc = boost::make_shared<PCLPointCloud>(); */
-
-    /* pcl::fromROSMsg(pcl_msg, *pc); */
-
-    /* Eigen::Matrix4f tf_matrix; */
-
-    /* geometry_msgs::TransformStamped tf; */
-
-    /* tf.transform.rotation = mrs_lib::AttitudeConverter(0, 0, 0).setHeading(0); */
-
-    /* pcl_ros::transformAsMatrix(tf.transform, tf_matrix); */
-
-    /* pcl::transformPointCloud(*pc, *pc, tf_matrix); */
-
-    /* pcl::toROSMsg(*pc, pcl_msg); */
-
-    /* ph_lidars_[i].publish(pcl_msg); */
   }
 }
 
