@@ -424,7 +424,7 @@ void UnrealSimulator::timerLidar([[maybe_unused]] const ros::TimerEvent& event) 
     }
 
     if (!res) {
-      ROS_ERROR("[UnrealSimulator]: [uav%d] - ERROR getLidarConfig", int(i));
+      ROS_ERROR_THROTTLE(1.0, "[UnrealSimulator]: [uav%d] - ERROR getLidarConfig", int(i));
       continue;
     }
 
@@ -435,7 +435,7 @@ void UnrealSimulator::timerLidar([[maybe_unused]] const ros::TimerEvent& event) 
     }
 
     if (!res) {
-      ROS_ERROR("[UnrealSimulator]: [uav%d] - ERROR getLidarData", int(i));
+      ROS_ERROR_THROTTLE(1.0, "[UnrealSimulator]: [uav%d] - ERROR getLidarData", int(i));
       continue;
     }
 
