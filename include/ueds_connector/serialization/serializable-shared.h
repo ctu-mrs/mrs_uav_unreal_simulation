@@ -68,6 +68,7 @@ enum MessageType : unsigned short {
   get_camera_depth = 0x15,
   get_camera_seg =  0x16,
   get_lidar_seg = 0x17,
+  get_camera_color_depth = 0x18,
 };
 
 struct LidarConfig
@@ -228,6 +229,24 @@ struct Response : public Common::NetworkResponse {
   }
 };
 }  // namespace GetCameraSeg
+
+namespace GetCameraColorDepth {
+struct Request : public Common::NetworkRequest {
+  Request() : Common::NetworkRequest(static_cast<unsigned short>(MessageType::get_camera_color_depth)) {}
+};
+
+struct Response : public Common::NetworkResponse {
+  Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::get_camera_color_depth)) {}
+  explicit Response(bool _status) : Common::NetworkResponse(MessageType::get_camera_color_depth, _status) {}
+
+  std::vector<unsigned char> imageData;
+
+  template <class Archive>
+  void serialize(Archive& archive) {
+    archive(cereal::base_class<Common::NetworkResponse>(this), imageData);
+  }
+};
+}  // namespace GetCameraColorDepth
 
 namespace GetRotation {
 struct Request : public Common::NetworkRequest {

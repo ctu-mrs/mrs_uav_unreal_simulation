@@ -20,10 +20,13 @@ sensors:
     rate: 10.0 # [Hz]
   depth:
     enabled: true
-    rate: 10.0 # [Hz]
+    rate: 5.0 # [Hz]
   seg:
     enabled: true
-    rate: 10.0 # [Hz]
+    rate: 5.0 # [Hz]
+  color_depth:
+    enabled: true
+    rate: 5.0 # [Hz]
 
 frames:
   world:

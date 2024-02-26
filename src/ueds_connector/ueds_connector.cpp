@@ -108,6 +108,19 @@ std::tuple<bool, std::vector<unsigned char>, uint32_t> UedsConnector::GetCameraS
 }
 //}
 
+/* GetCameraColorDepth() //{ */
+std::tuple<bool, std::vector<unsigned char>, uint32_t> UedsConnector::GetCameraColorDepth() {
+  Serializable::Drone::GetCameraColorDepth::Request request{};
+
+  Serializable::Drone::GetCameraColorDepth::Response response{};
+  const auto status = Request(request, response);
+  const auto success = status && response.status;
+
+  return std::make_tuple(success, success ? response.imageData : std::vector<unsigned char>(),
+                         success ? response.imageData.size() : 0);
+}
+//}
+
 /* getRotation() //{ */
 
 std::pair<bool, Rotation> UedsConnector::GetRotation() {
