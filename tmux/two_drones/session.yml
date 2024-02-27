@@ -67,6 +67,11 @@ windows:
         - waitForControl; rosrun rviz rviz -d ./rviz.rviz
         - waitForControl; roslaunch mrs_rviz_plugins load_robot.launch
         - waitForControl; waitForControl; roslaunch mrs_rviz_plugins rviz_interface.launch
+  - tf_connector:
+      layout: tiled
+      panes:
+        - waitForRos; roslaunch mrs_tf_connector tf_connector.launch
+
   - layout:
       layout: tiled
       panes:
