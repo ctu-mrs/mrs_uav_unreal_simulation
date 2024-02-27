@@ -447,7 +447,7 @@ void UnrealSimulator::timerLidar([[maybe_unused]] const ros::TimerEvent& event) 
                                   sensor_msgs::PointField::FLOAT32, "intensity", 1, sensor_msgs::PointField::FLOAT32);
     // Msg header
     pcl_msg.header.stamp    = ros::Time::now();
-    pcl_msg.header.frame_id = "uav1/fcu";
+    pcl_msg.header.frame_id = "uav"+ std::to_string(i+1) +"/fcu";
 
     pcl_msg.height   = lidarConfig.BeamVertRays;
     pcl_msg.width    = lidarConfig.BeamHorRays;
@@ -609,7 +609,7 @@ void UnrealSimulator::timerSegLidar([[maybe_unused]] const ros::TimerEvent& even
     sensor_msgs::PointCloud2 pcl_msg;
     pcl::toROSMsg(pcl_cloud, pcl_msg);
     pcl_msg.header.stamp    = ros::Time::now();
-    pcl_msg.header.frame_id = "uav1/fcu";
+    pcl_msg.header.frame_id = "uav"+ std::to_string(i+1) +"/fcu";
 
     ph_seg_lidars_[i].publish(pcl_msg);
   }
