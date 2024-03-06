@@ -22,10 +22,10 @@ sensors:
     enabled: false
     rate: 10.0 # [Hz]
   seg:
-    enabled: true
+    enabled: false
     rate: 5.0 # [Hz]
   color_depth:
-    enabled: true
+    enabled: false
     rate: 5.0 # [Hz]
 
 frames:

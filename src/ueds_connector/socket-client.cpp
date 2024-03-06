@@ -3,6 +3,9 @@
 
 #include <ueds_connector/socket-client.h>
 
+#include <chrono>
+#include <thread>
+
 using kissnet::socket_status;
 using ueds_connector::SocketClient;
 
@@ -179,6 +182,7 @@ bool SocketClient::GetMessage(std::string& message) {
   while (true) {
 
     const auto [receive_size, receive_status] = ReceiveMessage();
+
     if (!receive_size || receive_status == 0) {
       ClearInQueue_();
       return false;
@@ -189,7 +193,7 @@ bool SocketClient::GetMessage(std::string& message) {
     std::string chunk_str(chunk, receive_size);
     message += chunk_str;
 
-    if (socket_->bytes_available() == 0 && message[message.size() - 1] == END_OF_MESSAGE) {
+    if (socket_->bytes_available() == 0 && message[message.size() - 1] == END_OF_MESSAGE && message[message.size() - 2] == END_OF_MESSAGE && message[message.size() - 3] == END_OF_MESSAGE) {
       // std::cout << "received: "<< message[message.size()-1] << std::endl;
       break;
     }
