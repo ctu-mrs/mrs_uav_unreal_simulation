@@ -1,4 +1,4 @@
-# MRS UAV Unreal Engine Simulator
+# MRS UAV Unreal Engine 5 (UE5) Simulator
 
 ## Installation
 
@@ -9,8 +9,8 @@
 ```bash
 sudo apt install ros-noetic-mrs-uav-unreal-simulation
 ```
-3. Download the [Unreal Engine Drone Simulator]()
-4. Launch the unreal simulator by `./ueds.sh`.
+3. Download the and untar [Unreal Engine Drone Simulator](https://nasmrs.felk.cvut.cz/index.php/s/kfuWK1KS9h7oJ0I)
+4. Launch the UE5 Simulator by `./ueds.sh`.
 5. Start the MRS UAV System UE5 endpoint
 ```bash
 roscd mrs_uav_unreal_simulation
@@ -39,7 +39,7 @@ hostAddressLoopback=true
 ```bash
 sudo apt install ros-noetic-mrs-uav-unreal-simulation
 ```
-6. Download the [Unreal Engine Drone Simulator](https://nasmrs.felk.cvut.cz/index.php/s/qLVIlBxtk8VCj5q)
+6. Download and unzip the [Unreal Engine Drone Simulator](https://nasmrs.felk.cvut.cz/index.php/s/qLVIlBxtk8VCj5q)
 7. Start the Unreal Engine Drone Simulator
 8. Start the MRS UAV System UE5 endpoint
 ```bash
