@@ -34,7 +34,7 @@ debugConsole=false
 [experimental]
 hostAddressLoopback=true
 ```
-4. Install the [MRS UAV[MRS UAV System](https://github.com/ctu-mrs/mrs_uav_system) into WSL 2.0
+4. Install the [MRS UAV System](https://github.com/ctu-mrs/mrs_uav_system) into WSL 2.0
 5. Install the MRS UAV System UE5 endpoint
 ```bash
 sudo apt install ros-noetic-mrs-uav-unreal-simulation
