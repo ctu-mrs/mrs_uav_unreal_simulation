@@ -4,13 +4,14 @@
 
 ### Linux
 
-1. Install the MRS UAV System
+1. Install the [MRS UAV System](https://github.com/ctu-mrs/mrs_uav_system)
+2. Install the MRS UAV System UE5 endpoint
 ```bash
 sudo apt install ros-noetic-mrs-uav-unreal-simulation
 ```
-6. Download the [Unreal Engine Drone Simulator]()
-3. Launch the unreal simulator by `./ueds.sh`.
-4. Start the MRS UAV System UE5 endpoint
+3. Download the [Unreal Engine Drone Simulator]()
+4. Launch the unreal simulator by `./ueds.sh`.
+5. Start the MRS UAV System UE5 endpoint
 ```bash
 roscd mrs_uav_unreal_simulation
 ./tmux/one_drone/start.sh
@@ -33,14 +34,14 @@ debugConsole=false
 [experimental]
 hostAddressLoopback=true
 ```
-4. Install the [MRS UAV System]() into WSL 2.0
+4. Install the [MRS UAV[MRS UAV System](https://github.com/ctu-mrs/mrs_uav_system) into WSL 2.0
 5. Install the MRS UAV System UE5 endpoint
 ```bash
 sudo apt install ros-noetic-mrs-uav-unreal-simulation
 ```
 6. Download the [Unreal Engine Drone Simulator](https://nasmrs.felk.cvut.cz/index.php/s/qLVIlBxtk8VCj5q)
 7. Start the Unreal Engine Drone Simulator
-4. Start the MRS UAV System UE5 endpoint
+8. Start the MRS UAV System UE5 endpoint
 ```bash
 roscd mrs_uav_unreal_simulation
 ./tmux/one_drone/start.sh
