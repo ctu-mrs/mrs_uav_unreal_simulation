@@ -103,8 +103,8 @@ enum CameraCaptureModeEnum : unsigned short {
 
 struct CameraConfig {
   CameraConfig() = default;
-  CameraConfig(bool showDebugCamera, double angleFov, const Coordinates offset, const Rotation orientation)
-      : showDebugCamera(showDebugCamera), angleFOV(angleFov), offset(offset), orientation(orientation) {}
+  CameraConfig(bool showDebugCamera, double angleFov, const Coordinates offset, const Rotation orientation, int Width, int Height)
+      : showDebugCamera(showDebugCamera), angleFOV(angleFov), offset(offset), orientation(orientation), Width(Width), Height(Height) {}
 
   bool showDebugCamera;
 
@@ -113,10 +113,14 @@ struct CameraConfig {
   Coordinates offset;
 
   Rotation orientation;
+  
+  int Width;
+  
+  int Height;
 
   std::string toString() const {
     return "(showDebugCamera: " + std::to_string(showDebugCamera) + ", angleFOV: " + std::to_string(angleFOV) +
-           ", offset: " + offset.toString() + ", directionZ: " + orientation.toString() + ")";
+           ", offset: " + offset.toString() + ", directionZ: " + orientation.toString() + ", Width: " + std::to_string(Width) + ", Height: " + std::to_string(Height) + ")";
   }
 };
 }  // namespace ueds_connector

@@ -364,6 +364,9 @@ std::pair<bool, CameraConfig> UedsConnector::GetCameraConfig() {
     config.offset = Coordinates{response.config.offsetX, response.config.offsetY, response.config.offsetZ};
 
     config.orientation = Rotation{response.config.orientationPitch, response.config.orientationYaw, response.config.orientationRoll};
+    
+    config.Width = response.config.Width;
+    config.Height = response.config.Height;
   }
 
   return std::make_pair(success, config);
@@ -389,6 +392,9 @@ bool UedsConnector::SetCameraConfig(const CameraConfig& config) {
   request.config.orientationPitch = config.orientation.pitch;
   request.config.orientationYaw   = config.orientation.yaw;
   request.config.orientationRoll  = config.orientation.roll;
+
+  request.config.Width = config.Width;
+  request.config.Height = config.Height;
 
   Serializable::Drone::SetCameraConfig::Response response{};
 
