@@ -277,8 +277,6 @@ void UnrealSimulator::onInit() {
     ph_color_depths_.push_back(mrs_lib::PublisherHandler<sensor_msgs::CompressedImage>(nh_, "/" + uav_name + "/depth_color/image_raw/compressed", 10));
   }
 
-  ueds_game_controller_->SetCameraCaptureMode(ueds_connector::CameraCaptureModeEnum::CAPTURE_ALL_FRAMES);
-
   // | --------------- dynamic reconfigure server --------------- |
 
   drs_.reset(new Drs_t(mutex_drs_, nh_));
