@@ -1,5 +1,18 @@
 # MRS UAV Unreal Engine 5 (UE5) Simulator
 
+## Requirements
+
+* A dedicated NVidia GPU (at least MX450, RTX is recommended) or a comparable AMD GPU
+* 3 GB of HDD space
+
+## The maps
+
+| Map Name  |                         |
+|-----------|-------------------------|
+| Valley    | ![](.fig/valley.jpg)    |
+| Forest    | ![](.fig/forest.jpg)    |
+| Warehouse | ![](.fig/warehouse.jpg) |
+
 ## Installation
 
 ### Linux
@@ -10,7 +23,7 @@
 sudo apt install ros-noetic-mrs-uav-unreal-simulation
 ```
 3. Download the and untar [Unreal Engine Drone Simulator](https://nasmrs.felk.cvut.cz/index.php/s/kfuWK1KS9h7oJ0I)
-4. Launch the UE5 Simulator by `./ueds.sh`.
+4. Launch the UE5 Simulator by `./ueds.sh`. Alternatively, start it in a headless mode via `./ueds.sh -renderOffScreen`.
 5. Start the MRS UAV System UE5 endpoint
 ```bash
 roscd mrs_uav_unreal_simulation
