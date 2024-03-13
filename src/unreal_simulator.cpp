@@ -872,6 +872,36 @@ void UnrealSimulator::callbackDrs(mrs_uav_unreal_simulation::unreal_simulatorCon
   timer_rgb_.setPeriod(ros::Duration(1.0 / config.rgb_rate));
 
   timer_lidar_.setPeriod(ros::Duration(1.0 / config.lidar_rate));
+  
+  
+  ueds_connector::CameraConfig cameraConfig{};
+  cameraConfig.Width = config.rgb_width;
+  cameraConfig.Height = config.rgb_height;
+  cameraConfig.angleFOV = config.rgb_fov;
+  cameraConfig.offset = ueds_connector::Coordinates(config.rgb_offset_x, config.rgb_offset_y, config.rgb_offset_z);
+  cameraConfig.orientation = ueds_connector::Rotation(config.rgb_rotation_pitch, config.rgb_rotation_roll, config.rgb_rotation_yaw);
+  for (size_t i = 0; i < uavs_.size(); i++) {
+    const auto res = ueds_connectors_[i]->SetCameraConfig(cameraConfig);
+    if (!res) {
+      ROS_ERROR("[UnrealSimulator]: failed to set camera config for uav %d", i);
+    } 
+  }
+
+  ueds_connector::LidarConfig lidarConfig{};
+  lidarConfig.BeamHorRays = config.lidar_horizontal_rays;
+  lidarConfig.BeamVertRays = config.lidar_vertical_rays;
+  lidarConfig.FOVHor = config.lidar_horizontal_fov;
+  lidarConfig.FOVVert = config.lidar_vertical_fov;
+  lidarConfig.beamLength = config.lidar_beam_length;
+  lidarConfig.offset = ueds_connector::Coordinates(config.lidar_offset_x, config.lidar_offset_y, config.lidar_offset_z);
+  lidarConfig.orientation = ueds_connector::Rotation(config.lidar_rotation_pitch, config.lidar_rotation_roll, config.lidar_rotation_yaw);
+  for (size_t i = 0; i < uavs_.size(); i++) {
+    const auto res = ueds_connectors_[i]->SetLidarConfig(lidarConfig);
+    if (!res) {
+      ROS_ERROR("[UnrealSimulator]: failed to set lidar config for uav %d", i);
+    } 
+  } 
+
 
   ROS_INFO("[UnrealSimulator]: DRS updated params");
 }
