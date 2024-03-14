@@ -180,12 +180,33 @@ void UnrealSimulator::onInit() {
 
   param_loader.loadParam("sensors/lidar/enabled", drs_params_.lidar_enabled);
   param_loader.loadParam("sensors/lidar/rate", drs_params_.lidar_rate);
+  param_loader.loadParam("sensors/lidar/horizontal_fov", drs_params_.lidar_horizontal_fov); 
+  param_loader.loadParam("sensors/lidar/vertical_fov", drs_params_.lidar_vertical_fov);
+  param_loader.loadParam("sensors/lidar/horizontal_rays", drs_params_.lidar_horizontal_rays);
+  param_loader.loadParam("sensors/lidar/vertical_rays", drs_params_.lidar_vertical_rays);
+  param_loader.loadParam("sensors/lidar/offset_x", drs_params_.lidar_offset_x);
+  param_loader.loadParam("sensors/lidar/offset_y", drs_params_.lidar_offset_y);
+  param_loader.loadParam("sensors/lidar/offset_z", drs_params_.lidar_offset_z);
+  param_loader.loadParam("sensors/lidar/rotation_pitch", drs_params_.lidar_rotation_pitch);
+  param_loader.loadParam("sensors/lidar/rotation_roll", drs_params_.lidar_rotation_roll);
+  param_loader.loadParam("sensors/lidar/rotation_yaw", drs_params_.lidar_rotation_yaw);
+  param_loader.loadParam("sensors/lidar/beam_length", drs_params_.lidar_beam_length);
+
 
   param_loader.loadParam("sensors/lidar_seg/enabled", drs_params_.lidar_seg_enabled);
   param_loader.loadParam("sensors/lidar_seg/rate", drs_params_.lidar_seg_rate);
 
   param_loader.loadParam("sensors/rgb/enabled", drs_params_.rgb_enabled);
   param_loader.loadParam("sensors/rgb/rate", drs_params_.rgb_rate);
+  param_loader.loadParam("sensors/rgb/width", drs_params_.rgb_width);
+  param_loader.loadParam("sensors/rgb/height", drs_params_.rgb_height);
+  param_loader.loadParam("sensors/rgb/fov", drs_params_.rgb_fov);
+  param_loader.loadParam("sensors/rgb/offset_x", drs_params_.rgb_offset_x);
+  param_loader.loadParam("sensors/rgb/offset_y", drs_params_.rgb_offset_y);
+  param_loader.loadParam("sensors/rgb/offset_z", drs_params_.rgb_offset_z);
+  param_loader.loadParam("sensors/rgb/rotation_pitch", drs_params_.rgb_rotation_pitch);
+  param_loader.loadParam("sensors/rgb/rotation_roll", drs_params_.rgb_rotation_roll);
+  param_loader.loadParam("sensors/rgb/rotation_yaw", drs_params_.rgb_rotation_yaw);
 
   param_loader.loadParam("sensors/depth/enabled", drs_params_.depth_enabled);
   param_loader.loadParam("sensors/depth/rate", drs_params_.depth_rate);
@@ -850,8 +871,21 @@ void UnrealSimulator::callbackDrs(mrs_uav_unreal_simulation::unreal_simulatorCon
 
     if (!old_params.paused && config.paused) {
       timer_main_.stop();
+      timer_rgb_.stop();
+      timer_seg_.stop();
+      timer_depth_.stop();
+      timer_lidar_.stop();
+      timer_seg_lidar_.stop();
+      timer_color_depth_.stop();
     } else if (old_params.paused && !config.paused) {
       timer_main_.start();
+      timer_rgb_.start();
+      timer_seg_.start();
+      timer_depth_.start();
+      timer_lidar_.start();
+      timer_seg_lidar_.start();
+      timer_color_depth_.start();
+
     }
   }
 
@@ -870,9 +904,11 @@ void UnrealSimulator::callbackDrs(mrs_uav_unreal_simulation::unreal_simulatorCon
   // | ------------------ set the camera rates ------------------ |
 
   timer_rgb_.setPeriod(ros::Duration(1.0 / config.rgb_rate));
-
+  timer_seg_.setPeriod(ros::Duration(1.0 / config.seg_rate));
+  timer_depth_.setPeriod(ros::Duration(1.0 / config.depth_rate));
+  timer_color_depth_.setPeriod(ros::Duration(1.0 / config.color_depth_rate));
   timer_lidar_.setPeriod(ros::Duration(1.0 / config.lidar_rate));
-  
+  timer_seg_lidar_.setPeriod(ros::Duration(1.0 / config.lidar_rate)); 
   
   ueds_connector::CameraConfig cameraConfig{};
   cameraConfig.Width = config.rgb_width;
