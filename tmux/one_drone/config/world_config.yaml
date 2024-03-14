@@ -7,7 +7,7 @@ world_origin:
 
 safety_area:
 
-  enabled: true
+  enabled: false
 
   horizontal:
 
