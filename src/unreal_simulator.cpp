@@ -12,6 +12,8 @@
 #include <mrs_lib/param_loader.h>
 #include <mrs_lib/publisher_handler.h>
 #include <mrs_lib/scope_timer.h>
+#include <mrs_lib/transform_broadcaster.h>
+#include <tf2_ros/static_transform_broadcaster.h>
 
 #include <dynamic_reconfigure/server.h>
 #include <mrs_uav_unreal_simulation/unreal_simulatorConfig.h>
@@ -23,6 +25,7 @@
 #include <sensor_msgs/point_cloud2_iterator.h>
 #include <sensor_msgs/Image.h>
 #include <sensor_msgs/CompressedImage.h>
+#include <sensor_msgs/CameraInfo.h>
 
 #include <ueds_connector/ueds_connector.h>
 #include <ueds_connector/game-mode-controller.h>
@@ -90,6 +93,10 @@ private:
   ros::Timer timer_color_depth_;
   void       timerColorDepth(const ros::TimerEvent& event);
 
+  // | --------------------------- tfs -------------------------- |
+
+  tf2_ros::StaticTransformBroadcaster static_broadcaster_;
+
   // | ------------------------ rtf check ----------------------- |
 
   double    actual_rtf_ = 1.0;
@@ -106,6 +113,8 @@ private:
   std::vector<mrs_lib::PublisherHandler<sensor_msgs::CompressedImage>> ph_depths_;
   std::vector<mrs_lib::PublisherHandler<sensor_msgs::CompressedImage>> ph_segs_;
   std::vector<mrs_lib::PublisherHandler<sensor_msgs::CompressedImage>> ph_color_depths_;
+
+  std::vector<mrs_lib::PublisherHandler<sensor_msgs::CameraInfo>> ph_rgbs_info_;
 
   // | ------------------------- system ------------------------- |
 
@@ -180,7 +189,7 @@ void UnrealSimulator::onInit() {
 
   param_loader.loadParam("sensors/lidar/enabled", drs_params_.lidar_enabled);
   param_loader.loadParam("sensors/lidar/rate", drs_params_.lidar_rate);
-  param_loader.loadParam("sensors/lidar/horizontal_fov", drs_params_.lidar_horizontal_fov); 
+  param_loader.loadParam("sensors/lidar/horizontal_fov", drs_params_.lidar_horizontal_fov);
   param_loader.loadParam("sensors/lidar/vertical_fov", drs_params_.lidar_vertical_fov);
   param_loader.loadParam("sensors/lidar/horizontal_rays", drs_params_.lidar_horizontal_rays);
   param_loader.loadParam("sensors/lidar/vertical_rays", drs_params_.lidar_vertical_rays);
@@ -296,6 +305,8 @@ void UnrealSimulator::onInit() {
     ph_depths_.push_back(mrs_lib::PublisherHandler<sensor_msgs::CompressedImage>(nh_, "/" + uav_name + "/depth/image_raw/compressed", 10));
     ph_segs_.push_back(mrs_lib::PublisherHandler<sensor_msgs::CompressedImage>(nh_, "/" + uav_name + "/seg/image_raw/compressed", 10));
     ph_color_depths_.push_back(mrs_lib::PublisherHandler<sensor_msgs::CompressedImage>(nh_, "/" + uav_name + "/depth_color/image_raw/compressed", 10));
+
+    ph_rgbs_info_.push_back(mrs_lib::PublisherHandler<sensor_msgs::CameraInfo>(nh_, "/" + uav_name + "/rgbd/camera_info", 10));
   }
 
   // | --------------- dynamic reconfigure server --------------- |
@@ -468,7 +479,7 @@ void UnrealSimulator::timerLidar([[maybe_unused]] const ros::TimerEvent& event) 
                                   sensor_msgs::PointField::FLOAT32, "intensity", 1, sensor_msgs::PointField::FLOAT32);
     // Msg header
     pcl_msg.header.stamp    = ros::Time::now();
-    pcl_msg.header.frame_id = "uav"+ std::to_string(i+1) +"/fcu";
+    pcl_msg.header.frame_id = "uav" + std::to_string(i + 1) + "/fcu";
 
     pcl_msg.height   = lidarConfig.BeamVertRays;
     pcl_msg.width    = lidarConfig.BeamHorRays;
@@ -630,7 +641,7 @@ void UnrealSimulator::timerSegLidar([[maybe_unused]] const ros::TimerEvent& even
     sensor_msgs::PointCloud2 pcl_msg;
     pcl::toROSMsg(pcl_cloud, pcl_msg);
     pcl_msg.header.stamp    = ros::Time::now();
-    pcl_msg.header.frame_id = "uav"+ std::to_string(i+1) +"/fcu";
+    pcl_msg.header.frame_id = "uav" + std::to_string(i + 1) + "/fcu";
 
     ph_seg_lidars_[i].publish(pcl_msg);
   }
@@ -675,12 +686,112 @@ void UnrealSimulator::timerRgb([[maybe_unused]] const ros::TimerEvent& event) {
 
     // ROS_WARN("Unreal: send camera msg");
     sensor_msgs::CompressedImage img_msg;
+
     img_msg.header.stamp = ros::Time::now();
-    img_msg.format       = "jpeg";
+
+    img_msg.header.frame_id = "uav" + std::to_string(i + 1) + "/rgbd";
+
+    img_msg.format = "jpeg";
 
     img_msg.data = cameraData;
 
     ph_rgbs_[i].publish(img_msg);
+
+    // fabricating the camera info
+
+    ueds_connector::CameraConfig camera_config;
+
+    /* timer.checkpoint("before_getting_data"); */
+
+    {
+      std::scoped_lock lock(mutex_ueds_);
+
+      std::tie(res, camera_config) = ueds_connectors_[i]->GetCameraConfig();
+    }
+
+    sensor_msgs::CameraInfo camera_info;
+
+    camera_info.header = img_msg.header;
+
+    camera_info.height = camera_config.Height;
+    camera_info.width  = camera_config.Width;
+
+    // distortion
+    camera_info.distortion_model = "plumb_bob";
+
+    camera_info.D.resize(5);
+    camera_info.D[0] = 0;
+    camera_info.D[1] = 0;
+    camera_info.D[2] = 0;
+    camera_info.D[3] = 0;
+    camera_info.D[4] = 0;
+
+    // original camera matrix
+    camera_info.K[0] = camera_config.Width / (2.0 * tan(0.5 * M_PI * (camera_config.angleFOV / 180.0)));
+    camera_info.K[1] = 0.0;
+    camera_info.K[2] = camera_config.Width / 2.0;
+    camera_info.K[3] = 0.0;
+    camera_info.K[4] = camera_config.Height / (2 * tan(0.5 * M_PI * (camera_config.angleFOV / 180.0)));
+    camera_info.K[5] = camera_config.Height / 2.0;
+    camera_info.K[6] = 0.0;
+    camera_info.K[7] = 0.0;
+    camera_info.K[8] = 1.0;
+
+    // rectification
+    camera_info.R[0] = 1.0;
+    camera_info.R[1] = 0.0;
+    camera_info.R[2] = 0.0;
+    camera_info.R[3] = 0.0;
+    camera_info.R[4] = 1.0;
+    camera_info.R[5] = 0.0;
+    camera_info.R[6] = 0.0;
+    camera_info.R[7] = 0.0;
+    camera_info.R[8] = 1.0;
+
+    // camera projection matrix (same as camera matrix due to lack of distortion/rectification) (is this generated?)
+    camera_info.P[0]  = camera_config.Width / (2.0 * tan(0.5 * M_PI * (camera_config.angleFOV / 180.0)));
+    camera_info.P[1]  = 0.0;
+    camera_info.P[2]  = camera_config.Width / 2.0;
+    camera_info.P[3]  = 0.0;
+    camera_info.P[4]  = 0.0;
+    camera_info.P[5]  = camera_config.Height / (2.0 * tan(0.5 * M_PI * (camera_config.angleFOV / 180.0)));
+    camera_info.P[6]  = camera_config.Height / 2.0;
+    camera_info.P[7]  = 0.0;
+    camera_info.P[8]  = 0.0;
+    camera_info.P[9]  = 0.0;
+    camera_info.P[10] = 1.0;
+    camera_info.P[11] = 0.0;
+
+    this->ph_rgbs_info_[i].publish(camera_info);
+
+    // publish the tf
+
+    geometry_msgs::TransformStamped tf_msg;
+
+    tf_msg.header.stamp = ros::Time::now();
+
+    tf_msg.header.frame_id = "uav" + std::to_string(i + 1) + "/fcu";
+    tf_msg.child_frame_id  = "uav" + std::to_string(i + 1) + "/rgbd";
+
+    tf_msg.transform.translation.x = camera_config.offset.x / 100.0;
+    tf_msg.transform.translation.y = camera_config.offset.y / 100.0;
+    tf_msg.transform.translation.z = camera_config.offset.z / 100.0;
+
+    Eigen::Matrix3d initial_tf = mrs_lib::AttitudeConverter(Eigen::Quaterniond(-0.5, 0.5, -0.5, 0.5));
+
+    Eigen::Matrix3d dynamic_tf = mrs_lib::AttitudeConverter(M_PI * (camera_config.orientation.roll / 180.0), M_PI * (camera_config.orientation.pitch / 180.0),
+                                                            M_PI * (camera_config.orientation.yaw / 180.0));
+
+    Eigen::Matrix3d final_tf = dynamic_tf * initial_tf;
+
+    tf_msg.transform.rotation = mrs_lib::AttitudeConverter(final_tf);
+
+    try {
+      static_broadcaster_.sendTransform(tf_msg);
+    }
+    catch (...) {
+      ROS_ERROR("[UnrealSimulator]: could not publish camera tf");
+    }
   }
 }
 
@@ -871,21 +982,8 @@ void UnrealSimulator::callbackDrs(mrs_uav_unreal_simulation::unreal_simulatorCon
 
     if (!old_params.paused && config.paused) {
       timer_main_.stop();
-      timer_rgb_.stop();
-      timer_seg_.stop();
-      timer_depth_.stop();
-      timer_lidar_.stop();
-      timer_seg_lidar_.stop();
-      timer_color_depth_.stop();
     } else if (old_params.paused && !config.paused) {
       timer_main_.start();
-      timer_rgb_.start();
-      timer_seg_.start();
-      timer_depth_.start();
-      timer_lidar_.start();
-      timer_seg_lidar_.start();
-      timer_color_depth_.start();
-
     }
   }
 
@@ -908,36 +1006,49 @@ void UnrealSimulator::callbackDrs(mrs_uav_unreal_simulation::unreal_simulatorCon
   timer_depth_.setPeriod(ros::Duration(1.0 / config.depth_rate));
   timer_color_depth_.setPeriod(ros::Duration(1.0 / config.color_depth_rate));
   timer_lidar_.setPeriod(ros::Duration(1.0 / config.lidar_rate));
-  timer_seg_lidar_.setPeriod(ros::Duration(1.0 / config.lidar_rate)); 
-  
-  ueds_connector::CameraConfig cameraConfig{};
-  cameraConfig.Width = config.rgb_width;
-  cameraConfig.Height = config.rgb_height;
-  cameraConfig.angleFOV = config.rgb_fov;
-  cameraConfig.offset = ueds_connector::Coordinates(config.rgb_offset_x, config.rgb_offset_y, config.rgb_offset_z);
-  cameraConfig.orientation = ueds_connector::Rotation(config.rgb_rotation_pitch, config.rgb_rotation_roll, config.rgb_rotation_yaw);
-  for (size_t i = 0; i < uavs_.size(); i++) {
-    const auto res = ueds_connectors_[i]->SetCameraConfig(cameraConfig);
-    if (!res) {
-      ROS_ERROR("[UnrealSimulator]: failed to set camera config for uav %d", i);
-    } 
+  timer_seg_lidar_.setPeriod(ros::Duration(1.0 / config.lidar_rate));
+
+  {
+    std::scoped_lock lock(mutex_ueds_);
+
+    ueds_connector::CameraConfig cameraConfig{};
+
+    cameraConfig.Width       = config.rgb_width;
+    cameraConfig.Height      = config.rgb_height;
+    cameraConfig.angleFOV    = config.rgb_fov;
+    cameraConfig.offset      = ueds_connector::Coordinates(config.rgb_offset_x, config.rgb_offset_y, config.rgb_offset_z);
+    cameraConfig.orientation = ueds_connector::Rotation(config.rgb_rotation_pitch, config.rgb_rotation_roll, config.rgb_rotation_yaw);
+
+    for (size_t i = 0; i < uavs_.size(); i++) {
+      const auto res = ueds_connectors_[i]->SetCameraConfig(cameraConfig);
+      if (!res) {
+        ROS_ERROR("[UnrealSimulator]: failed to set camera config for uav %lu", i);
+      }
+    }
   }
 
-  ueds_connector::LidarConfig lidarConfig{};
-  lidarConfig.BeamHorRays = config.lidar_horizontal_rays;
-  lidarConfig.BeamVertRays = config.lidar_vertical_rays;
-  lidarConfig.FOVHor = config.lidar_horizontal_fov;
-  lidarConfig.FOVVert = config.lidar_vertical_fov;
-  lidarConfig.beamLength = config.lidar_beam_length;
-  lidarConfig.offset = ueds_connector::Coordinates(config.lidar_offset_x, config.lidar_offset_y, config.lidar_offset_z);
-  lidarConfig.orientation = ueds_connector::Rotation(config.lidar_rotation_pitch, config.lidar_rotation_roll, config.lidar_rotation_yaw);
-  for (size_t i = 0; i < uavs_.size(); i++) {
-    const auto res = ueds_connectors_[i]->SetLidarConfig(lidarConfig);
-    if (!res) {
-      ROS_ERROR("[UnrealSimulator]: failed to set lidar config for uav %d", i);
-    } 
-  } 
+  {
+    std::scoped_lock lock(mutex_ueds_);
 
+    ueds_connector::LidarConfig lidarConfig{};
+
+    lidarConfig.BeamHorRays  = config.lidar_horizontal_rays;
+    lidarConfig.BeamVertRays = config.lidar_vertical_rays;
+    lidarConfig.FOVHor       = config.lidar_horizontal_fov;
+    lidarConfig.FOVVert      = config.lidar_vertical_fov;
+    lidarConfig.beamLength   = config.lidar_beam_length;
+    lidarConfig.offset       = ueds_connector::Coordinates(config.lidar_offset_x, config.lidar_offset_y, config.lidar_offset_z);
+    lidarConfig.orientation  = ueds_connector::Rotation(config.lidar_rotation_pitch, config.lidar_rotation_roll, config.lidar_rotation_yaw);
+
+    for (size_t i = 0; i < uavs_.size(); i++) {
+
+      const auto res = ueds_connectors_[i]->SetLidarConfig(lidarConfig);
+
+      if (!res) {
+        ROS_ERROR("[UnrealSimulator]: failed to set lidar config for uav %lu", i);
+      }
+    }
+  }
 
   ROS_INFO("[UnrealSimulator]: DRS updated params");
 }
@@ -1004,11 +1115,11 @@ void UnrealSimulator::updateUnrealPoses(void) {
 
       const auto [res, teleportedTo, rotatedTo, isHit, impactPoint] = ueds_connectors_[i]->SetLocationAndRotation(pos, rot);
 
-      if (isHit) {
-        if (!uavs_[i]->hasCrashed()) {
-          uavs_[i]->crash();
-        }
-      }
+      /* if (isHit) { */
+      /*   if (!uavs_[i]->hasCrashed()) { */
+      /*     uavs_[i]->crash(); */
+      /*   } */
+      /* } */
     }
   }
 }

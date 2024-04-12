@@ -1,4 +1,4 @@
-resolution: 0.2
+resolution: 0.4
 
 # for point cloud raycasting
 sensor_params:
