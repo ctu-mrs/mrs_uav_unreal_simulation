@@ -3,4 +3,4 @@ euclidean_distance_cutoff: 1.2 # [m]
 max_altitude: 5.0 # [m]
 
 subt_planner:
-  use: false
+  use: true

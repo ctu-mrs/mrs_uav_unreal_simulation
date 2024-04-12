@@ -1115,11 +1115,11 @@ void UnrealSimulator::updateUnrealPoses(void) {
 
       const auto [res, teleportedTo, rotatedTo, isHit, impactPoint] = ueds_connectors_[i]->SetLocationAndRotation(pos, rot);
 
-      /* if (isHit) { */
-      /*   if (!uavs_[i]->hasCrashed()) { */
-      /*     uavs_[i]->crash(); */
-      /*   } */
-      /* } */
+      if (isHit) {
+        if (!uavs_[i]->hasCrashed()) {
+          uavs_[i]->crash();
+        }
+      }
     }
   }
 }
