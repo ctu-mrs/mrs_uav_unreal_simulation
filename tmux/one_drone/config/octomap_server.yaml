@@ -12,8 +12,9 @@ sensor_params:
       max_range: 20.0 # [m] max range of points to be included as occupied, free space is updated up to min(max_range, free_ray_distance)
       free_ray_distance: 10.0 # [m] max distance for free space raycasting
 
+      vertical_fov_angle: deg(90)
+
       # fallback values used for free space raycasting for missing data, uses pointcloud dimensions from the incoming message by default
-      vertical_fov_angle: deg(90.0)
       vertical_rays: 128
       horizontal_rays: 128
 

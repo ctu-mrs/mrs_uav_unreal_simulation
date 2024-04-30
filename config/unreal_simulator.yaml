@@ -13,7 +13,7 @@ sensors:
     enabled: true
     rate: 10.0 # [Hz]
     horizontal_fov: 360.0 # [deg]
-    vertical_fov: 45.0 # [deg]
+    vertical_fov: 90.0 # [deg]
     horizontal_rays: 128
     vertical_rays: 32
     offset_x: 0.0 # [m]
