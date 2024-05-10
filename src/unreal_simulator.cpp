@@ -27,6 +27,10 @@
 #include <sensor_msgs/CompressedImage.h>
 #include <sensor_msgs/CameraInfo.h>
 
+#include <image_transport/image_transport.h>
+#include <opencv2/highgui/highgui.hpp>
+#include <cv_bridge/cv_bridge.h>
+
 #include <ueds_connector/ueds_connector.h>
 #include <ueds_connector/game-mode-controller.h>
 
@@ -56,9 +60,12 @@ private:
   ros::NodeHandle   nh_;
   std::atomic<bool> is_initialized_;
 
+  std::shared_ptr<image_transport::ImageTransport> it_;
+
   // | ------------------------- params ------------------------- |
 
   double _simulation_rate_;
+  bool   _collisions_;
 
   ros::Time  sim_time_;
   std::mutex mutex_sim_time_;
@@ -107,12 +114,14 @@ private:
   mrs_lib::PublisherHandler<rosgraph_msgs::Clock>     ph_clock_;
   mrs_lib::PublisherHandler<geometry_msgs::PoseArray> ph_poses_;
 
-  std::vector<mrs_lib::PublisherHandler<sensor_msgs::PointCloud2>>     ph_lidars_;
-  std::vector<mrs_lib::PublisherHandler<sensor_msgs::PointCloud2>>     ph_seg_lidars_;
-  std::vector<mrs_lib::PublisherHandler<sensor_msgs::CompressedImage>> ph_rgbs_;
-  std::vector<mrs_lib::PublisherHandler<sensor_msgs::CompressedImage>> ph_depths_;
-  std::vector<mrs_lib::PublisherHandler<sensor_msgs::CompressedImage>> ph_segs_;
-  std::vector<mrs_lib::PublisherHandler<sensor_msgs::CompressedImage>> ph_color_depths_;
+  std::vector<mrs_lib::PublisherHandler<sensor_msgs::PointCloud2>> ph_lidars_;
+  std::vector<mrs_lib::PublisherHandler<sensor_msgs::PointCloud2>> ph_seg_lidars_;
+  std::vector<mrs_lib::PublisherHandler<sensor_msgs::Image>>       ph_color_depths_;
+
+  std::vector<image_transport::Publisher> imp_rgbd_;
+  std::vector<image_transport::Publisher> imp_depth_;
+  std::vector<image_transport::Publisher> imp_segs_;
+  std::vector<image_transport::Publisher> imp_color_depth_;
 
   std::vector<mrs_lib::PublisherHandler<sensor_msgs::CameraInfo>> ph_rgbs_info_;
 
@@ -170,6 +179,8 @@ void UnrealSimulator::onInit() {
   sim_time_            = ros::Time(0);
   last_published_time_ = ros::Time(0);
 
+  it_ = std::make_shared<image_transport::ImageTransport>(nh_);
+
   mrs_lib::ParamLoader param_loader(nh_, "UnrealSimulator");
 
   std::string custom_config_path;
@@ -186,6 +197,8 @@ void UnrealSimulator::onInit() {
   param_loader.loadParam("simulation_rate", _simulation_rate_);
   param_loader.loadParam("realtime_factor", drs_params_.realtime_factor);
   param_loader.loadParam("frames/world/name", _world_frame_name_);
+
+  param_loader.loadParam("collisions", _collisions_);
 
   param_loader.loadParam("sensors/lidar/enabled", drs_params_.lidar_enabled);
   param_loader.loadParam("sensors/lidar/rate", drs_params_.lidar_rate);
@@ -301,10 +314,11 @@ void UnrealSimulator::onInit() {
 
     ph_lidars_.push_back(mrs_lib::PublisherHandler<sensor_msgs::PointCloud2>(nh_, "/" + uav_name + "/lidar/points", 10));
     ph_seg_lidars_.push_back(mrs_lib::PublisherHandler<sensor_msgs::PointCloud2>(nh_, "/" + uav_name + "/lidar_seg/points", 10));
-    ph_rgbs_.push_back(mrs_lib::PublisherHandler<sensor_msgs::CompressedImage>(nh_, "/" + uav_name + "/rgbd/image_raw/compressed", 10));
-    ph_depths_.push_back(mrs_lib::PublisherHandler<sensor_msgs::CompressedImage>(nh_, "/" + uav_name + "/depth/image_raw/compressed", 10));
-    ph_segs_.push_back(mrs_lib::PublisherHandler<sensor_msgs::CompressedImage>(nh_, "/" + uav_name + "/seg/image_raw/compressed", 10));
-    ph_color_depths_.push_back(mrs_lib::PublisherHandler<sensor_msgs::CompressedImage>(nh_, "/" + uav_name + "/depth_color/image_raw/compressed", 10));
+
+    imp_rgbd_.push_back(it_->advertise("/" + uav_name + "/rgbd/image_raw", 10));
+    imp_depth_.push_back(it_->advertise("/" + uav_name + "/depth/image_raw", 10));
+    imp_segs_.push_back(it_->advertise("/" + uav_name + "/seg/image_raw", 10));
+    imp_color_depth_.push_back(it_->advertise("/" + uav_name + "/depth_color/image_raw", 10));
 
     ph_rgbs_info_.push_back(mrs_lib::PublisherHandler<sensor_msgs::CameraInfo>(nh_, "/" + uav_name + "/rgbd/camera_info", 10));
   }
@@ -569,7 +583,9 @@ void UnrealSimulator::timerSegLidar([[maybe_unused]] const ros::TimerEvent& even
     }
 
     PCLPointCloudColor pcl_cloud;
+
     for (const ueds_connector::LidarSegData& ray : lidarSegData) {
+
       pcl::PointXYZRGB point;
       tf::Vector3      dir = tf::Vector3(ray.directionX, ray.directionY, ray.directionZ);
       dir                  = dir.normalized() * (ray.distance / 100.0);
@@ -637,7 +653,6 @@ void UnrealSimulator::timerSegLidar([[maybe_unused]] const ros::TimerEvent& even
       pcl_cloud.push_back(point);
     }
 
-
     sensor_msgs::PointCloud2 pcl_msg;
     pcl::toROSMsg(pcl_cloud, pcl_msg);
     pcl_msg.header.stamp    = ros::Time::now();
@@ -684,21 +699,15 @@ void UnrealSimulator::timerRgb([[maybe_unused]] const ros::TimerEvent& event) {
 
     /* timer.checkpoint("after_getting_data"); */
 
-    // ROS_WARN("Unreal: send camera msg");
-    sensor_msgs::CompressedImage img_msg;
+    cv::Mat               image = cv::imdecode(cameraData, cv::IMREAD_COLOR);
+    sensor_msgs::ImagePtr msg   = cv_bridge::CvImage(std_msgs::Header(), "bgr8", image).toImageMsg();
 
-    img_msg.header.stamp = ros::Time::now();
+    msg->header.frame_id = "uav" + std::to_string(i + 1) + "/rgbd";
+    msg->header.stamp    = ros::Time::now();
 
-    img_msg.header.frame_id = "uav" + std::to_string(i + 1) + "/rgbd";
-
-    img_msg.format = "jpeg";
-
-    img_msg.data = cameraData;
-
-    ph_rgbs_[i].publish(img_msg);
+    imp_rgbd_[i].publish(msg);
 
     // fabricating the camera info
-
     ueds_connector::CameraConfig camera_config;
 
     /* timer.checkpoint("before_getting_data"); */
@@ -711,7 +720,7 @@ void UnrealSimulator::timerRgb([[maybe_unused]] const ros::TimerEvent& event) {
 
     sensor_msgs::CameraInfo camera_info;
 
-    camera_info.header = img_msg.header;
+    camera_info.header = msg->header;
 
     camera_info.height = camera_config.Height;
     camera_info.width  = camera_config.Width;
@@ -731,7 +740,7 @@ void UnrealSimulator::timerRgb([[maybe_unused]] const ros::TimerEvent& event) {
     camera_info.K[1] = 0.0;
     camera_info.K[2] = camera_config.Width / 2.0;
     camera_info.K[3] = 0.0;
-    camera_info.K[4] = camera_config.Height / (2 * tan(0.5 * M_PI * (camera_config.angleFOV / 180.0)));
+    camera_info.K[4] = camera_config.Width / (2.0 * tan(0.5 * M_PI * (camera_config.angleFOV / 180.0)));
     camera_info.K[5] = camera_config.Height / 2.0;
     camera_info.K[6] = 0.0;
     camera_info.K[7] = 0.0;
@@ -754,7 +763,7 @@ void UnrealSimulator::timerRgb([[maybe_unused]] const ros::TimerEvent& event) {
     camera_info.P[2]  = camera_config.Width / 2.0;
     camera_info.P[3]  = 0.0;
     camera_info.P[4]  = 0.0;
-    camera_info.P[5]  = camera_config.Height / (2.0 * tan(0.5 * M_PI * (camera_config.angleFOV / 180.0)));
+    camera_info.P[5]  = camera_config.Width / (2.0 * tan(0.5 * M_PI * (camera_config.angleFOV / 180.0)));
     camera_info.P[6]  = camera_config.Height / 2.0;
     camera_info.P[7]  = 0.0;
     camera_info.P[8]  = 0.0;
@@ -832,14 +841,15 @@ void UnrealSimulator::timerDepth([[maybe_unused]] const ros::TimerEvent& event) 
 
     /* timer.checkpoint("after_getting_data"); */
 
-    // ROS_WARN("Unreal: send camera msg");
-    sensor_msgs::CompressedImage img_msg;
-    img_msg.header.stamp = ros::Time::now();
-    img_msg.format       = "jpeg";
+    cv::Mat               image = cv::imdecode(cameraData, cv::IMREAD_COLOR);
+    sensor_msgs::ImagePtr msg   = cv_bridge::CvImage(std_msgs::Header(), "bgr8", image).toImageMsg();
 
-    img_msg.data = cameraData;
+    msg->header.frame_id = "uav" + std::to_string(i + 1) + "/depth";
+    msg->header.stamp    = ros::Time::now();
 
-    ph_depths_[i].publish(img_msg);
+    msg->data = cameraData;
+
+    imp_depth_[i].publish(msg);
   }
 }
 
@@ -880,14 +890,15 @@ void UnrealSimulator::timerSeg([[maybe_unused]] const ros::TimerEvent& event) {
 
     /* timer.checkpoint("after_getting_data"); */
 
-    // ROS_WARN("Unreal: send camera msg");
-    sensor_msgs::CompressedImage img_msg;
-    img_msg.header.stamp = ros::Time::now();
-    img_msg.format       = "jpeg";
+    cv::Mat               image = cv::imdecode(cameraData, cv::IMREAD_COLOR);
+    sensor_msgs::ImagePtr msg   = cv_bridge::CvImage(std_msgs::Header(), "bgr8", image).toImageMsg();
 
-    img_msg.data = cameraData;
+    msg->header.frame_id = "uav" + std::to_string(i + 1) + "/seg";
+    msg->header.stamp    = ros::Time::now();
 
-    ph_segs_[i].publish(img_msg);
+    msg->data = cameraData;
+
+    imp_depth_[i].publish(msg);
   }
 }
 
@@ -929,13 +940,15 @@ void UnrealSimulator::timerColorDepth([[maybe_unused]] const ros::TimerEvent& ev
     /* timer.checkpoint("after_getting_data"); */
 
     // ROS_WARN("Unreal: send camera msg");
-    sensor_msgs::CompressedImage img_msg;
-    img_msg.header.stamp = ros::Time::now();
-    img_msg.format       = "jpeg";
+    cv::Mat               image = cv::imdecode(cameraData, cv::IMREAD_COLOR);
+    sensor_msgs::ImagePtr msg   = cv_bridge::CvImage(std_msgs::Header(), "bgr8", image).toImageMsg();
 
-    img_msg.data = cameraData;
+    msg->header.frame_id = "uav" + std::to_string(i + 1) + "/colored_depth";
+    msg->header.stamp    = ros::Time::now();
 
-    ph_color_depths_[i].publish(img_msg);
+    msg->data = cameraData;
+
+    imp_depth_[i].publish(msg);
 
     /* if (!drs_params_.color_depth_PC_enabled) { */
     /*   ROS_INFO_THROTTLE(1.0, "[UnrealSimulator]: Color depth PC sensor disabled"); */
@@ -1115,7 +1128,7 @@ void UnrealSimulator::updateUnrealPoses(void) {
 
       const auto [res, teleportedTo, rotatedTo, isHit, impactPoint] = ueds_connectors_[i]->SetLocationAndRotation(pos, rot);
 
-      if (isHit) {
+      if (_collisions_ && isHit) {
         if (!uavs_[i]->hasCrashed()) {
           uavs_[i]->crash();
         }

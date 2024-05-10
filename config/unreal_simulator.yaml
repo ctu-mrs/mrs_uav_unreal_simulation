@@ -8,6 +8,8 @@ iterate_without_input: true
 
 input_timeout: 1.0 # [s]
 
+collisions: true
+
 sensors:
   lidar:
     enabled: true
