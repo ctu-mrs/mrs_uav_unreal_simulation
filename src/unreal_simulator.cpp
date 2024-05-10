@@ -100,6 +100,9 @@ private:
   ros::Timer timer_color_depth_;
   void       timerColorDepth(const ros::TimerEvent& event);
 
+  ros::Timer timer_camera_info_;
+  void       timerCameraInfo(const ros::TimerEvent& event);
+
   // | --------------------------- tfs -------------------------- |
 
   tf2_ros::StaticTransformBroadcaster static_broadcaster_;
@@ -118,10 +121,10 @@ private:
   std::vector<mrs_lib::PublisherHandler<sensor_msgs::PointCloud2>> ph_seg_lidars_;
   std::vector<mrs_lib::PublisherHandler<sensor_msgs::Image>>       ph_color_depths_;
 
-  std::vector<image_transport::Publisher> imp_rgbd_;
-  std::vector<image_transport::Publisher> imp_depth_;
-  std::vector<image_transport::Publisher> imp_segs_;
-  std::vector<image_transport::Publisher> imp_color_depth_;
+  std::vector<image_transport::Publisher> imp_rgbd_color_;
+  std::vector<image_transport::Publisher> imp_rgbd_depth_;
+  std::vector<image_transport::Publisher> imp_rgbd_segmented_;
+  std::vector<image_transport::Publisher> imp_rgbd_color_depth_;
 
   std::vector<mrs_lib::PublisherHandler<sensor_msgs::CameraInfo>> ph_rgbs_info_;
 
@@ -315,12 +318,12 @@ void UnrealSimulator::onInit() {
     ph_lidars_.push_back(mrs_lib::PublisherHandler<sensor_msgs::PointCloud2>(nh_, "/" + uav_name + "/lidar/points", 10));
     ph_seg_lidars_.push_back(mrs_lib::PublisherHandler<sensor_msgs::PointCloud2>(nh_, "/" + uav_name + "/lidar_seg/points", 10));
 
-    imp_rgbd_.push_back(it_->advertise("/" + uav_name + "/rgbd/image_raw", 10));
-    imp_depth_.push_back(it_->advertise("/" + uav_name + "/depth/image_raw", 10));
-    imp_segs_.push_back(it_->advertise("/" + uav_name + "/seg/image_raw", 10));
-    imp_color_depth_.push_back(it_->advertise("/" + uav_name + "/depth_color/image_raw", 10));
+    imp_rgbd_color_.push_back(it_->advertise("/" + uav_name + "/rgbd/color/image_raw", 10));
+    imp_rgbd_depth_.push_back(it_->advertise("/" + uav_name + "/rgbd/depth/image_raw", 10));
+    imp_rgbd_segmented_.push_back(it_->advertise("/" + uav_name + "/rgbd/segmented/image_raw", 10));
+    imp_rgbd_color_depth_.push_back(it_->advertise("/" + uav_name + "/rgbd/color_depth/image_raw", 10));
 
-    ph_rgbs_info_.push_back(mrs_lib::PublisherHandler<sensor_msgs::CameraInfo>(nh_, "/" + uav_name + "/rgbd/camera_info", 10));
+    ph_rgbs_info_.push_back(mrs_lib::PublisherHandler<sensor_msgs::CameraInfo>(nh_, "/" + uav_name + "/rgbd/color/camera_info", 10));
   }
 
   // | --------------- dynamic reconfigure server --------------- |
@@ -354,6 +357,8 @@ void UnrealSimulator::onInit() {
   timer_seg_lidar_ = nh_.createTimer(ros::Duration(1.0 / drs_params_.lidar_rate), &UnrealSimulator::timerSegLidar, this);
 
   timer_rgb_ = nh_.createTimer(ros::Duration(1.0 / drs_params_.rgb_rate), &UnrealSimulator::timerRgb, this);
+
+  timer_camera_info_ = nh_.createTimer(ros::Rate(1.0), &UnrealSimulator::timerCameraInfo, this);
 
   timer_depth_ = nh_.createTimer(ros::Duration(1.0 / drs_params_.depth_rate), &UnrealSimulator::timerDepth, this);
 
@@ -705,7 +710,216 @@ void UnrealSimulator::timerRgb([[maybe_unused]] const ros::TimerEvent& event) {
     msg->header.frame_id = "uav" + std::to_string(i + 1) + "/rgbd";
     msg->header.stamp    = ros::Time::now();
 
-    imp_rgbd_[i].publish(msg);
+    imp_rgbd_color_[i].publish(msg);
+  }
+}
+
+//}
+
+/* timerDepth() //{ */
+
+void UnrealSimulator::timerDepth([[maybe_unused]] const ros::TimerEvent& event) {
+
+  if (!is_initialized_) {
+    return;
+  }
+
+  /* mrs_lib::ScopeTimer timer = mrs_lib::ScopeTimer("timerRgb()"); */
+
+  auto drs_params = mrs_lib::get_mutexed(mutex_drs_params_, drs_params_);
+
+  if (!drs_params_.depth_enabled) {
+    ROS_INFO_THROTTLE(1.0, "[UnrealSimulator]: Depth sensor disabled");
+    return;
+  }
+
+  updateUnrealPoses();
+
+  for (size_t i = 0; i < uavs_.size(); i++) {
+
+    bool                       res;
+    std::vector<unsigned char> cameraData;
+    uint32_t                   size;
+
+    /* timer.checkpoint("before_getting_data"); */
+
+    {
+      std::scoped_lock lock(mutex_ueds_);
+
+      std::tie(res, cameraData, size) = ueds_connectors_[i]->GetCameraDepth();
+    }
+
+    /* timer.checkpoint("after_getting_data"); */
+
+    cv::Mat               image = cv::imdecode(cameraData, cv::IMREAD_COLOR);
+    sensor_msgs::ImagePtr msg   = cv_bridge::CvImage(std_msgs::Header(), "bgr8", image).toImageMsg();
+
+    msg->header.frame_id = "uav" + std::to_string(i + 1) + "/rgbd";
+    msg->header.stamp    = ros::Time::now();
+
+    msg->data = cameraData;
+
+    imp_rgbd_depth_[i].publish(msg);
+  }
+}
+
+//}
+
+/* timerSeg() //{ */
+
+void UnrealSimulator::timerSeg([[maybe_unused]] const ros::TimerEvent& event) {
+
+  if (!is_initialized_) {
+    return;
+  }
+
+  /* mrs_lib::ScopeTimer timer = mrs_lib::ScopeTimer("timerRgb()"); */
+
+  auto drs_params = mrs_lib::get_mutexed(mutex_drs_params_, drs_params_);
+
+  if (!drs_params_.seg_enabled) {
+    ROS_INFO_THROTTLE(1.0, "[UnrealSimulator]: Seg sensor disabled");
+    return;
+  }
+
+  updateUnrealPoses();
+
+  for (size_t i = 0; i < uavs_.size(); i++) {
+
+    bool                       res;
+    std::vector<unsigned char> cameraData;
+    uint32_t                   size;
+
+    /* timer.checkpoint("before_getting_data"); */
+
+    {
+      std::scoped_lock lock(mutex_ueds_);
+
+      std::tie(res, cameraData, size) = ueds_connectors_[i]->GetCameraSeg();
+    }
+
+    /* timer.checkpoint("after_getting_data"); */
+
+    cv::Mat               image = cv::imdecode(cameraData, cv::IMREAD_COLOR);
+    sensor_msgs::ImagePtr msg   = cv_bridge::CvImage(std_msgs::Header(), "bgr8", image).toImageMsg();
+
+    msg->header.frame_id = "uav" + std::to_string(i + 1) + "/rgbd";
+    msg->header.stamp    = ros::Time::now();
+
+    msg->data = cameraData;
+
+    imp_rgbd_depth_[i].publish(msg);
+  }
+}
+
+//}
+
+/* timerColorDepth() //{ */
+
+void UnrealSimulator::timerColorDepth([[maybe_unused]] const ros::TimerEvent& event) {
+
+  if (!is_initialized_) {
+    return;
+  }
+
+  /* mrs_lib::ScopeTimer timer = mrs_lib::ScopeTimer("timerRgb()"); */
+
+  auto drs_params = mrs_lib::get_mutexed(mutex_drs_params_, drs_params_);
+
+  if (!drs_params_.color_depth_enabled) {
+    ROS_INFO_THROTTLE(1.0, "[UnrealSimulator]: Color depth sensor disabled");
+    return;
+  }
+
+  updateUnrealPoses();
+
+  for (size_t i = 0; i < uavs_.size(); i++) {
+
+    bool                       res;
+    std::vector<unsigned char> cameraData;
+    uint32_t                   size;
+
+    /* timer.checkpoint("before_getting_data"); */
+
+    {
+      std::scoped_lock lock(mutex_ueds_);
+
+      std::tie(res, cameraData, size) = ueds_connectors_[i]->GetCameraColorDepth();
+    }
+
+    /* timer.checkpoint("after_getting_data"); */
+
+    // ROS_WARN("Unreal: send camera msg");
+    cv::Mat               image = cv::imdecode(cameraData, cv::IMREAD_COLOR);
+    sensor_msgs::ImagePtr msg   = cv_bridge::CvImage(std_msgs::Header(), "bgr8", image).toImageMsg();
+
+    msg->header.frame_id = "uav" + std::to_string(i + 1) + "/rgbd";
+    msg->header.stamp    = ros::Time::now();
+
+    msg->data = cameraData;
+
+    imp_rgbd_color_depth_[i].publish(msg);
+
+    /* if (!drs_params_.color_depth_PC_enabled) { */
+    /*   ROS_INFO_THROTTLE(1.0, "[UnrealSimulator]: Color depth PC sensor disabled"); */
+    /*   return; */
+    /* } */
+
+    /* PCLPointCloud pcl_cloud; */
+    /* float         disp_min = 30; */
+    /* float         disp_max = 550; */
+    /* for (uint32_t i = 0; i < size; i++) { */
+    /*   // retrive the pixel data from the image and get the individual color values */
+    /*   uint8_t r = cameraData[i * 4]; */
+    /*   uint8_t g = cameraData[i * 4 + 1]; */
+    /*   uint8_t b = cameraData[i * 4 + 2]; */
+
+    /*   float d_normal; */
+
+    /*   if (r >= g && r >= b && g >= b) { */
+    /*     d_normal = g - b; */
+    /*   } else if (r >= g && r >= b && g >= b) { */
+    /*     d_normal = g - b + 1529 */
+    /*   } else if (g >= r && g >= b) { */
+    /*     d_normal = b - r + 510; */
+    /*   } else if (b >= g && b >= r) { */
+    /*     d_normal = r - g + 1020; */
+    /*   } */
+    /*   depth_recovered = 1529 / (1529 * disp_min + (disp_max - disp_min) * d_normal); */
+    /* } */
+  }
+}
+
+//}
+
+/* timerCameraInfo() //{ */
+
+void UnrealSimulator::timerCameraInfo([[maybe_unused]] const ros::TimerEvent& event) {
+
+  if (!is_initialized_) {
+    return;
+  }
+
+  auto drs_params = mrs_lib::get_mutexed(mutex_drs_params_, drs_params_);
+
+  if (!(drs_params_.rgb_enabled || drs_params.color_depth_enabled || drs_params.depth_enabled || drs_params.seg_enabled)) {
+    return;
+  }
+
+  for (size_t i = 0; i < uavs_.size(); i++) {
+
+    bool                       res;
+    std::vector<unsigned char> cameraData;
+    uint32_t                   size;
+
+    /* timer.checkpoint("before_getting_data"); */
+
+    {
+      std::scoped_lock lock(mutex_ueds_);
+
+      std::tie(res, cameraData, size) = ueds_connectors_[i]->GetCameraData();
+    }
+
 
     // fabricating the camera info
     ueds_connector::CameraConfig camera_config;
@@ -720,7 +934,7 @@ void UnrealSimulator::timerRgb([[maybe_unused]] const ros::TimerEvent& event) {
 
     sensor_msgs::CameraInfo camera_info;
 
-    camera_info.header = msg->header;
+    camera_info.header.frame_id = "uav" + std::to_string(i + 1) + "/rgbd";
 
     camera_info.height = camera_config.Height;
     camera_info.width  = camera_config.Width;
@@ -801,182 +1015,6 @@ void UnrealSimulator::timerRgb([[maybe_unused]] const ros::TimerEvent& event) {
     catch (...) {
       ROS_ERROR("[UnrealSimulator]: could not publish camera tf");
     }
-  }
-}
-
-//}
-
-/* timerDepth() //{ */
-
-void UnrealSimulator::timerDepth([[maybe_unused]] const ros::TimerEvent& event) {
-
-  if (!is_initialized_) {
-    return;
-  }
-
-  /* mrs_lib::ScopeTimer timer = mrs_lib::ScopeTimer("timerRgb()"); */
-
-  auto drs_params = mrs_lib::get_mutexed(mutex_drs_params_, drs_params_);
-
-  if (!drs_params_.depth_enabled) {
-    ROS_INFO_THROTTLE(1.0, "[UnrealSimulator]: Depth sensor disabled");
-    return;
-  }
-
-  updateUnrealPoses();
-
-  for (size_t i = 0; i < uavs_.size(); i++) {
-
-    bool                       res;
-    std::vector<unsigned char> cameraData;
-    uint32_t                   size;
-
-    /* timer.checkpoint("before_getting_data"); */
-
-    {
-      std::scoped_lock lock(mutex_ueds_);
-
-      std::tie(res, cameraData, size) = ueds_connectors_[i]->GetCameraDepth();
-    }
-
-    /* timer.checkpoint("after_getting_data"); */
-
-    cv::Mat               image = cv::imdecode(cameraData, cv::IMREAD_COLOR);
-    sensor_msgs::ImagePtr msg   = cv_bridge::CvImage(std_msgs::Header(), "bgr8", image).toImageMsg();
-
-    msg->header.frame_id = "uav" + std::to_string(i + 1) + "/depth";
-    msg->header.stamp    = ros::Time::now();
-
-    msg->data = cameraData;
-
-    imp_depth_[i].publish(msg);
-  }
-}
-
-//}
-
-/* timerSeg() //{ */
-
-void UnrealSimulator::timerSeg([[maybe_unused]] const ros::TimerEvent& event) {
-
-  if (!is_initialized_) {
-    return;
-  }
-
-  /* mrs_lib::ScopeTimer timer = mrs_lib::ScopeTimer("timerRgb()"); */
-
-  auto drs_params = mrs_lib::get_mutexed(mutex_drs_params_, drs_params_);
-
-  if (!drs_params_.seg_enabled) {
-    ROS_INFO_THROTTLE(1.0, "[UnrealSimulator]: Seg sensor disabled");
-    return;
-  }
-
-  updateUnrealPoses();
-
-  for (size_t i = 0; i < uavs_.size(); i++) {
-
-    bool                       res;
-    std::vector<unsigned char> cameraData;
-    uint32_t                   size;
-
-    /* timer.checkpoint("before_getting_data"); */
-
-    {
-      std::scoped_lock lock(mutex_ueds_);
-
-      std::tie(res, cameraData, size) = ueds_connectors_[i]->GetCameraSeg();
-    }
-
-    /* timer.checkpoint("after_getting_data"); */
-
-    cv::Mat               image = cv::imdecode(cameraData, cv::IMREAD_COLOR);
-    sensor_msgs::ImagePtr msg   = cv_bridge::CvImage(std_msgs::Header(), "bgr8", image).toImageMsg();
-
-    msg->header.frame_id = "uav" + std::to_string(i + 1) + "/seg";
-    msg->header.stamp    = ros::Time::now();
-
-    msg->data = cameraData;
-
-    imp_depth_[i].publish(msg);
-  }
-}
-
-//}
-
-/* timerColorDepth() //{ */
-
-void UnrealSimulator::timerColorDepth([[maybe_unused]] const ros::TimerEvent& event) {
-
-  if (!is_initialized_) {
-    return;
-  }
-
-  /* mrs_lib::ScopeTimer timer = mrs_lib::ScopeTimer("timerRgb()"); */
-
-  auto drs_params = mrs_lib::get_mutexed(mutex_drs_params_, drs_params_);
-
-  if (!drs_params_.color_depth_enabled) {
-    ROS_INFO_THROTTLE(1.0, "[UnrealSimulator]: Color depth sensor disabled");
-    return;
-  }
-
-  updateUnrealPoses();
-
-  for (size_t i = 0; i < uavs_.size(); i++) {
-
-    bool                       res;
-    std::vector<unsigned char> cameraData;
-    uint32_t                   size;
-
-    /* timer.checkpoint("before_getting_data"); */
-
-    {
-      std::scoped_lock lock(mutex_ueds_);
-
-      std::tie(res, cameraData, size) = ueds_connectors_[i]->GetCameraColorDepth();
-    }
-
-    /* timer.checkpoint("after_getting_data"); */
-
-    // ROS_WARN("Unreal: send camera msg");
-    cv::Mat               image = cv::imdecode(cameraData, cv::IMREAD_COLOR);
-    sensor_msgs::ImagePtr msg   = cv_bridge::CvImage(std_msgs::Header(), "bgr8", image).toImageMsg();
-
-    msg->header.frame_id = "uav" + std::to_string(i + 1) + "/colored_depth";
-    msg->header.stamp    = ros::Time::now();
-
-    msg->data = cameraData;
-
-    imp_depth_[i].publish(msg);
-
-    /* if (!drs_params_.color_depth_PC_enabled) { */
-    /*   ROS_INFO_THROTTLE(1.0, "[UnrealSimulator]: Color depth PC sensor disabled"); */
-    /*   return; */
-    /* } */
-
-    /* PCLPointCloud pcl_cloud; */
-    /* float         disp_min = 30; */
-    /* float         disp_max = 550; */
-    /* for (uint32_t i = 0; i < size; i++) { */
-    /*   // retrive the pixel data from the image and get the individual color values */
-    /*   uint8_t r = cameraData[i * 4]; */
-    /*   uint8_t g = cameraData[i * 4 + 1]; */
-    /*   uint8_t b = cameraData[i * 4 + 2]; */
-
-    /*   float d_normal; */
-
-    /*   if (r >= g && r >= b && g >= b) { */
-    /*     d_normal = g - b; */
-    /*   } else if (r >= g && r >= b && g >= b) { */
-    /*     d_normal = g - b + 1529 */
-    /*   } else if (g >= r && g >= b) { */
-    /*     d_normal = b - r + 510; */
-    /*   } else if (b >= g && b >= r) { */
-    /*     d_normal = r - g + 1020; */
-    /*   } */
-    /*   depth_recovered = 1529 / (1529 * disp_min + (disp_max - disp_min) * d_normal); */
-    /* } */
   }
 }
 

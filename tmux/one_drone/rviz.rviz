@@ -6,6 +6,7 @@ Panels:
       Expanded:
         - /TF1/Frames1
         - /TF1/Tree1
+        - /Image1
       Splitter Ratio: 0.6970587968826294
     Tree Height: 382
   - Class: rviz/Selection
@@ -299,7 +300,7 @@ Visualization Manager:
               Marker Topic: /uav1/control_manager/trajectory_original/markers
               Name: Markers
               Namespaces:
-                "": true
+                {}
               Queue Size: 100
               Value: true
           Enabled: true
@@ -423,7 +424,7 @@ Visualization Manager:
               Marker Topic: /uav1/control_manager/mpc_tracker/trajectory_processed/markers
               Name: Markers
               Namespaces:
-                "": true
+                {}
               Queue Size: 100
               Value: true
           Enabled: true
@@ -437,9 +438,7 @@ Visualization Manager:
           Marker Topic: /uav1/trajectory_generation/markers/final
           Name: final
           Namespaces:
-            markers/final_lines: true
-            markers/final_points: true
-            markers/final_triangles: true
+            {}
           Queue Size: 100
           Value: true
         - Class: rviz/MarkerArray
@@ -447,16 +446,14 @@ Visualization Manager:
           Marker Topic: /uav1/trajectory_generation/markers/original
           Name: original
           Namespaces:
-            markers/original_lines: true
-            markers/original_points: true
-            markers/original_triangles: true
+            {}
           Queue Size: 100
           Value: true
       Enabled: true
       Name: TrajectoryGeneration
     - Class: rviz/Image
       Enabled: true
-      Image Topic: /uav1/rgbd/image_raw
+      Image Topic: /uav1/rgbd/color/image_raw
       Max Value: 1
       Median window: 5
       Min Value: 0
@@ -469,8 +466,8 @@ Visualization Manager:
     - Alpha: 1
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
-        Max Value: 4.316592693328857
-        Min Value: -1.061531662940979
+        Max Value: 8.462370872497559
+        Min Value: -1.29250168800354
         Value: true
       Axis: Z
       Channel Name: intensity
@@ -589,7 +586,7 @@ Window Geometry:
   Views:
     collapsed: true
   Width: 2548
-  X: 0
-  Y: 0
+  X: -32
+  Y: -32
   vio_camera:
     collapsed: false
