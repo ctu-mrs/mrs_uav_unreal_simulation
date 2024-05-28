@@ -74,9 +74,9 @@ struct LidarConfig
               const Rotation orientation, double FOVHor, double FOVVert)
       : Enable(Enable),
         showBeams(showBeams),
+        beamLength(beamLength),
         BeamHorRays(BeamHorRays),
         BeamVertRays(BeamVertRays),
-        beamLength(beamLength),
         Frequency(Frequency),
         offset(offset),
         orientation(orientation),
@@ -111,7 +111,7 @@ enum CameraCaptureModeEnum : unsigned short
 struct CameraConfig
 {
   CameraConfig() = default;
-  CameraConfig(bool showDebugCamera, double angleFov, const Coordinates offset, const Rotation orientation, int Width, int Heightm, double baseline)
+  CameraConfig(bool showDebugCamera, double angleFov, const Coordinates offset, const Rotation orientation, int Width, int Height, double baseline)
       : showDebugCamera(showDebugCamera), angleFOV(angleFov), offset(offset), orientation(orientation), Width(Width), Height(Height), baseline(baseline) {
   }
 
@@ -121,13 +121,13 @@ struct CameraConfig
 
   Coordinates offset;
 
-  double baseline;
-
   Rotation orientation;
 
   int Width;
 
   int Height;
+
+  double baseline;
 
   std::string toString() const {
     return "(showDebugCamera: " + std::to_string(showDebugCamera) + ", angleFOV: " + std::to_string(angleFOV) + ", offset: " + offset.toString() +

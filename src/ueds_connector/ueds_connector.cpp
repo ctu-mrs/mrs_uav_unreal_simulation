@@ -238,10 +238,13 @@ std::tuple<bool, std::vector<LidarData>, Coordinates> UedsConnector::GetLidarDat
   const auto                                  success = status && response.status;
   std::vector<LidarData>                      lidarData;
   Coordinates                                 start{};
+
   if (success) {
+
     const auto arrSize = response.lidarData.size();
     lidarData.resize(arrSize);
-    for (int i = 0; i < arrSize; i++) {
+
+    for (size_t i = 0; i < arrSize; i++) {
       lidarData[i]            = LidarData{};
       lidarData[i].distance   = response.lidarData[i].distance;
       lidarData[i].directionX = response.lidarData[i].directionX;
@@ -270,10 +273,13 @@ std::tuple<bool, std::vector<LidarSegData>, Coordinates> UedsConnector::GetLidar
   const auto                                     success = status && response.status;
   std::vector<LidarSegData>                      lidarSegData;
   Coordinates                                    start{};
+
   if (success) {
+
     const auto arrSize = response.lidarSegData.size();
     lidarSegData.resize(arrSize);
-    for (int i = 0; i < arrSize; i++) {
+
+    for (size_t i = 0; i < arrSize; i++) {
       lidarSegData[i]              = LidarSegData{};
       lidarSegData[i].distance     = response.lidarSegData[i].distance;
       lidarSegData[i].directionX   = response.lidarSegData[i].directionX;
@@ -286,6 +292,7 @@ std::tuple<bool, std::vector<LidarSegData>, Coordinates> UedsConnector::GetLidar
     start.y = response.startY;
     start.z = response.startZ;
   }
+
   // std::cout << "Get lidar data drone controller: " << success << std::endl;
   return std::make_tuple(success, lidarSegData, start);
 }
@@ -398,6 +405,8 @@ bool UedsConnector::SetCameraConfig(const CameraConfig& config) {
   request.config.showDebugCamera = config.showDebugCamera;
 
   request.config.angleFOV = config.angleFOV;
+
+  request.config.baseline = config.baseline;
 
   request.config.offsetX = config.offset.x;
   request.config.offsetY = config.offset.y;

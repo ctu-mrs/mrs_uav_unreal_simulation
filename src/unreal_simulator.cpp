@@ -137,6 +137,7 @@ private:
   std::vector<image_transport::Publisher> imp_rgbd_color_depth_;
 
   std::vector<mrs_lib::PublisherHandler<sensor_msgs::CameraInfo>> ph_rgbs_info_;
+  std::vector<mrs_lib::PublisherHandler<sensor_msgs::CameraInfo>> ph_rgbs_right_info_;
   std::vector<mrs_lib::PublisherHandler<sensor_msgs::CameraInfo>> ph_depth_info_;
 
   // | ------------------------- system ------------------------- |
@@ -341,6 +342,8 @@ void UnrealSimulator::onInit() {
     imp_rgbd_color_depth_.push_back(it_->advertise("/" + uav_name + "/rgbd/color_depth/image_raw", 10));
 
     ph_rgbs_info_.push_back(mrs_lib::PublisherHandler<sensor_msgs::CameraInfo>(nh_, "/" + uav_name + "/rgbd/color/camera_info", 10));
+
+    ph_rgbs_right_info_.push_back(mrs_lib::PublisherHandler<sensor_msgs::CameraInfo>(nh_, "/" + uav_name + "/rgbd/color_right/camera_info", 10));
 
     ph_depth_info_.push_back(mrs_lib::PublisherHandler<sensor_msgs::CameraInfo>(nh_, "/" + uav_name + "/rgbd/depth/camera_info", 10));
   }
@@ -777,13 +780,14 @@ void UnrealSimulator::timerRgb([[maybe_unused]] const ros::TimerEvent& event) {
 
       camera_info.header = msg->header;
 
-      ph_rgbs_info_[i].publish(camera_info);
+      ph_rgbs_right_info_[i].publish(camera_info);
 
       auto camera_tf = mrs_lib::get_mutexed(mutex_camera_tf_, camera_tf_);
 
       camera_tf.header.stamp    = msg->header.stamp;
       camera_tf.header.frame_id = "uav" + std::to_string(i + 1) + "/fcu";
       camera_tf.child_frame_id  = "uav" + std::to_string(i + 1) + "/rgbd_right";
+      camera_tf.transform.translation.y = -drs_params.stereo_baseline;
 
       try {
         static_broadcaster_.sendTransform(camera_tf);

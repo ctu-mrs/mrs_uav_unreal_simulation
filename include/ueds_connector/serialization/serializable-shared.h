@@ -136,12 +136,14 @@ struct CameraConfig
 
   double angleFOV;
 
+  double baseline;
+
   int Width;
   int Height;
 
   template <class Archive>
   void serialize(Archive& archive) {
-    archive(showDebugCamera, offsetX, offsetY, offsetZ, orientationPitch, orientationYaw, orientationRoll, angleFOV, Width, Height);
+    archive(showDebugCamera, offsetX, offsetY, offsetZ, orientationPitch, orientationYaw, orientationRoll, angleFOV, Width, Height, baseline);
   }
 };
 
