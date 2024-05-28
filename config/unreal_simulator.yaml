@@ -11,6 +11,7 @@ input_timeout: 1.0 # [s]
 collisions: true
 
 sensors:
+
   lidar:
     enabled: true
     rate: 10.0 # [Hz]
@@ -25,9 +26,11 @@ sensors:
     rotation_roll: 90.0 # [deg]
     rotation_yaw: 0.0 # [deg]
     beam_length: 1000.0 # [m]
+
   lidar_seg:
     enabled: false
     rate: 10.0 # [Hz]
+
   rgb:
     enabled: true
     rate: 10.0 # [Hz]
@@ -40,13 +43,19 @@ sensors:
     rotation_pitch: 0.0
     rotation_yaw: 0.0
     rotation_roll: 0.0
+    
+  stereo:
+    enabled: true
+    baseline: 0.1 # [m]
 
   depth:
     enabled: false
     rate: 10.0 # [Hz]
+
   seg:
     enabled: false
     rate: 5.0 # [Hz]
+
   color_depth:
     enabled: false
     rate: 5.0 # [Hz]

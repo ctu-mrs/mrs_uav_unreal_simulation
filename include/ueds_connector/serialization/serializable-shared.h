@@ -7,13 +7,20 @@
 
 #include <cereal/types/vector.hpp>
 
-namespace Serializable {
-namespace Common {
-enum MessageType : unsigned short { ping = 0x1 };
+namespace Serializable
+{
+namespace Common
+{
+enum MessageType : unsigned short
+{
+  ping = 0x1
+};
 
-struct NetworkRequest {
+struct NetworkRequest
+{
   NetworkRequest() = default;
-  explicit NetworkRequest(unsigned short _type) : type(_type) {}
+  explicit NetworkRequest(unsigned short _type) : type(_type) {
+  }
 
   unsigned short type;
 
@@ -23,14 +30,18 @@ struct NetworkRequest {
   }
 };
 
-struct NetworkResponse {
+struct NetworkResponse
+{
   NetworkResponse() = default;
-  explicit NetworkResponse(unsigned short _type) : type(_type), status(true) {}
-  explicit NetworkResponse(bool _status) : status(_status) {}
-  explicit NetworkResponse(unsigned short _type, bool _status) : type(_type), status(_status) {}
+  explicit NetworkResponse(unsigned short _type) : type(_type), status(true) {
+  }
+  explicit NetworkResponse(bool _status) : status(_status) {
+  }
+  explicit NetworkResponse(unsigned short _type, bool _status) : type(_type), status(_status) {
+  }
 
   unsigned short type;
-  bool status;
+  bool           status;
 
   template <class Archive>
   void serialize(Archive& archive) {
@@ -38,43 +49,52 @@ struct NetworkResponse {
   }
 };
 
-namespace Ping {
-struct Request : public Common::NetworkRequest {
-  Request() : Common::NetworkRequest(static_cast<unsigned short>(MessageType::ping)) {}
+namespace Ping
+{
+struct Request : public Common::NetworkRequest
+{
+  Request() : Common::NetworkRequest(static_cast<unsigned short>(MessageType::ping)) {
+  }
 };
 
-struct Response : public Common::NetworkResponse {
-  Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::ping)) {}
-  explicit Response(bool _status) : Common::NetworkResponse(MessageType::ping, _status) {}
+struct Response : public Common::NetworkResponse
+{
+  Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::ping)) {
+  }
+  explicit Response(bool _status) : Common::NetworkResponse(MessageType::ping, _status) {
+  }
 };
 }  // namespace Ping
 }  // namespace Common
 
-namespace Drone {
-enum MessageType : unsigned short {
-  get_location = 0x2,
-  set_location = 0x3,
-  get_camera_data = 0x4,
-  get_rotation = 0x5,
-  set_rotation = 0x6,
-  set_location_and_rotation = 0x7,
-  get_lidar_data = 0x8,
-  get_lidar_config = 0x9,
-  set_lidar_config = 0x10,
-  get_camera_config = 0x11,
-  set_camera_config = 0x12,
-  get_move_line_visible = 0x13,
-  set_move_line_visible = 0x14,
-  get_camera_depth = 0x15,
-  get_camera_seg =  0x16,
-  get_lidar_seg = 0x17,
-  get_camera_color_depth = 0x18,
+namespace Drone
+{
+enum MessageType : unsigned short
+{
+  get_location              = 0x2,
+  set_location              = 0x3,
+  get_left_camera_data      = 0x4,
+  get_right_camera_data     = 0x5,
+  get_rotation              = 0x6,
+  set_rotation              = 0x7,
+  set_location_and_rotation = 0x8,
+  get_lidar_data            = 0x9,
+  get_lidar_config          = 0x10,
+  set_lidar_config          = 0x11,
+  get_camera_config         = 0x12,
+  set_camera_config         = 0x13,
+  get_move_line_visible     = 0x14,
+  set_move_line_visible     = 0x15,
+  get_camera_depth          = 0x16,
+  get_camera_seg            = 0x17,
+  get_lidar_seg             = 0x19,
+  get_camera_color_depth    = 0x19,
 };
 
 struct LidarConfig
 {
-  bool Enable;
-  bool ShowBeams;
+  bool   Enable;
+  bool   ShowBeams;
   double BeamLength;
 
   double BeamHorRays;
@@ -92,12 +112,13 @@ struct LidarConfig
   double FOVHor;
   double FOVVert;
 
-//  double vertRayDiff;
-//  double horRayDif;
+  //  double vertRayDiff;
+  //  double horRayDif;
 
   template <class Archive>
   void serialize(Archive& archive) {
-    archive(Enable, ShowBeams, BeamLength, BeamHorRays, BeamVertRays, Frequency, OffsetX, OffsetY, OffsetZ, OrientationPitch, OrientationYaw, OrientationRoll,FOVHor,FOVVert);
+    archive(Enable, ShowBeams, BeamLength, BeamHorRays, BeamVertRays, Frequency, OffsetX, OffsetY, OffsetZ, OrientationPitch, OrientationYaw, OrientationRoll,
+            FOVHor, FOVVert);
   }
 };
 
@@ -114,7 +135,7 @@ struct CameraConfig
   double orientationRoll;
 
   double angleFOV;
-  
+
   int Width;
   int Height;
 
@@ -124,14 +145,20 @@ struct CameraConfig
   }
 };
 
-namespace GetLocation {
-struct Request : public Common::NetworkRequest {
-  Request() : Common::NetworkRequest(static_cast<unsigned short>(MessageType::get_location)) {}
+namespace GetLocation
+{
+struct Request : public Common::NetworkRequest
+{
+  Request() : Common::NetworkRequest(static_cast<unsigned short>(MessageType::get_location)) {
+  }
 };
 
-struct Response : public Common::NetworkResponse {
-  Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::get_location)) {}
-  explicit Response(bool _status) : Common::NetworkResponse(MessageType::get_location, _status) {}
+struct Response : public Common::NetworkResponse
+{
+  Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::get_location)) {
+  }
+  explicit Response(bool _status) : Common::NetworkResponse(MessageType::get_location, _status) {
+  }
 
   double x;
   double y;
@@ -144,14 +171,17 @@ struct Response : public Common::NetworkResponse {
 };
 }  // namespace GetLocation
 
-namespace SetLocation {
-struct Request : public Common::NetworkRequest {
-  Request() : Common::NetworkRequest(static_cast<unsigned short>(MessageType::set_location)) {}
+namespace SetLocation
+{
+struct Request : public Common::NetworkRequest
+{
+  Request() : Common::NetworkRequest(static_cast<unsigned short>(MessageType::set_location)) {
+  }
 
   double x;
   double y;
   double z;
-  bool checkCollisions;
+  bool   checkCollisions;
 
   template <class Archive>
   void serialize(Archive& archive) {
@@ -159,15 +189,18 @@ struct Request : public Common::NetworkRequest {
   }
 };
 
-struct Response : public Common::NetworkResponse {
-  Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::set_location)) {}
-  explicit Response(bool _status) : Common::NetworkResponse(MessageType::set_location, _status) {}
+struct Response : public Common::NetworkResponse
+{
+  Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::set_location)) {
+  }
+  explicit Response(bool _status) : Common::NetworkResponse(MessageType::set_location, _status) {
+  }
 
   double teleportedToX;
   double teleportedToY;
   double teleportedToZ;
 
-  bool isHit;
+  bool   isHit;
   double impactPointX;
   double impactPointY;
   double impactPointZ;
@@ -179,14 +212,20 @@ struct Response : public Common::NetworkResponse {
 };
 }  // namespace SetLocation
 
-namespace GetCameraData {
-struct Request : public Common::NetworkRequest {
-  Request() : Common::NetworkRequest(static_cast<unsigned short>(MessageType::get_camera_data)) {}
+namespace GetLeftCameraData
+{
+struct Request : public Common::NetworkRequest
+{
+  Request() : Common::NetworkRequest(static_cast<unsigned short>(MessageType::get_left_camera_data)) {
+  }
 };
 
-struct Response : public Common::NetworkResponse {
-  Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::get_camera_data)) {}
-  explicit Response(bool _status) : Common::NetworkResponse(MessageType::get_camera_data, _status) {}
+struct Response : public Common::NetworkResponse
+{
+  Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::get_left_camera_data)) {
+  }
+  explicit Response(bool _status) : Common::NetworkResponse(MessageType::get_left_camera_data, _status) {
+  }
 
   std::vector<unsigned char> imageData;
 
@@ -195,16 +234,46 @@ struct Response : public Common::NetworkResponse {
     archive(cereal::base_class<Common::NetworkResponse>(this), imageData);
   }
 };
-}  // namespace GetCameraData
+}  // namespace GetLeftCameraData
 
-namespace GetCameraDepth {
-struct Request : public Common::NetworkRequest {
-  Request() : Common::NetworkRequest(static_cast<unsigned short>(MessageType::get_camera_depth)) {}
+namespace GetRightCameraData
+{
+struct Request : public Common::NetworkRequest
+{
+  Request() : Common::NetworkRequest(static_cast<unsigned short>(MessageType::get_right_camera_data)) {
+  }
 };
 
-struct Response : public Common::NetworkResponse {
-  Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::get_camera_depth)) {}
-  explicit Response(bool _status) : Common::NetworkResponse(MessageType::get_camera_depth, _status) {}
+struct Response : public Common::NetworkResponse
+{
+  Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::get_right_camera_data)) {
+  }
+  explicit Response(bool _status) : Common::NetworkResponse(MessageType::get_right_camera_data, _status) {
+  }
+
+  std::vector<unsigned char> imageData;
+
+  template <class Archive>
+  void serialize(Archive& archive) {
+    archive(cereal::base_class<Common::NetworkResponse>(this), imageData);
+  }
+};
+}  // namespace GetRightCameraData
+
+namespace GetCameraDepth
+{
+struct Request : public Common::NetworkRequest
+{
+  Request() : Common::NetworkRequest(static_cast<unsigned short>(MessageType::get_camera_depth)) {
+  }
+};
+
+struct Response : public Common::NetworkResponse
+{
+  Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::get_camera_depth)) {
+  }
+  explicit Response(bool _status) : Common::NetworkResponse(MessageType::get_camera_depth, _status) {
+  }
 
   std::vector<unsigned char> imageData;
 
@@ -215,14 +284,20 @@ struct Response : public Common::NetworkResponse {
 };
 }  // namespace GetCameraDepth
 
-namespace GetCameraSeg {
-struct Request : public Common::NetworkRequest {
-  Request() : Common::NetworkRequest(static_cast<unsigned short>(MessageType::get_camera_seg)) {}
+namespace GetCameraSeg
+{
+struct Request : public Common::NetworkRequest
+{
+  Request() : Common::NetworkRequest(static_cast<unsigned short>(MessageType::get_camera_seg)) {
+  }
 };
 
-struct Response : public Common::NetworkResponse {
-  Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::get_camera_seg)) {}
-  explicit Response(bool _status) : Common::NetworkResponse(MessageType::get_camera_seg, _status) {}
+struct Response : public Common::NetworkResponse
+{
+  Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::get_camera_seg)) {
+  }
+  explicit Response(bool _status) : Common::NetworkResponse(MessageType::get_camera_seg, _status) {
+  }
 
   std::vector<unsigned char> imageData;
 
@@ -233,14 +308,20 @@ struct Response : public Common::NetworkResponse {
 };
 }  // namespace GetCameraSeg
 
-namespace GetCameraColorDepth {
-struct Request : public Common::NetworkRequest {
-  Request() : Common::NetworkRequest(static_cast<unsigned short>(MessageType::get_camera_color_depth)) {}
+namespace GetCameraColorDepth
+{
+struct Request : public Common::NetworkRequest
+{
+  Request() : Common::NetworkRequest(static_cast<unsigned short>(MessageType::get_camera_color_depth)) {
+  }
 };
 
-struct Response : public Common::NetworkResponse {
-  Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::get_camera_color_depth)) {}
-  explicit Response(bool _status) : Common::NetworkResponse(MessageType::get_camera_color_depth, _status) {}
+struct Response : public Common::NetworkResponse
+{
+  Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::get_camera_color_depth)) {
+  }
+  explicit Response(bool _status) : Common::NetworkResponse(MessageType::get_camera_color_depth, _status) {
+  }
 
   std::vector<unsigned char> imageData;
 
@@ -251,14 +332,20 @@ struct Response : public Common::NetworkResponse {
 };
 }  // namespace GetCameraColorDepth
 
-namespace GetRotation {
-struct Request : public Common::NetworkRequest {
-  Request() : Common::NetworkRequest(static_cast<unsigned short>(MessageType::get_rotation)) {}
+namespace GetRotation
+{
+struct Request : public Common::NetworkRequest
+{
+  Request() : Common::NetworkRequest(static_cast<unsigned short>(MessageType::get_rotation)) {
+  }
 };
 
-struct Response : public Common::NetworkResponse {
-  Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::get_rotation)) {}
-  explicit Response(bool _status) : Common::NetworkResponse(MessageType::get_rotation, _status) {}
+struct Response : public Common::NetworkResponse
+{
+  Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::get_rotation)) {
+  }
+  explicit Response(bool _status) : Common::NetworkResponse(MessageType::get_rotation, _status) {
+  }
 
   double pitch;
   double yaw;
@@ -271,9 +358,12 @@ struct Response : public Common::NetworkResponse {
 };
 }  // namespace GetRotation
 
-namespace SetRotation {
-struct Request : public Common::NetworkRequest {
-  Request() : Common::NetworkRequest(static_cast<unsigned short>(MessageType::set_rotation)) {}
+namespace SetRotation
+{
+struct Request : public Common::NetworkRequest
+{
+  Request() : Common::NetworkRequest(static_cast<unsigned short>(MessageType::set_rotation)) {
+  }
 
   double pitch;
   double yaw;
@@ -285,15 +375,18 @@ struct Request : public Common::NetworkRequest {
   }
 };
 
-struct Response : public Common::NetworkResponse {
-  Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::set_rotation)) {}
-  explicit Response(bool _status) : Common::NetworkResponse(MessageType::set_rotation, _status) {}
+struct Response : public Common::NetworkResponse
+{
+  Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::set_rotation)) {
+  }
+  explicit Response(bool _status) : Common::NetworkResponse(MessageType::set_rotation, _status) {
+  }
 
   double rotatedToPitch;
   double rotatedToYaw;
   double rotatedToRoll;
 
-  bool isHit;
+  bool   isHit;
   double impactPointX;
   double impactPointY;
   double impactPointZ;
@@ -305,9 +398,12 @@ struct Response : public Common::NetworkResponse {
 };
 }  // namespace SetRotation
 
-namespace SetLocationAndRotation {
-struct Request : public Common::NetworkRequest {
-  Request() : Common::NetworkRequest(static_cast<unsigned short>(MessageType::set_location_and_rotation)) {}
+namespace SetLocationAndRotation
+{
+struct Request : public Common::NetworkRequest
+{
+  Request() : Common::NetworkRequest(static_cast<unsigned short>(MessageType::set_location_and_rotation)) {
+  }
 
   double x;
   double y;
@@ -322,32 +418,38 @@ struct Request : public Common::NetworkRequest {
   }
 };
 
-struct Response : public Common::NetworkResponse {
-  Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::set_location_and_rotation)) {}
-  explicit Response(bool _status) : Common::NetworkResponse(MessageType::set_location_and_rotation, _status) {}
+struct Response : public Common::NetworkResponse
+{
+  Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::set_location_and_rotation)) {
+  }
+  explicit Response(bool _status) : Common::NetworkResponse(MessageType::set_location_and_rotation, _status) {
+  }
 
   double teleportedToX;
   double teleportedToY;
   double teleportedToZ;
-  
+
   double rotatedToPitch;
   double rotatedToYaw;
   double rotatedToRoll;
 
-  bool isHit;
+  bool   isHit;
   double impactPointX;
   double impactPointY;
   double impactPointZ;
 
   template <class Archive>
   void serialize(Archive& archive) {
-    archive(cereal::base_class<Common::NetworkResponse>(this), teleportedToX, teleportedToY, teleportedToZ, rotatedToPitch, rotatedToYaw, rotatedToRoll, isHit, impactPointX, impactPointY, impactPointZ);
+    archive(cereal::base_class<Common::NetworkResponse>(this), teleportedToX, teleportedToY, teleportedToZ, rotatedToPitch, rotatedToYaw, rotatedToRoll, isHit,
+            impactPointX, impactPointY, impactPointZ);
   }
 };
 }  // namespace SetLocationAndRotation
 
-namespace GetLidarData {
-struct LidarData {
+namespace GetLidarData
+{
+struct LidarData
+{
   LidarData() = default;
 
   double distance;
@@ -361,13 +463,18 @@ struct LidarData {
   }
 };
 
-struct Request : public Common::NetworkRequest {
-  Request() : Common::NetworkRequest(static_cast<unsigned short>(MessageType::get_lidar_data)) {}
+struct Request : public Common::NetworkRequest
+{
+  Request() : Common::NetworkRequest(static_cast<unsigned short>(MessageType::get_lidar_data)) {
+  }
 };
 
-struct Response : public Common::NetworkResponse {
-  Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::get_lidar_data)) {}
-  explicit Response(bool _status) : Common::NetworkResponse(MessageType::get_lidar_data, _status) {}
+struct Response : public Common::NetworkResponse
+{
+  Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::get_lidar_data)) {
+  }
+  explicit Response(bool _status) : Common::NetworkResponse(MessageType::get_lidar_data, _status) {
+  }
 
   double startX;
   double startY;
@@ -382,28 +489,35 @@ struct Response : public Common::NetworkResponse {
 };
 }  // namespace GetLidarData
 
-namespace GetLidarSegData {
-struct LidarSegData {
+namespace GetLidarSegData
+{
+struct LidarSegData
+{
   LidarSegData() = default;
 
   double distance;
   double directionX;
   double directionY;
   double directionZ;
-  int segmentation;
+  int    segmentation;
   template <class Archive>
   void serialize(Archive& archive) {
     archive(distance, directionX, directionY, directionZ, segmentation);
   }
 };
 
-struct Request : public Common::NetworkRequest {
-  Request() : Common::NetworkRequest(static_cast<unsigned short>(MessageType::get_lidar_seg)) {}
+struct Request : public Common::NetworkRequest
+{
+  Request() : Common::NetworkRequest(static_cast<unsigned short>(MessageType::get_lidar_seg)) {
+  }
 };
 
-struct Response : public Common::NetworkResponse {
-  Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::get_lidar_seg)) {}
-  explicit Response(bool _status) : Common::NetworkResponse(MessageType::get_lidar_seg, _status) {}
+struct Response : public Common::NetworkResponse
+{
+  Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::get_lidar_seg)) {
+  }
+  explicit Response(bool _status) : Common::NetworkResponse(MessageType::get_lidar_seg, _status) {
+  }
 
   double startX;
   double startY;
@@ -418,12 +532,15 @@ struct Response : public Common::NetworkResponse {
 };
 }  // namespace GetLidarSegData
 
-namespace GetLidarConfig {
-struct Request : public Common::NetworkRequest {
+namespace GetLidarConfig
+{
+struct Request : public Common::NetworkRequest
+{
   Request() : Common::NetworkRequest(static_cast<unsigned short>(MessageType::get_lidar_config)){};
 };
 
-struct Response : public Common::NetworkResponse {
+struct Response : public Common::NetworkResponse
+{
   Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::get_lidar_config)){};
   explicit Response(bool _status) : Common::NetworkResponse(MessageType::get_lidar_config, _status){};
 
@@ -436,8 +553,10 @@ struct Response : public Common::NetworkResponse {
 };
 }  // namespace GetLidarConfig
 
-namespace SetLidarConfig {
-struct Request : public Common::NetworkRequest {
+namespace SetLidarConfig
+{
+struct Request : public Common::NetworkRequest
+{
   Request() : Common::NetworkRequest(static_cast<unsigned short>(MessageType::set_lidar_config)){};
 
   LidarConfig config;
@@ -448,18 +567,22 @@ struct Request : public Common::NetworkRequest {
   }
 };
 
-struct Response : public Common::NetworkResponse {
+struct Response : public Common::NetworkResponse
+{
   Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::set_lidar_config)){};
   explicit Response(bool _status) : Common::NetworkResponse(MessageType::set_lidar_config, _status){};
 };
 }  // namespace SetLidarConfig
 
-namespace GetCameraConfig {
-struct Request : public Common::NetworkRequest {
+namespace GetCameraConfig
+{
+struct Request : public Common::NetworkRequest
+{
   Request() : Common::NetworkRequest(static_cast<unsigned short>(MessageType::get_camera_config)){};
 };
 
-struct Response : public Common::NetworkResponse {
+struct Response : public Common::NetworkResponse
+{
   Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::get_camera_config)){};
   explicit Response(bool _status) : Common::NetworkResponse(MessageType::get_camera_config, _status){};
 
@@ -472,8 +595,10 @@ struct Response : public Common::NetworkResponse {
 };
 }  // namespace GetCameraConfig
 
-namespace SetCameraConfig {
-struct Request : public Common::NetworkRequest {
+namespace SetCameraConfig
+{
+struct Request : public Common::NetworkRequest
+{
   Request() : Common::NetworkRequest(static_cast<unsigned short>(MessageType::set_camera_config)){};
 
   CameraConfig config;
@@ -484,18 +609,22 @@ struct Request : public Common::NetworkRequest {
   }
 };
 
-struct Response : public Common::NetworkResponse {
+struct Response : public Common::NetworkResponse
+{
   Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::set_camera_config)){};
   explicit Response(bool _status) : Common::NetworkResponse(MessageType::set_camera_config, _status){};
 };
 }  // namespace SetCameraConfig
 
-namespace GetMoveLineVisible {
-struct Request : public Common::NetworkRequest {
+namespace GetMoveLineVisible
+{
+struct Request : public Common::NetworkRequest
+{
   Request() : Common::NetworkRequest(static_cast<unsigned short>(MessageType::get_move_line_visible)){};
 };
 
-struct Response : public Common::NetworkResponse {
+struct Response : public Common::NetworkResponse
+{
   Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::get_move_line_visible)){};
   explicit Response(bool _status) : Common::NetworkResponse(MessageType::get_move_line_visible, _status){};
 
@@ -508,8 +637,10 @@ struct Response : public Common::NetworkResponse {
 };
 }  // namespace GetMoveLineVisible
 
-namespace SetMoveLineVisible {
-struct Request : public Common::NetworkRequest {
+namespace SetMoveLineVisible
+{
+struct Request : public Common::NetworkRequest
+{
   Request() : Common::NetworkRequest(static_cast<unsigned short>(MessageType::set_move_line_visible)){};
 
   bool visible;
@@ -520,7 +651,8 @@ struct Request : public Common::NetworkRequest {
   }
 };
 
-struct Response : public Common::NetworkResponse {
+struct Response : public Common::NetworkResponse
+{
   Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::set_move_line_visible)){};
   explicit Response(bool _status) : Common::NetworkResponse(MessageType::set_move_line_visible, _status){};
 };
@@ -528,24 +660,32 @@ struct Response : public Common::NetworkResponse {
 
 }  // namespace Drone
 
-namespace GameMode {
-enum MessageType : unsigned short {
-  get_drones = 0x2,
-  spawn_drone = 0x3,
-  remove_drone = 0x4,
+namespace GameMode
+{
+enum MessageType : unsigned short
+{
+  get_drones              = 0x2,
+  spawn_drone             = 0x3,
+  remove_drone            = 0x4,
   get_camera_capture_mode = 0x5,
   set_camera_capture_mode = 0x6,
-  get_fps = 0x7
+  get_fps                 = 0x7
 };
 
-namespace GetDrones {
-struct Request : public Common::NetworkRequest {
-  Request(): Common::NetworkRequest(static_cast<unsigned short>(MessageType::get_drones)) {}
+namespace GetDrones
+{
+struct Request : public Common::NetworkRequest
+{
+  Request() : Common::NetworkRequest(static_cast<unsigned short>(MessageType::get_drones)) {
+  }
 };
 
-struct Response : public Common::NetworkResponse {
-  Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::get_drones)) {}
-  explicit Response(bool _status) : Common::NetworkResponse(MessageType::get_drones, _status) {}
+struct Response : public Common::NetworkResponse
+{
+  Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::get_drones)) {
+  }
+  explicit Response(bool _status) : Common::NetworkResponse(MessageType::get_drones, _status) {
+  }
 
   std::vector<int> ports;
 
@@ -556,14 +696,20 @@ struct Response : public Common::NetworkResponse {
 };
 }  // namespace GetDrones
 
-namespace SpawnDrone {
-struct Request : public Common::NetworkRequest {
-  Request(): Common::NetworkRequest(static_cast<unsigned short>(MessageType::spawn_drone)) {}
+namespace SpawnDrone
+{
+struct Request : public Common::NetworkRequest
+{
+  Request() : Common::NetworkRequest(static_cast<unsigned short>(MessageType::spawn_drone)) {
+  }
 };
 
-struct Response : public Common::NetworkResponse {
-  Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::spawn_drone)) {}
-  explicit Response(bool _status) : Common::NetworkResponse(MessageType::spawn_drone, _status) {}
+struct Response : public Common::NetworkResponse
+{
+  Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::spawn_drone)) {
+  }
+  explicit Response(bool _status) : Common::NetworkResponse(MessageType::spawn_drone, _status) {
+  }
 
   int port;
 
@@ -574,9 +720,12 @@ struct Response : public Common::NetworkResponse {
 };
 }  // namespace SpawnDrone
 
-namespace RemoveDrone {
-struct Request : public Common::NetworkRequest {
-  Request(): Common::NetworkRequest(MessageType::remove_drone) {}
+namespace RemoveDrone
+{
+struct Request : public Common::NetworkRequest
+{
+  Request() : Common::NetworkRequest(MessageType::remove_drone) {
+  }
 
   int port;
 
@@ -586,25 +735,31 @@ struct Request : public Common::NetworkRequest {
   }
 };
 
-struct Response : public Common::NetworkResponse {
-  Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::remove_drone)) {}
-  explicit Response(bool _status) : Common::NetworkResponse(MessageType::remove_drone, _status) {}
+struct Response : public Common::NetworkResponse
+{
+  Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::remove_drone)) {
+  }
+  explicit Response(bool _status) : Common::NetworkResponse(MessageType::remove_drone, _status) {
+  }
 };
 }  // namespace RemoveDrone
 
 enum CameraCaptureModeEnum : unsigned short
 {
-  CAPTURE_ALL_FRAMES = 0x0,
+  CAPTURE_ALL_FRAMES  = 0x0,
   CAPTURE_ON_MOVEMENT = 0x1,
-  CAPTURE_ON_DEMAND = 0x2,
+  CAPTURE_ON_DEMAND   = 0x2,
 };
 
-namespace GetCameraCaptureMode {
-struct Request : public Common::NetworkRequest {
-  Request(): Common::NetworkRequest(MessageType::get_camera_capture_mode){};
+namespace GetCameraCaptureMode
+{
+struct Request : public Common::NetworkRequest
+{
+  Request() : Common::NetworkRequest(MessageType::get_camera_capture_mode){};
 };
 
-struct Response : public Common::NetworkResponse {
+struct Response : public Common::NetworkResponse
+{
   Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::get_camera_capture_mode)){};
   explicit Response(bool _status) : Common::NetworkResponse(MessageType::get_camera_capture_mode, _status){};
 
@@ -617,9 +772,11 @@ struct Response : public Common::NetworkResponse {
 };
 }  // namespace GetCameraCaptureMode
 
-namespace SetCameraCaptureMode {
-struct Request : public Common::NetworkRequest {
-  Request(): Common::NetworkRequest(MessageType::set_camera_capture_mode){};
+namespace SetCameraCaptureMode
+{
+struct Request : public Common::NetworkRequest
+{
+  Request() : Common::NetworkRequest(MessageType::set_camera_capture_mode){};
 
   CameraCaptureModeEnum cameraCaptureMode;
 
@@ -629,18 +786,22 @@ struct Request : public Common::NetworkRequest {
   }
 };
 
-struct Response : public Common::NetworkResponse {
+struct Response : public Common::NetworkResponse
+{
   Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::set_camera_capture_mode)){};
   explicit Response(bool _status) : Common::NetworkResponse(MessageType::set_camera_capture_mode, _status){};
 };
 }  // namespace SetCameraCaptureMode
 
-namespace GetFps {
-struct Request : public Common::NetworkRequest {
-  Request(): Common::NetworkRequest(MessageType::get_fps){};
+namespace GetFps
+{
+struct Request : public Common::NetworkRequest
+{
+  Request() : Common::NetworkRequest(MessageType::get_fps){};
 };
 
-struct Response : public Common::NetworkResponse {
+struct Response : public Common::NetworkResponse
+{
   Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::get_fps)){};
   explicit Response(bool _status) : Common::NetworkResponse(MessageType::get_fps, _status){};
 

@@ -25,14 +25,16 @@ public:
 
   std::tuple<bool, Coordinates, bool, Coordinates> SetLocation(const Coordinates& coordinates, bool checkCollisions);
 
-  std::tuple<bool, std::vector<unsigned char>, uint32_t> GetCameraData();
+  std::tuple<bool, std::vector<unsigned char>, uint32_t> GetLeftCameraData();
+
+  std::tuple<bool, std::vector<unsigned char>, uint32_t> GetRightCameraData();
 
   std::tuple<bool, std::vector<unsigned char>, uint32_t> GetCameraDepth();
-  
+
   std::tuple<bool, std::vector<unsigned char>, uint32_t> GetCameraSeg();
-  
+
   std::tuple<bool, std::vector<unsigned char>, uint32_t> GetCameraColorDepth();
-  
+
   std::pair<bool, Rotation> GetRotation();
 
   std::tuple<bool, Rotation, bool, Coordinates> SetRotation(const Rotation& rotation);

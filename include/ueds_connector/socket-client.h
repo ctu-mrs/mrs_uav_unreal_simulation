@@ -23,17 +23,18 @@
 
 #define END_OF_MESSAGE '$'
 
-namespace ueds_connector {
+namespace ueds_connector
+{
 
 class SocketClient {
- public:
+public:
   SocketClient();
   SocketClient(const std::string& address, uint16_t port);
   ~SocketClient();
 
   kissnet::socket_status::values Connect();
-  bool ConnectSimple();
-  bool Disconnect();
+  bool                           ConnectSimple();
+  bool                           Disconnect();
 
   std::tuple<uint32_t, kissnet::socket_status> ReceiveMessage();
 
@@ -46,7 +47,8 @@ class SocketClient {
     try {
       cereal::BinaryOutputArchive oa(outputStream);
       oa(message);
-    } catch (cereal::Exception& exception) {
+    }
+    catch (cereal::Exception& exception) {
       std::cerr << "Serialization error: " << exception.what() << std::endl;
       return std::make_tuple(0, kissnet::socket_status::errored);
     }
@@ -68,18 +70,19 @@ class SocketClient {
       return false;
     }
 
-//    std::cout << "m.length " << response_str.length() << std::endl;
-//    std::cout << typeid(response).name() << std::endl;
-    //std::cout << typeid(Serializable::Drone::GetLidarData::Response).name() << std::endl;
+    //    std::cout << "m.length " << response_str.length() << std::endl;
+    //    std::cout << typeid(response).name() << std::endl;
+    // std::cout << typeid(Serializable::Drone::GetLidarData::Response).name() << std::endl;
 
 
     try {
-      std::stringstream ss2(response_str);
+      std::stringstream          ss2(response_str);
       cereal::BinaryInputArchive ia(ss2);
       ia(response);
 
       return true;
-    } catch (cereal::Exception& exception) {
+    }
+    catch (cereal::Exception& exception) {
       // TODO
       std::cout << "SOCKET-CLIENT serialization crashed!!!" << exception.what() << std::endl;
     }
@@ -94,20 +97,20 @@ class SocketClient {
     return address_;
   }
 
- private:
-  uint16_t port_ = DEFAULT_PORT;
-  std::string address_ = LOCALHOST;
-  std::unique_ptr<kissnet::tcp_socket> socket_ = nullptr;
+private:
+  uint16_t                             port_    = DEFAULT_PORT;
+  std::string                          address_ = LOCALHOST;
+  std::unique_ptr<kissnet::tcp_socket> socket_  = nullptr;
 
   std::queue<std::unique_ptr<std::vector<std::byte>>> in_queue_;
 
- protected:
-  void PushToInQueue_(std::unique_ptr<std::vector<std::byte>> item);
-  std::unique_ptr<std::vector<std::byte>> PopFromInQueue_();
-  void ClearInQueue_();
-  [[nodiscard]] bool InQueueEmpty_() const;
-  [[nodiscard]] bool IsSocketValid_() const;
-  [[nodiscard]] bool IsReadyToSend_() const;
+protected:
+  void                                                       PushToInQueue_(std::unique_ptr<std::vector<std::byte>> item);
+  std::unique_ptr<std::vector<std::byte>>                    PopFromInQueue_();
+  void                                                       ClearInQueue_();
+  [[nodiscard]] bool                                         InQueueEmpty_() const;
+  [[nodiscard]] bool                                         IsSocketValid_() const;
+  [[nodiscard]] bool                                         IsReadyToSend_() const;
   [[nodiscard]] std::tuple<uint32_t, kissnet::socket_status> SendMessage_(const std::byte* buffer, uint32_t size) const;
 
   bool GetMessage(std::string& message);

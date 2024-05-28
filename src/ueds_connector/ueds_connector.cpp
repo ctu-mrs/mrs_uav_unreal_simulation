@@ -67,15 +67,32 @@ std::tuple<bool, Coordinates, bool, Coordinates> UedsConnector::SetLocation(cons
 
 //}
 
-/* GetCameraData() //{ */
+/* GetLeftCameraData() //{ */
 
-std::tuple<bool, std::vector<unsigned char>, uint32_t> UedsConnector::GetCameraData() {
+std::tuple<bool, std::vector<unsigned char>, uint32_t> UedsConnector::GetLeftCameraData() {
 
-  Serializable::Drone::GetCameraData::Request request{};
+  Serializable::Drone::GetLeftCameraData::Request request{};
 
-  Serializable::Drone::GetCameraData::Response response{};
-  const auto                                   status  = Request(request, response);
-  const auto                                   success = status && response.status;
+  Serializable::Drone::GetLeftCameraData::Response response{};
+
+  const auto status  = Request(request, response);
+  const auto success = status && response.status;
+
+  return std::make_tuple(success, success ? response.imageData : std::vector<unsigned char>(), success ? response.imageData.size() : 0);
+}
+
+//}
+
+/* GetRightCameraData() //{ */
+
+std::tuple<bool, std::vector<unsigned char>, uint32_t> UedsConnector::GetRightCameraData() {
+
+  Serializable::Drone::GetRightCameraData::Request request{};
+
+  Serializable::Drone::GetRightCameraData::Response response{};
+
+  const auto status  = Request(request, response);
+  const auto success = status && response.status;
 
   return std::make_tuple(success, success ? response.imageData : std::vector<unsigned char>(), success ? response.imageData.size() : 0);
 }
@@ -87,11 +104,10 @@ std::tuple<bool, std::vector<unsigned char>, uint32_t> UedsConnector::GetCameraD
   Serializable::Drone::GetCameraDepth::Request request{};
 
   Serializable::Drone::GetCameraDepth::Response response{};
-  const auto status = Request(request, response);
-  const auto success = status && response.status;
+  const auto                                    status  = Request(request, response);
+  const auto                                    success = status && response.status;
 
-  return std::make_tuple(success, success ? response.imageData : std::vector<unsigned char>(),
-                         success ? response.imageData.size() : 0);
+  return std::make_tuple(success, success ? response.imageData : std::vector<unsigned char>(), success ? response.imageData.size() : 0);
 }
 //}
 
@@ -100,11 +116,10 @@ std::tuple<bool, std::vector<unsigned char>, uint32_t> UedsConnector::GetCameraS
   Serializable::Drone::GetCameraSeg::Request request{};
 
   Serializable::Drone::GetCameraSeg::Response response{};
-  const auto status = Request(request, response);
-  const auto success = status && response.status;
+  const auto                                  status  = Request(request, response);
+  const auto                                  success = status && response.status;
 
-  return std::make_tuple(success, success ? response.imageData : std::vector<unsigned char>(),
-                         success ? response.imageData.size() : 0);
+  return std::make_tuple(success, success ? response.imageData : std::vector<unsigned char>(), success ? response.imageData.size() : 0);
 }
 //}
 
@@ -113,11 +128,10 @@ std::tuple<bool, std::vector<unsigned char>, uint32_t> UedsConnector::GetCameraC
   Serializable::Drone::GetCameraColorDepth::Request request{};
 
   Serializable::Drone::GetCameraColorDepth::Response response{};
-  const auto status = Request(request, response);
-  const auto success = status && response.status;
+  const auto                                         status  = Request(request, response);
+  const auto                                         success = status && response.status;
 
-  return std::make_tuple(success, success ? response.imageData : std::vector<unsigned char>(),
-                         success ? response.imageData.size() : 0);
+  return std::make_tuple(success, success ? response.imageData : std::vector<unsigned char>(), success ? response.imageData.size() : 0);
 }
 //}
 
@@ -252,19 +266,19 @@ std::tuple<bool, std::vector<LidarSegData>, Coordinates> UedsConnector::GetLidar
   Serializable::Drone::GetLidarSegData::Request request{};
 
   Serializable::Drone::GetLidarSegData::Response response{};
-  const auto status = Request(request, response);
-  const auto success = status && response.status;
-  std::vector<LidarSegData> lidarSegData;
-  Coordinates start{};
+  const auto                                     status  = Request(request, response);
+  const auto                                     success = status && response.status;
+  std::vector<LidarSegData>                      lidarSegData;
+  Coordinates                                    start{};
   if (success) {
     const auto arrSize = response.lidarSegData.size();
     lidarSegData.resize(arrSize);
     for (int i = 0; i < arrSize; i++) {
-      lidarSegData[i] = LidarSegData{};
-      lidarSegData[i].distance = response.lidarSegData[i].distance;
-      lidarSegData[i].directionX = response.lidarSegData[i].directionX;
-      lidarSegData[i].directionY = response.lidarSegData[i].directionY;
-      lidarSegData[i].directionZ = response.lidarSegData[i].directionZ;
+      lidarSegData[i]              = LidarSegData{};
+      lidarSegData[i].distance     = response.lidarSegData[i].distance;
+      lidarSegData[i].directionX   = response.lidarSegData[i].directionX;
+      lidarSegData[i].directionY   = response.lidarSegData[i].directionY;
+      lidarSegData[i].directionZ   = response.lidarSegData[i].directionZ;
       lidarSegData[i].segmentation = response.lidarSegData[i].segmentation;
     }
 
@@ -272,7 +286,7 @@ std::tuple<bool, std::vector<LidarSegData>, Coordinates> UedsConnector::GetLidar
     start.y = response.startY;
     start.z = response.startZ;
   }
-  //std::cout << "Get lidar data drone controller: " << success << std::endl;
+  // std::cout << "Get lidar data drone controller: " << success << std::endl;
   return std::make_tuple(success, lidarSegData, start);
 }
 //}
@@ -364,8 +378,8 @@ std::pair<bool, CameraConfig> UedsConnector::GetCameraConfig() {
     config.offset = Coordinates{response.config.offsetX, response.config.offsetY, response.config.offsetZ};
 
     config.orientation = Rotation{response.config.orientationPitch, response.config.orientationYaw, response.config.orientationRoll};
-    
-    config.Width = response.config.Width;
+
+    config.Width  = response.config.Width;
     config.Height = response.config.Height;
   }
 
@@ -393,7 +407,7 @@ bool UedsConnector::SetCameraConfig(const CameraConfig& config) {
   request.config.orientationYaw   = config.orientation.yaw;
   request.config.orientationRoll  = config.orientation.roll;
 
-  request.config.Width = config.Width;
+  request.config.Width  = config.Width;
   request.config.Height = config.Height;
 
   Serializable::Drone::SetCameraConfig::Response response{};

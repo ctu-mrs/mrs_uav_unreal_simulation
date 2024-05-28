@@ -16,48 +16,46 @@
 #define USE_LIDAR true
 #define USE_CAMERA true
 
-//namespace ueds_uav_api
+// namespace ueds_uav_api
 namespace mrs_multirotor_simulator
 {
 
-class DroneControllerRos
-{
+class DroneControllerRos {
 private:
-    std::string uav_name_;
+  std::string uav_name_;
 
-    double simulation_rate_;
+  double simulation_rate_;
 
-    bool oneUAVsim_;
+  bool oneUAVsim_;
 
-    std::shared_ptr<UavSystemRos> uav_system_;
+  std::shared_ptr<UavSystemRos> uav_system_;
 
-    ueds_connector::Coordinates ueds_world_frame_;
+  ueds_connector::Coordinates ueds_world_frame_;
 
-    std::unique_ptr<ueds_connector::DroneController> drone_controller_;
+  std::unique_ptr<ueds_connector::DroneController> drone_controller_;
 
-    ros::Timer ueds_timer_;
-    ros::Publisher lidar_pub_;
-    ros::Publisher camera_pub_;
+  ros::Timer     ueds_timer_;
+  ros::Publisher lidar_pub_;
+  ros::Publisher camera_pub_;
+
 public:
-    DroneControllerRos();
-    DroneControllerRos(ros::NodeHandle& nh, double simulation_rate, std::shared_ptr<UavSystemRos> uav_system, const std::string name, int port, bool oneUAVsim);
+  DroneControllerRos();
+  DroneControllerRos(ros::NodeHandle& nh, double simulation_rate, std::shared_ptr<UavSystemRos> uav_system, const std::string name, int port, bool oneUAVsim);
 
-    ~DroneControllerRos();
+  ~DroneControllerRos();
 
-    std::string getName();
+  std::string getName();
 
-    void uedsTimer();
+  void uedsTimer();
 
-    void uedsSetPositionAndRotation();
+  void uedsSetPositionAndRotation();
 
-    void uedsPublishLidar();
+  void uedsPublishLidar();
 
-    void uedsPubllishCamera();
-    
+  void uedsPubllishCamera();
 };
 
 
-    
-} // namespace name
+}  // namespace mrs_multirotor_simulator
 
 #endif
