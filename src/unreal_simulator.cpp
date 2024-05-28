@@ -30,6 +30,7 @@
 #include <image_transport/image_transport.h>
 #include <opencv2/highgui/highgui.hpp>
 #include <cv_bridge/cv_bridge.h>
+#include <opencv2/opencv.hpp>
 
 #include <ueds_connector/ueds_connector.h>
 #include <ueds_connector/game-mode-controller.h>
@@ -107,6 +108,14 @@ private:
 
   tf2_ros::StaticTransformBroadcaster static_broadcaster_;
 
+  // | ----------------------- camera info ---------------------- |
+
+  sensor_msgs::CameraInfo camera_info_;
+  std::mutex              mutex_camera_info_;
+
+  geometry_msgs::TransformStamped camera_tf_;
+  std::mutex                      mutex_camera_tf_;
+
   // | ------------------------ rtf check ----------------------- |
 
   double    actual_rtf_ = 1.0;
@@ -127,6 +136,7 @@ private:
   std::vector<image_transport::Publisher> imp_rgbd_color_depth_;
 
   std::vector<mrs_lib::PublisherHandler<sensor_msgs::CameraInfo>> ph_rgbs_info_;
+  std::vector<mrs_lib::PublisherHandler<sensor_msgs::CameraInfo>> ph_depth_info_;
 
   // | ------------------------- system ------------------------- |
 
@@ -161,6 +171,8 @@ private:
   std::vector<ueds_connector::Coordinates> ueds_world_origins_;
 
   void updateUnrealPoses(void);
+
+  void refreshCameraInfo(void);
 };
 
 //}
@@ -324,6 +336,8 @@ void UnrealSimulator::onInit() {
     imp_rgbd_color_depth_.push_back(it_->advertise("/" + uav_name + "/rgbd/color_depth/image_raw", 10));
 
     ph_rgbs_info_.push_back(mrs_lib::PublisherHandler<sensor_msgs::CameraInfo>(nh_, "/" + uav_name + "/rgbd/color/camera_info", 10));
+
+    ph_depth_info_.push_back(mrs_lib::PublisherHandler<sensor_msgs::CameraInfo>(nh_, "/" + uav_name + "/rgbd/depth/camera_info", 10));
   }
 
   // | --------------- dynamic reconfigure server --------------- |
@@ -358,13 +372,15 @@ void UnrealSimulator::onInit() {
 
   timer_rgb_ = nh_.createTimer(ros::Duration(1.0 / drs_params_.rgb_rate), &UnrealSimulator::timerRgb, this);
 
-  timer_camera_info_ = nh_.createTimer(ros::Rate(1.0), &UnrealSimulator::timerCameraInfo, this);
-
   timer_depth_ = nh_.createTimer(ros::Duration(1.0 / drs_params_.depth_rate), &UnrealSimulator::timerDepth, this);
 
   timer_seg_ = nh_.createTimer(ros::Duration(1.0 / drs_params_.seg_rate), &UnrealSimulator::timerSeg, this);
 
   timer_color_depth_ = nh_.createTimer(ros::Duration(1.0 / drs_params_.color_depth_rate), &UnrealSimulator::timerColorDepth, this);
+
+  // | ----------------- initialize camera info ----------------- |
+
+  refreshCameraInfo();
 
   // | ----------------------- finish init ---------------------- |
 
@@ -694,23 +710,41 @@ void UnrealSimulator::timerRgb([[maybe_unused]] const ros::TimerEvent& event) {
     std::vector<unsigned char> cameraData;
     uint32_t                   size;
 
-    /* timer.checkpoint("before_getting_data"); */
-
     {
       std::scoped_lock lock(mutex_ueds_);
 
       std::tie(res, cameraData, size) = ueds_connectors_[i]->GetCameraData();
     }
 
-    /* timer.checkpoint("after_getting_data"); */
+    cv::Mat image = cv::imdecode(cameraData, cv::IMREAD_COLOR);
 
-    cv::Mat               image = cv::imdecode(cameraData, cv::IMREAD_COLOR);
-    sensor_msgs::ImagePtr msg   = cv_bridge::CvImage(std_msgs::Header(), "bgr8", image).toImageMsg();
+    ROS_INFO("[UnrealSimulator]: rgb size1 %d size2 %d", size, image.cols * image.rows * image.channels());
+
+    sensor_msgs::ImagePtr msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", image).toImageMsg();
 
     msg->header.frame_id = "uav" + std::to_string(i + 1) + "/rgbd";
     msg->header.stamp    = ros::Time::now();
 
     imp_rgbd_color_[i].publish(msg);
+
+    auto camera_info = mrs_lib::get_mutexed(mutex_camera_info_, camera_info_);
+
+    camera_info.header = msg->header;
+
+    ph_rgbs_info_[i].publish(camera_info);
+
+    auto camera_tf = mrs_lib::get_mutexed(mutex_camera_tf_, camera_tf_);
+
+    camera_tf.header.stamp    = msg->header.stamp;
+    camera_tf.header.frame_id = "uav" + std::to_string(i + 1) + "/fcu";
+    camera_tf.child_frame_id  = "uav" + std::to_string(i + 1) + "/rgbd";
+
+    try {
+      static_broadcaster_.sendTransform(camera_tf);
+    }
+    catch (...) {
+      ROS_ERROR("[UnrealSimulator]: could not publish camera tf");
+    }
   }
 }
 
@@ -751,15 +785,26 @@ void UnrealSimulator::timerDepth([[maybe_unused]] const ros::TimerEvent& event) 
 
     /* timer.checkpoint("after_getting_data"); */
 
-    cv::Mat               image = cv::imdecode(cameraData, cv::IMREAD_COLOR);
-    sensor_msgs::ImagePtr msg   = cv_bridge::CvImage(std_msgs::Header(), "bgr8", image).toImageMsg();
+    cv::Mat image = cv::imdecode(cameraData, cv::IMREAD_COLOR);
+
+    cv::Mat gs;
+
+    cv::cvtColor(image, gs, cv::COLOR_BGR2GRAY);
+
+    gs.convertTo(gs, CV_16U);
+
+    sensor_msgs::ImagePtr msg = cv_bridge::CvImage(std_msgs::Header(), "mono16", gs).toImageMsg();
 
     msg->header.frame_id = "uav" + std::to_string(i + 1) + "/rgbd";
     msg->header.stamp    = ros::Time::now();
 
-    msg->data = cameraData;
-
     imp_rgbd_depth_[i].publish(msg);
+
+    auto camera_info = mrs_lib::get_mutexed(mutex_camera_info_, camera_info_);
+
+    camera_info.header = msg->header;
+
+    ph_depth_info_[i].publish(camera_info);
   }
 }
 
@@ -806,8 +851,6 @@ void UnrealSimulator::timerSeg([[maybe_unused]] const ros::TimerEvent& event) {
     msg->header.frame_id = "uav" + std::to_string(i + 1) + "/rgbd";
     msg->header.stamp    = ros::Time::now();
 
-    msg->data = cameraData;
-
     imp_rgbd_depth_[i].publish(msg);
   }
 }
@@ -850,13 +893,16 @@ void UnrealSimulator::timerColorDepth([[maybe_unused]] const ros::TimerEvent& ev
     /* timer.checkpoint("after_getting_data"); */
 
     // ROS_WARN("Unreal: send camera msg");
-    cv::Mat               image = cv::imdecode(cameraData, cv::IMREAD_COLOR);
-    sensor_msgs::ImagePtr msg   = cv_bridge::CvImage(std_msgs::Header(), "bgr8", image).toImageMsg();
+    cv::Mat image = cv::imdecode(cameraData, cv::IMREAD_COLOR);
+
+    cv::Mat greyscale_out;
+
+    cv::transform(image, greyscale_out, cv::Matx13f(1.0, 0.0, 0.0));
+
+    sensor_msgs::ImagePtr msg = cv_bridge::CvImage(std_msgs::Header(), "mono16", greyscale_out).toImageMsg();
 
     msg->header.frame_id = "uav" + std::to_string(i + 1) + "/rgbd";
     msg->header.stamp    = ros::Time::now();
-
-    msg->data = cameraData;
 
     imp_rgbd_color_depth_[i].publish(msg);
 
@@ -1101,6 +1147,8 @@ void UnrealSimulator::callbackDrs(mrs_uav_unreal_simulation::unreal_simulatorCon
     }
   }
 
+  refreshCameraInfo();
+
   ROS_INFO("[UnrealSimulator]: DRS updated params");
 }
 
@@ -1173,6 +1221,97 @@ void UnrealSimulator::updateUnrealPoses(void) {
       }
     }
   }
+}
+
+//}
+
+/* refreshCameraInfo() //{ */
+
+void UnrealSimulator::refreshCameraInfo(void) {
+
+  bool                         res;
+  ueds_connector::CameraConfig camera_config;
+
+  {
+    std::scoped_lock lock(mutex_ueds_);
+
+    std::tie(res, camera_config) = ueds_connectors_[0]->GetCameraConfig();
+  }
+
+  sensor_msgs::CameraInfo camera_info;
+
+  camera_info.height = camera_config.Height;
+  camera_info.width  = camera_config.Width;
+
+  // distortion
+  camera_info.distortion_model = "plumb_bob";
+
+  camera_info.D.resize(5);
+  camera_info.D[0] = 0;
+  camera_info.D[1] = 0;
+  camera_info.D[2] = 0;
+  camera_info.D[3] = 0;
+  camera_info.D[4] = 0;
+
+  // original camera matrix
+  camera_info.K[0] = camera_config.Width / (2.0 * tan(0.5 * M_PI * (camera_config.angleFOV / 180.0)));
+  camera_info.K[1] = 0.0;
+  camera_info.K[2] = camera_config.Width / 2.0;
+  camera_info.K[3] = 0.0;
+  camera_info.K[4] = camera_config.Width / (2.0 * tan(0.5 * M_PI * (camera_config.angleFOV / 180.0)));
+  camera_info.K[5] = camera_config.Height / 2.0;
+  camera_info.K[6] = 0.0;
+  camera_info.K[7] = 0.0;
+  camera_info.K[8] = 1.0;
+
+  // rectification
+  camera_info.R[0] = 1.0;
+  camera_info.R[1] = 0.0;
+  camera_info.R[2] = 0.0;
+  camera_info.R[3] = 0.0;
+  camera_info.R[4] = 1.0;
+  camera_info.R[5] = 0.0;
+  camera_info.R[6] = 0.0;
+  camera_info.R[7] = 0.0;
+  camera_info.R[8] = 1.0;
+
+  // camera projection matrix (same as camera matrix due to lack of distortion/rectification) (is this generated?)
+  camera_info.P[0]  = camera_config.Width / (2.0 * tan(0.5 * M_PI * (camera_config.angleFOV / 180.0)));
+  camera_info.P[1]  = 0.0;
+  camera_info.P[2]  = camera_config.Width / 2.0;
+  camera_info.P[3]  = 0.0;
+  camera_info.P[4]  = 0.0;
+  camera_info.P[5]  = camera_config.Width / (2.0 * tan(0.5 * M_PI * (camera_config.angleFOV / 180.0)));
+  camera_info.P[6]  = camera_config.Height / 2.0;
+  camera_info.P[7]  = 0.0;
+  camera_info.P[8]  = 0.0;
+  camera_info.P[9]  = 0.0;
+  camera_info.P[10] = 1.0;
+  camera_info.P[11] = 0.0;
+
+  mrs_lib::set_mutexed(mutex_camera_info_, camera_info, camera_info_);
+
+  geometry_msgs::TransformStamped tf_msg;
+
+  tf_msg.header.stamp = ros::Time::now();
+
+  /* tf_msg.header.frame_id = "uav" + std::to_string(i + 1) + "/fcu"; */
+  /* tf_msg.child_frame_id  = "uav" + std::to_string(i + 1) + "/rgbd"; */
+
+  tf_msg.transform.translation.x = camera_config.offset.x / 100.0;
+  tf_msg.transform.translation.y = camera_config.offset.y / 100.0;
+  tf_msg.transform.translation.z = camera_config.offset.z / 100.0;
+
+  Eigen::Matrix3d initial_tf = mrs_lib::AttitudeConverter(Eigen::Quaterniond(-0.5, 0.5, -0.5, 0.5));
+
+  Eigen::Matrix3d dynamic_tf = mrs_lib::AttitudeConverter(M_PI * (camera_config.orientation.roll / 180.0), M_PI * (camera_config.orientation.pitch / 180.0),
+                                                          M_PI * (camera_config.orientation.yaw / 180.0));
+
+  Eigen::Matrix3d final_tf = dynamic_tf * initial_tf;
+
+  tf_msg.transform.rotation = mrs_lib::AttitudeConverter(final_tf);
+
+  mrs_lib::set_mutexed(mutex_camera_tf_, tf_msg, camera_tf_);
 }
 
 //}
