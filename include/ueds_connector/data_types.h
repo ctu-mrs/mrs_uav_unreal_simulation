@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "string"
+#include <string>
 
 namespace ueds_connector
 {
@@ -108,30 +108,44 @@ enum CameraCaptureModeEnum : unsigned short
   CAPTURE_ON_DEMAND   = 0x2,
 };
 
-struct CameraConfig
+struct RgbCameraConfig
 {
-  CameraConfig() = default;
-  CameraConfig(bool showDebugCamera, double angleFov, const Coordinates offset, const Rotation orientation, int Width, int Height, double baseline)
-      : showDebugCamera(showDebugCamera), angleFOV(angleFov), offset(offset), orientation(orientation), Width(Width), Height(Height), baseline(baseline) {
+  RgbCameraConfig() = default;
+  RgbCameraConfig(bool show_debug_camera, const Coordinates offset, const Rotation orientation, double fov, int width, int height)
+      : show_debug_camera_(show_debug_camera), offset_(offset), orientation_(orientation), fov_(fov), width_(width), height_(height) {
   }
 
-  bool showDebugCamera;
+  bool show_debug_camera_;
 
-  double angleFOV;
+  Coordinates offset_;
 
-  Coordinates offset;
+  Rotation orientation_;
 
-  Rotation orientation;
+  double fov_;
 
-  int Width;
-
-  int Height;
-
-  double baseline;
-
-  std::string toString() const {
-    return "(showDebugCamera: " + std::to_string(showDebugCamera) + ", angleFOV: " + std::to_string(angleFOV) + ", offset: " + offset.toString() +
-           ", directionZ: " + orientation.toString() + ", Width: " + std::to_string(Width) + ", Height: " + std::to_string(Height) + ")";
-  }
+  int width_;
+  int height_;
 };
+
+struct StereoCameraConfig
+{
+  StereoCameraConfig() = default;
+  StereoCameraConfig(bool show_debug_camera, const Coordinates offset, const Rotation orientation, double fov, int width, int height, double baseline)
+      : show_debug_camera_(show_debug_camera), offset_(offset), orientation_(orientation), fov_(fov), width_(width), height_(height), baseline_(baseline) {
+  }
+
+  bool show_debug_camera_;
+
+  Coordinates offset_;
+
+  Rotation orientation_;
+
+  double fov_;
+
+  int width_;
+  int height_;
+
+  double baseline_;
+};
+
 }  // namespace ueds_connector

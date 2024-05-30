@@ -4,9 +4,8 @@
 #pragma once
 
 #include <memory>
-
-#include "../data-types.h"
-#include "serializable-shared.h"
+#include <ueds_connector/data_types.h>
+#include <ueds_connector/serialization/serializable_shared.h>
 
 namespace Serializable::Drone::GetLocation
 {

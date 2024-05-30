@@ -6,8 +6,8 @@
 #include <string>
 #include <vector>
 
-#include <ueds_connector/data-types.h>
-#include <ueds_connector/socket-client.h>
+#include <ueds_connector/data_types.h>
+#include <ueds_connector/socket_client.h>
 
 namespace ueds_connector
 {
@@ -25,9 +25,9 @@ public:
 
   std::tuple<bool, Coordinates, bool, Coordinates> SetLocation(const Coordinates& coordinates, bool checkCollisions);
 
-  std::tuple<bool, std::vector<unsigned char>, uint32_t> GetLeftCameraData();
+  std::tuple<bool, std::vector<unsigned char>, uint32_t> GetRgbCameraData();
 
-  std::tuple<bool, std::vector<unsigned char>, uint32_t> GetRightCameraData();
+  std::tuple<bool, std::vector<unsigned char>, std::vector<unsigned char>> GetStereoCameraData();
 
   std::tuple<bool, std::vector<unsigned char>, uint32_t> GetCameraDepth();
 
@@ -49,9 +49,13 @@ public:
 
   bool SetLidarConfig(const LidarConfig& config);
 
-  std::pair<bool, CameraConfig> GetCameraConfig();
+  std::pair<bool, RgbCameraConfig> GetRgbCameraConfig();
 
-  bool SetCameraConfig(const CameraConfig& config);
+  bool SetRgbCameraConfig(const RgbCameraConfig& config);
+
+  std::pair<bool, StereoCameraConfig> GetStereoCameraConfig();
+
+  bool SetStereoCameraConfig(const StereoCameraConfig& config);
 
   std::pair<bool, bool> GetMoveLineVisible();
 

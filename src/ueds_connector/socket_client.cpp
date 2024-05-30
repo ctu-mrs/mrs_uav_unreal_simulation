@@ -1,7 +1,7 @@
 // Copyright [2022] <Jakub Jirkal>
 // This code is licensed under MIT license (see LICENSE for details)
 
-#include <ueds_connector/socket-client.h>
+#include <ueds_connector/socket_client.h>
 
 #include <chrono>
 #include <thread>

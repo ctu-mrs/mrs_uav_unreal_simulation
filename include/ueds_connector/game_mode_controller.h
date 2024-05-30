@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-#include <ueds_connector/socket-client.h>
+#include <ueds_connector/socket_client.h>
 
 namespace ueds_connector
 {

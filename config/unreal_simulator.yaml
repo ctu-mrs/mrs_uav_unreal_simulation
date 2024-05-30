@@ -13,7 +13,7 @@ collisions: true
 sensors:
 
   lidar:
-    enabled: true
+    enabled: false
     rate: 10.0 # [Hz]
     horizontal_fov: 360.0 # [deg]
     vertical_fov: 90.0 # [deg]
@@ -21,44 +21,46 @@ sensors:
     vertical_rays: 32
     offset_x: 0.0 # [m]
     offset_y: 0.0 # [m]
-    offset_z: 6.0 # [m]
+    offset_z: 0.06 # [m]
     rotation_pitch: 0.0 # [deg]
     rotation_roll: 90.0 # [deg]
     rotation_yaw: 0.0 # [deg]
     beam_length: 1000.0 # [m]
 
-  lidar_seg:
-    enabled: false
-    rate: 10.0 # [Hz]
+    lidar_segmented:
+      enabled: false
+      rate: 10.0 # [Hz]
 
   rgb:
     enabled: true
     rate: 10.0 # [Hz]
-    width: 640
-    height: 480
-    fov: 90
-    offset_x: 14.9
+    width: 640 # [px]
+    height: 480 # [px]
+    fov: 90.0 # [deg]
+    offset_x: 0.14
     offset_y: 0.0
     offset_z: 0.0
     rotation_pitch: 0.0
     rotation_yaw: 0.0
     rotation_roll: 0.0
-    
-  stereo:
-    enabled: true
-    baseline: 0.1 # [m]
 
-  depth:
+    rgb_segmented:
+      enabled: false
+      rate: 5.0 # [Hz]
+
+  stereo:
     enabled: false
     rate: 10.0 # [Hz]
-
-  seg:
-    enabled: false
-    rate: 5.0 # [Hz]
-
-  color_depth:
-    enabled: false
-    rate: 5.0 # [Hz]
+    baseline: 0.1 # [m]
+    width: 640 # [px]
+    height: 480 # [px]
+    fov: 90.0 # [deg]
+    offset_x: 0.14
+    offset_y: 0.0
+    offset_z: 0.0
+    rotation_pitch: 0.0
+    rotation_yaw: 0.0
+    rotation_roll: 0.0
 
 frames:
   world:

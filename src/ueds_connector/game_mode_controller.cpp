@@ -1,7 +1,7 @@
 // Copyright [2022] <Jakub Jirkal>
 // This code is licensed under MIT license (see LICENSE for details)
 
-#include <ueds_connector/game-mode-controller.h>
+#include <ueds_connector/game_mode_controller.h>
 
 #include <sstream>
 

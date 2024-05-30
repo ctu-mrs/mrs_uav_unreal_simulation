@@ -15,7 +15,7 @@
 
 #include <cereal/archives/binary.hpp>
 #include <kissnet/kissnet.hpp>
-#include <ueds_connector/serialization/serializable-extended.h>
+#include <ueds_connector/serialization/serializable_extended.h>
 
 #define LOCALHOST "127.0.0.1"
 #define DEFAULT_PORT 8080
@@ -69,11 +69,6 @@ public:
     if (!GetMessage(response_str)) {
       return false;
     }
-
-    //    std::cout << "m.length " << response_str.length() << std::endl;
-    //    std::cout << typeid(response).name() << std::endl;
-    // std::cout << typeid(Serializable::Drone::GetLidarData::Response).name() << std::endl;
-
 
     try {
       std::stringstream          ss2(response_str);

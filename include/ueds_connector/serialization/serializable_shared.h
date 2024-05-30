@@ -16,6 +16,8 @@ enum MessageType : unsigned short
   ping = 0x1
 };
 
+/* NetworkRequest //{ */
+
 struct NetworkRequest
 {
   NetworkRequest() = default;
@@ -29,6 +31,10 @@ struct NetworkRequest
     archive(type);
   }
 };
+
+//}
+
+/* NetworkResponse //{ */
 
 struct NetworkResponse
 {
@@ -49,6 +55,10 @@ struct NetworkResponse
   }
 };
 
+//}
+
+/* Ping //{ */
+
 namespace Ping
 {
 struct Request : public Common::NetworkRequest
@@ -65,31 +75,38 @@ struct Response : public Common::NetworkResponse
   }
 };
 }  // namespace Ping
+
+//}
+
 }  // namespace Common
 
 namespace Drone
 {
 enum MessageType : unsigned short
 {
-  get_location              = 0x2,
-  set_location              = 0x3,
-  get_left_camera_data      = 0x4,
-  get_right_camera_data     = 0x5,
-  get_rotation              = 0x6,
-  set_rotation              = 0x7,
-  set_location_and_rotation = 0x8,
-  get_lidar_data            = 0x9,
-  get_lidar_config          = 0x10,
-  set_lidar_config          = 0x11,
-  get_camera_config         = 0x12,
-  set_camera_config         = 0x13,
-  get_move_line_visible     = 0x14,
-  set_move_line_visible     = 0x15,
-  get_camera_depth          = 0x16,
-  get_camera_seg            = 0x17,
-  get_lidar_seg             = 0x19,
-  get_camera_color_depth    = 0x19,
+  get_location              = 2,
+  set_location              = 3,
+  get_rgb_camera_data       = 4,
+  get_stereo_camera_data    = 5,
+  get_rotation              = 6,
+  set_rotation              = 7,
+  set_location_and_rotation = 8,
+  get_lidar_data            = 9,
+  get_lidar_config          = 10,
+  set_lidar_config          = 11,
+  get_rgb_camera_config     = 12,
+  set_rgb_camera_config     = 13,
+  get_stereo_camera_config  = 14,
+  set_stereo_camera_config  = 15,
+  get_move_line_visible     = 16,
+  set_move_line_visible     = 17,
+  get_camera_depth          = 18,
+  get_camera_seg            = 19,
+  get_lidar_seg             = 20,
+  get_camera_color_depth    = 21,
 };
+
+/* struct LidarConfig //{ */
 
 struct LidarConfig
 {
@@ -122,30 +139,65 @@ struct LidarConfig
   }
 };
 
-struct CameraConfig
+//}
+
+/* struct RgbCameraConfig //{ */
+
+struct RgbCameraConfig
 {
-  bool showDebugCamera;
+  bool show_debug_camera_;
 
-  double offsetX;
-  double offsetY;
-  double offsetZ;
+  double offset_x_;
+  double offset_y_;
+  double offset_z_;
 
-  double orientationPitch;
-  double orientationYaw;
-  double orientationRoll;
+  double rotation_pitch_;
+  double rotation_yaw_;
+  double rotation_roll_;
 
-  double angleFOV;
+  double fov_;
 
-  double baseline;
-
-  int Width;
-  int Height;
+  int width_;
+  int height_;
 
   template <class Archive>
   void serialize(Archive& archive) {
-    archive(showDebugCamera, offsetX, offsetY, offsetZ, orientationPitch, orientationYaw, orientationRoll, angleFOV, Width, Height, baseline);
+    archive(show_debug_camera_, offset_x_, offset_y_, offset_z_, rotation_pitch_, rotation_yaw_, rotation_roll_, fov_, width_, height_);
   }
 };
+
+//}
+
+/* struct StereoCameraConfig //{ */
+
+struct StereoCameraConfig
+{
+  bool show_debug_camera_;
+
+  double offset_x_;
+  double offset_y_;
+  double offset_z_;
+
+  double rotation_pitch_;
+  double rotation_yaw_;
+  double rotation_roll_;
+
+  double fov_;
+
+  int width_;
+  int height_;
+
+  double baseline_;
+
+  template <class Archive>
+  void serialize(Archive& archive) {
+    archive(show_debug_camera_, offset_x_, offset_y_, offset_z_, rotation_pitch_, rotation_yaw_, rotation_roll_, fov_, width_, height_, baseline_);
+  }
+};
+
+//}
+
+/* GetLocation //{ */
 
 namespace GetLocation
 {
@@ -172,6 +224,10 @@ struct Response : public Common::NetworkResponse
   }
 };
 }  // namespace GetLocation
+
+//}
+
+/* SetLocation //{ */
 
 namespace SetLocation
 {
@@ -214,53 +270,66 @@ struct Response : public Common::NetworkResponse
 };
 }  // namespace SetLocation
 
-namespace GetLeftCameraData
+//}
+
+/* GetRgbCameraData //{ */
+
+namespace GetRgbCameraData
 {
 struct Request : public Common::NetworkRequest
 {
-  Request() : Common::NetworkRequest(static_cast<unsigned short>(MessageType::get_left_camera_data)) {
+  Request() : Common::NetworkRequest(static_cast<unsigned short>(MessageType::get_rgb_camera_data)) {
   }
 };
 
 struct Response : public Common::NetworkResponse
 {
-  Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::get_left_camera_data)) {
+  Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::get_rgb_camera_data)) {
   }
-  explicit Response(bool _status) : Common::NetworkResponse(MessageType::get_left_camera_data, _status) {
+  explicit Response(bool _status) : Common::NetworkResponse(MessageType::get_rgb_camera_data, _status) {
   }
 
-  std::vector<unsigned char> imageData;
+  std::vector<unsigned char> image_;
 
   template <class Archive>
   void serialize(Archive& archive) {
-    archive(cereal::base_class<Common::NetworkResponse>(this), imageData);
+    archive(cereal::base_class<Common::NetworkResponse>(this), image_);
   }
 };
-}  // namespace GetLeftCameraData
+}  // namespace GetRgbCameraData
 
-namespace GetRightCameraData
+//}
+
+/* GetStereoCameraData //{ */
+
+namespace GetStereoCameraData
 {
 struct Request : public Common::NetworkRequest
 {
-  Request() : Common::NetworkRequest(static_cast<unsigned short>(MessageType::get_right_camera_data)) {
+  Request() : Common::NetworkRequest(static_cast<unsigned short>(MessageType::get_stereo_camera_data)) {
   }
 };
 
 struct Response : public Common::NetworkResponse
 {
-  Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::get_right_camera_data)) {
+  Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::get_stereo_camera_data)) {
   }
-  explicit Response(bool _status) : Common::NetworkResponse(MessageType::get_right_camera_data, _status) {
+  explicit Response(bool _status) : Common::NetworkResponse(MessageType::get_stereo_camera_data, _status) {
   }
 
-  std::vector<unsigned char> imageData;
+  std::vector<unsigned char> image_left_;
+  std::vector<unsigned char> image_right_;
 
   template <class Archive>
   void serialize(Archive& archive) {
-    archive(cereal::base_class<Common::NetworkResponse>(this), imageData);
+    archive(cereal::base_class<Common::NetworkResponse>(this), image_left_, image_right_);
   }
 };
-}  // namespace GetRightCameraData
+}  // namespace GetStereoCameraData
+
+//}
+
+/* GetCameraDepth //{ */
 
 namespace GetCameraDepth
 {
@@ -286,6 +355,10 @@ struct Response : public Common::NetworkResponse
 };
 }  // namespace GetCameraDepth
 
+//}
+
+/* GetCameraSeg //{ */
+
 namespace GetCameraSeg
 {
 struct Request : public Common::NetworkRequest
@@ -310,6 +383,10 @@ struct Response : public Common::NetworkResponse
 };
 }  // namespace GetCameraSeg
 
+//}
+
+/* GetCameraColorDepth //{ */
+
 namespace GetCameraColorDepth
 {
 struct Request : public Common::NetworkRequest
@@ -333,6 +410,10 @@ struct Response : public Common::NetworkResponse
   }
 };
 }  // namespace GetCameraColorDepth
+
+//}
+
+/* GetRotation //{ */
 
 namespace GetRotation
 {
@@ -359,6 +440,10 @@ struct Response : public Common::NetworkResponse
   }
 };
 }  // namespace GetRotation
+
+//}
+
+/* SetRotation //{ */
 
 namespace SetRotation
 {
@@ -399,6 +484,10 @@ struct Response : public Common::NetworkResponse
   }
 };
 }  // namespace SetRotation
+
+//}
+
+/* SetLocationAndRotation //{ */
 
 namespace SetLocationAndRotation
 {
@@ -448,6 +537,10 @@ struct Response : public Common::NetworkResponse
 };
 }  // namespace SetLocationAndRotation
 
+//}
+
+/* GetLidarData //{ */
+
 namespace GetLidarData
 {
 struct LidarData
@@ -490,6 +583,10 @@ struct Response : public Common::NetworkResponse
   }
 };
 }  // namespace GetLidarData
+
+//}
+
+/* GetLidarSegData //{ */
 
 namespace GetLidarSegData
 {
@@ -534,6 +631,10 @@ struct Response : public Common::NetworkResponse
 };
 }  // namespace GetLidarSegData
 
+//}
+
+/* GetLidarConfig //{ */
+
 namespace GetLidarConfig
 {
 struct Request : public Common::NetworkRequest
@@ -554,6 +655,10 @@ struct Response : public Common::NetworkResponse
   }
 };
 }  // namespace GetLidarConfig
+
+//}
+
+/* SetLidarConfig //{ */
 
 namespace SetLidarConfig
 {
@@ -576,34 +681,42 @@ struct Response : public Common::NetworkResponse
 };
 }  // namespace SetLidarConfig
 
-namespace GetCameraConfig
+//}
+
+/* GetRgbCameraConfig //{ */
+
+namespace GetRgbCameraConfig
 {
 struct Request : public Common::NetworkRequest
 {
-  Request() : Common::NetworkRequest(static_cast<unsigned short>(MessageType::get_camera_config)){};
+  Request() : Common::NetworkRequest(static_cast<unsigned short>(MessageType::get_rgb_camera_config)){};
 };
 
 struct Response : public Common::NetworkResponse
 {
-  Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::get_camera_config)){};
-  explicit Response(bool _status) : Common::NetworkResponse(MessageType::get_camera_config, _status){};
+  Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::get_rgb_camera_config)){};
+  explicit Response(bool _status) : Common::NetworkResponse(MessageType::get_rgb_camera_config, _status){};
 
-  CameraConfig config;
+  RgbCameraConfig config;
 
   template <class Archive>
   void serialize(Archive& archive) {
     archive(cereal::base_class<Common::NetworkResponse>(this), config);
   }
 };
-}  // namespace GetCameraConfig
+}  // namespace GetRgbCameraConfig
 
-namespace SetCameraConfig
+//}
+
+/* SetRgbCameraConfig //{ */
+
+namespace SetRgbCameraConfig
 {
 struct Request : public Common::NetworkRequest
 {
-  Request() : Common::NetworkRequest(static_cast<unsigned short>(MessageType::set_camera_config)){};
+  Request() : Common::NetworkRequest(static_cast<unsigned short>(MessageType::set_rgb_camera_config)){};
 
-  CameraConfig config;
+  RgbCameraConfig config;
 
   template <class Archive>
   void serialize(Archive& archive) {
@@ -613,10 +726,64 @@ struct Request : public Common::NetworkRequest
 
 struct Response : public Common::NetworkResponse
 {
-  Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::set_camera_config)){};
-  explicit Response(bool _status) : Common::NetworkResponse(MessageType::set_camera_config, _status){};
+  Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::set_rgb_camera_config)){};
+  explicit Response(bool _status) : Common::NetworkResponse(MessageType::set_rgb_camera_config, _status){};
 };
-}  // namespace SetCameraConfig
+}  // namespace SetRgbCameraConfig
+
+//}
+
+/* GetStereoCameraConfig //{ */
+
+namespace GetStereoCameraConfig
+{
+struct Request : public Common::NetworkRequest
+{
+  Request() : Common::NetworkRequest(static_cast<unsigned short>(MessageType::get_stereo_camera_config)){};
+};
+
+struct Response : public Common::NetworkResponse
+{
+  Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::get_stereo_camera_config)){};
+  explicit Response(bool _status) : Common::NetworkResponse(MessageType::get_stereo_camera_config, _status){};
+
+  StereoCameraConfig config;
+
+  template <class Archive>
+  void serialize(Archive& archive) {
+    archive(cereal::base_class<Common::NetworkResponse>(this), config);
+  }
+};
+}  // namespace GetStereoCameraConfig
+
+//}
+
+/* SetStereoCameraConfig //{ */
+
+namespace SetStereoCameraConfig
+{
+struct Request : public Common::NetworkRequest
+{
+  Request() : Common::NetworkRequest(static_cast<unsigned short>(MessageType::set_stereo_camera_config)){};
+
+  StereoCameraConfig config;
+
+  template <class Archive>
+  void serialize(Archive& archive) {
+    archive(cereal::base_class<Common::NetworkRequest>(this), config);
+  }
+};
+
+struct Response : public Common::NetworkResponse
+{
+  Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::set_stereo_camera_config)){};
+  explicit Response(bool _status) : Common::NetworkResponse(MessageType::set_stereo_camera_config, _status){};
+};
+}  // namespace SetStereoCameraConfig
+
+//}
+
+/* GetMoveLineVisible //{ */
 
 namespace GetMoveLineVisible
 {
@@ -639,6 +806,10 @@ struct Response : public Common::NetworkResponse
 };
 }  // namespace GetMoveLineVisible
 
+//}
+
+/* SetMoveLineVisible //{ */
+
 namespace SetMoveLineVisible
 {
 struct Request : public Common::NetworkRequest
@@ -659,6 +830,8 @@ struct Response : public Common::NetworkResponse
   explicit Response(bool _status) : Common::NetworkResponse(MessageType::set_move_line_visible, _status){};
 };
 }  // namespace SetMoveLineVisible
+
+//}
 
 }  // namespace Drone
 
