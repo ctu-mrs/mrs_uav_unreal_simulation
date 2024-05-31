@@ -56,3 +56,17 @@ inline std::unique_ptr<Request> ToRequest(const ueds_connector::Coordinates& loc
   return request;
 }
 }  // namespace Serializable::Drone::SetLocationAndRotation
+
+namespace Serializable::Drone::SetLocationAndRotationAsync
+{
+inline std::unique_ptr<Request> ToRequest(const ueds_connector::Coordinates& location, const ueds_connector::Rotation& rotation) {
+  auto request   = std::make_unique<Request>();
+  request->x     = location.x;
+  request->y     = location.y;
+  request->z     = location.z;
+  request->pitch = rotation.pitch;
+  request->yaw   = rotation.yaw;
+  request->roll  = rotation.roll;
+  return request;
+}
+}  // namespace Serializable::Drone::SetLocationAndRotationAsync

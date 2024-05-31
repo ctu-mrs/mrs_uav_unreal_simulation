@@ -84,26 +84,27 @@ namespace Drone
 {
 enum MessageType : unsigned short
 {
-  get_location              = 2,
-  set_location              = 3,
-  get_rgb_camera_data       = 4,
-  get_stereo_camera_data    = 5,
-  get_rotation              = 6,
-  set_rotation              = 7,
-  set_location_and_rotation = 8,
-  get_lidar_data            = 9,
-  get_lidar_config          = 10,
-  set_lidar_config          = 11,
-  get_rgb_camera_config     = 12,
-  set_rgb_camera_config     = 13,
-  get_stereo_camera_config  = 14,
-  set_stereo_camera_config  = 15,
-  get_move_line_visible     = 16,
-  set_move_line_visible     = 17,
-  get_camera_depth          = 18,
-  get_camera_seg            = 19,
-  get_lidar_seg             = 20,
-  get_camera_color_depth    = 21,
+  get_location                    = 2,
+  set_location                    = 3,
+  get_rgb_camera_data             = 4,
+  get_stereo_camera_data          = 5,
+  get_rotation                    = 6,
+  set_rotation                    = 7,
+  set_location_and_rotation       = 8,
+  get_lidar_data                  = 9,
+  get_lidar_config                = 10,
+  set_lidar_config                = 11,
+  get_rgb_camera_config           = 12,
+  set_rgb_camera_config           = 13,
+  get_stereo_camera_config        = 14,
+  set_stereo_camera_config        = 15,
+  get_move_line_visible           = 16,
+  set_move_line_visible           = 17,
+  get_camera_depth                = 18,
+  get_camera_seg                  = 19,
+  get_lidar_seg                   = 20,
+  get_camera_color_depth          = 21,
+  set_location_and_rotation_async = 22,
 };
 
 /* struct LidarConfig //{ */
@@ -536,6 +537,44 @@ struct Response : public Common::NetworkResponse
   }
 };
 }  // namespace SetLocationAndRotation
+
+//}
+
+/* SetLocationAndRotationAsync //{ */
+
+namespace SetLocationAndRotationAsync
+{
+struct Request : public Common::NetworkRequest
+{
+  Request() : Common::NetworkRequest(static_cast<unsigned short>(MessageType::set_location_and_rotation_async)) {
+  }
+
+  double x;
+  double y;
+  double z;
+  double pitch;
+  double yaw;
+  double roll;
+
+  template <class Archive>
+  void serialize(Archive& archive) {
+    archive(cereal::base_class<Common::NetworkRequest>(this), x, y, z, pitch, yaw, roll);
+  }
+};
+
+struct Response : public Common::NetworkResponse
+{
+  Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::set_location_and_rotation_async)) {
+  }
+  explicit Response(bool _status) : Common::NetworkResponse(MessageType::set_location_and_rotation_async, _status) {
+  }
+
+  template <class Archive>
+  void serialize(Archive& archive) {
+    archive(cereal::base_class<Common::NetworkResponse>(this));
+  }
+};
+}  // namespace SetLocationAndRotationAsync
 
 //}
 

@@ -401,7 +401,7 @@ void UnrealSimulator::onInit() {
       cameraConfig.width_       = rgb_width_;
       cameraConfig.height_      = rgb_height_;
       cameraConfig.fov_         = rgb_fov_;
-      cameraConfig.offset_      = ueds_connector::Coordinates(rgb_offset_x_*100.0, rgb_offset_y_*100.0, rgb_offset_z_*100.0);
+      cameraConfig.offset_      = ueds_connector::Coordinates(rgb_offset_x_ * 100.0, rgb_offset_y_ * 100.0, rgb_offset_z_ * 100.0);
       cameraConfig.orientation_ = ueds_connector::Rotation(rgb_rotation_pitch_, rgb_rotation_roll_, rgb_rotation_yaw_);
 
       const auto res = ueds_connectors_[i]->SetRgbCameraConfig(cameraConfig);
@@ -422,7 +422,7 @@ void UnrealSimulator::onInit() {
       cameraConfig.height_      = stereo_height_;
       cameraConfig.fov_         = stereo_fov_;
       cameraConfig.baseline_    = stereo_baseline_;
-      cameraConfig.offset_      = ueds_connector::Coordinates(stereo_offset_x_*100.0, stereo_offset_y_*100.0, stereo_offset_z_*100.0);
+      cameraConfig.offset_      = ueds_connector::Coordinates(stereo_offset_x_ * 100.0, stereo_offset_y_ * 100.0, stereo_offset_z_ * 100.0);
       cameraConfig.orientation_ = ueds_connector::Rotation(stereo_rotation_pitch_, stereo_rotation_roll_, stereo_rotation_yaw_);
 
       const auto res = ueds_connectors_[i]->SetStereoCameraConfig(cameraConfig);
@@ -790,7 +790,7 @@ void UnrealSimulator::timerRgb([[maybe_unused]] const ros::TimerEvent& event) {
     return;
   }
 
-  /* mrs_lib::ScopeTimer timer = mrs_lib::ScopeTimer("timerRgb()"); */
+  mrs_lib::ScopeTimer timer = mrs_lib::ScopeTimer("timerRgb()");
 
   auto drs_params = mrs_lib::get_mutexed(mutex_drs_params_, drs_params_);
 
@@ -809,6 +809,8 @@ void UnrealSimulator::timerRgb([[maybe_unused]] const ros::TimerEvent& event) {
     std::vector<unsigned char> cameraData;
     uint32_t                   size;
 
+    timer.checkpoint("getting_camera_data");
+
     {
       std::scoped_lock lock(mutex_ueds_);
 
@@ -820,7 +822,11 @@ void UnrealSimulator::timerRgb([[maybe_unused]] const ros::TimerEvent& event) {
       continue;
     }
 
+    timer.checkpoint("before_decode");
+
     cv::Mat image = cv::imdecode(cameraData, cv::IMREAD_COLOR);
+
+    timer.checkpoint("after_decode");
 
     sensor_msgs::ImagePtr msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", image).toImageMsg();
 
@@ -1050,17 +1056,17 @@ void UnrealSimulator::updateUnrealPoses(void) {
       pos.y = ueds_world_origins_[i].y - state.x.y() * 100.0;
       pos.z = ueds_world_origins_[i].z + state.x.z() * 100.0;
 
+      ROS_INFO("[UnrealSimulator]: setting %f %f %f", pos.x, pos.y, pos.z);
+
       ueds_connector::Rotation rot;
       rot.pitch = 180.0 * (-pitch / M_PI);
       rot.roll  = 180.0 * (roll / M_PI);
       rot.yaw   = 180.0 * (-yaw / M_PI);
 
-      const auto [res, teleportedTo, rotatedTo, isHit, impactPoint] = ueds_connectors_[i]->SetLocationAndRotation(pos, rot);
+      {
+        mrs_lib::ScopeTimer timer = mrs_lib::ScopeTimer("SetLocationAndRotationAsync()");
 
-      if (_collisions_ && isHit) {
-        if (!uavs_[i]->hasCrashed()) {
-          uavs_[i]->crash();
-        }
+        const auto [res] = ueds_connectors_[i]->SetLocationAndRotationAsync(pos, rot);
       }
     }
   }

@@ -41,6 +41,8 @@ public:
 
   std::tuple<bool, Coordinates, Rotation, bool, Coordinates> SetLocationAndRotation(const Coordinates& coordinate, const Rotation& rotation);
 
+  std::tuple<bool> SetLocationAndRotationAsync(const Coordinates& coordinate, const Rotation& rotation);
+
   std::tuple<bool, std::vector<LidarData>, Coordinates> GetLidarData();
 
   std::tuple<bool, std::vector<LidarSegData>, Coordinates> GetLidarSegData();

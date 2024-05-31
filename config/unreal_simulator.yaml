@@ -32,7 +32,7 @@ sensors:
       rate: 10.0 # [Hz]
 
   rgb:
-    enabled: true
+    enabled: false
     rate: 10.0 # [Hz]
     width: 640 # [px]
     height: 480 # [px]

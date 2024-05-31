@@ -230,6 +230,27 @@ std::tuple<bool, Coordinates, Rotation, bool, Coordinates> UedsConnector::SetLoc
 
 //}
 
+/* setLocationAndRotationAsync() //{ */
+
+std::tuple<bool> UedsConnector::SetLocationAndRotationAsync(const Coordinates& coordinate, const Rotation& rotation) {
+
+  Serializable::Drone::SetLocationAndRotationAsync::Request request{};
+  request.x     = coordinate.x;
+  request.y     = coordinate.y;
+  request.z     = coordinate.z;
+  request.pitch = rotation.pitch;
+  request.yaw   = rotation.yaw;
+  request.roll  = rotation.roll;
+
+  Serializable::Drone::SetLocationAndRotation::Response response{};
+  const auto                                            status  = Request(request, response);
+  const auto                                            success = status && response.status;
+
+  return std::make_tuple(success);
+}
+
+//}
+
 /* getLidarData() //{ */
 
 std::tuple<bool, std::vector<LidarData>, Coordinates> UedsConnector::GetLidarData() {
