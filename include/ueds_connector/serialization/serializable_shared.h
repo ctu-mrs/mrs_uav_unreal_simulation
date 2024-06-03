@@ -291,10 +291,11 @@ struct Response : public Common::NetworkResponse
   }
 
   std::vector<unsigned char> image_;
+  double                     stamp_;
 
   template <class Archive>
   void serialize(Archive& archive) {
-    archive(cereal::base_class<Common::NetworkResponse>(this), image_);
+    archive(cereal::base_class<Common::NetworkResponse>(this), image_, stamp_);
   }
 };
 }  // namespace GetRgbCameraData
@@ -320,10 +321,11 @@ struct Response : public Common::NetworkResponse
 
   std::vector<unsigned char> image_left_;
   std::vector<unsigned char> image_right_;
+  double                     stamp_;
 
   template <class Archive>
   void serialize(Archive& archive) {
-    archive(cereal::base_class<Common::NetworkResponse>(this), image_left_, image_right_);
+    archive(cereal::base_class<Common::NetworkResponse>(this), image_left_, image_right_, stamp_);
   }
 };
 }  // namespace GetStereoCameraData
@@ -878,12 +880,13 @@ namespace GameMode
 {
 enum MessageType : unsigned short
 {
-  get_drones              = 0x2,
-  spawn_drone             = 0x3,
-  remove_drone            = 0x4,
-  get_camera_capture_mode = 0x5,
-  set_camera_capture_mode = 0x6,
-  get_fps                 = 0x7
+  get_drones              = 2,
+  spawn_drone             = 3,
+  remove_drone            = 4,
+  get_camera_capture_mode = 5,
+  set_camera_capture_mode = 6,
+  get_fps                 = 7,
+  get_time                = 8,
 };
 
 namespace GetDrones
@@ -958,6 +961,7 @@ struct Response : public Common::NetworkResponse
 };
 }  // namespace RemoveDrone
 
+
 enum CameraCaptureModeEnum : unsigned short
 {
   CAPTURE_ALL_FRAMES  = 0x0,
@@ -1027,5 +1031,28 @@ struct Response : public Common::NetworkResponse
   }
 };
 }  // namespace GetFps
+
+namespace GetTime
+{
+struct Request : public Common::NetworkRequest
+{
+  Request() : Common::NetworkRequest(MessageType::get_time){};
+};
+
+struct Response : public Common::NetworkResponse
+{
+  Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::get_time)){};
+  explicit Response(bool _status) : Common::NetworkResponse(MessageType::get_time, _status){};
+
+  double time;
+
+  template <class Archive>
+  void serialize(Archive& archive) {
+    archive(cereal::base_class<Common::NetworkResponse>(this), time);
+  }
+};
+}  // namespace GetTime
+
 }  // namespace GameMode
+
 }  // namespace Serializable

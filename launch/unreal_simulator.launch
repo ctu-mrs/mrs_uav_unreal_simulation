@@ -1,11 +1,12 @@
 <launch>
 
   <arg name="debug" default="false" />
-  <arg name="standalone" default="true" />
+  <arg name="standalone" default="false" />
   <arg name="bond" default="$(optenv BOND true)" />
-  <arg name="nodelet_manager_name" default="$(optenv NODELET_MANAGER)" />
+  <arg name="nodelet_manager_name" default="unreal_nodelet_manager" />
   <arg name="use_sim_time" default="true" />
   <arg name="custom_config" default="" />
+  <arg name="n_threads" default="8" />
 
   <arg     if="$(arg bond)" name="bond_suffix" value="" />
   <arg unless="$(arg bond)" name="bond_suffix" value="--no-bond" />
@@ -16,11 +17,19 @@
   <arg unless="$(eval arg('standalone') or arg('debug'))" name="nodelet_manager" value="$(arg nodelet_manager_name)" />
 
   <arg     if="$(arg debug)" name="launch_prefix" value="debug_roslaunch" />
-  <arg unless="$(arg debug)" name="launch_prefix" value="" />
+  <arg unless="$(eval arg('debug'))" name="launch_prefix" value="" />
 
   <group if="$(arg use_sim_time)">
     <param name="/use_sim_time" value="true" />
   </group>
+
+  <include file="$(find mrs_uav_unreal_simulation)/launch/nodelet_manager.launch">
+
+    <arg name="nodelet_manager_name" value="$(arg nodelet_manager_name)" />
+    <arg name="debug" value="$(arg debug)" />
+    <arg name="n_threads" value="$(arg n_threads)" />
+
+  </include>
 
   <node pkg="nodelet" type="nodelet" name="unreal_simulator" args="$(arg nodelet) mrs_uav_unreal_simulation/UnrealSimulator $(arg nodelet_manager) $(arg bond_suffix)" output="screen" launch-prefix="$(arg launch_prefix)">
 

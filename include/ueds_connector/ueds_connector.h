@@ -25,9 +25,9 @@ public:
 
   std::tuple<bool, Coordinates, bool, Coordinates> SetLocation(const Coordinates& coordinates, bool checkCollisions);
 
-  std::tuple<bool, std::vector<unsigned char>, uint32_t> GetRgbCameraData();
+  std::tuple<bool, std::vector<unsigned char>, double, uint32_t> GetRgbCameraData();
 
-  std::tuple<bool, std::vector<unsigned char>, std::vector<unsigned char>> GetStereoCameraData();
+  std::tuple<bool, std::vector<unsigned char>, std::vector<unsigned char>, double> GetStereoCameraData();
 
   std::tuple<bool, std::vector<unsigned char>, uint32_t> GetCameraDepth();
 

@@ -29,6 +29,8 @@ public:
   bool SetCameraCaptureMode(const CameraCaptureModeEnum& cameraCaptureMode);
 
   std::pair<bool, float> GetFps();
+
+  std::pair<bool, double> GetTime();
 };
 
 }  // namespace ueds_connector

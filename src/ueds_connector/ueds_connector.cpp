@@ -71,7 +71,7 @@ std::tuple<bool, Coordinates, bool, Coordinates> UedsConnector::SetLocation(cons
 
 /* GetRgbCameraData() //{ */
 
-std::tuple<bool, std::vector<unsigned char>, uint32_t> UedsConnector::GetRgbCameraData() {
+std::tuple<bool, std::vector<unsigned char>, double, uint32_t> UedsConnector::GetRgbCameraData() {
 
   Serializable::Drone::GetRgbCameraData::Request request{};
 
@@ -80,14 +80,15 @@ std::tuple<bool, std::vector<unsigned char>, uint32_t> UedsConnector::GetRgbCame
   const auto status  = Request(request, response);
   const auto success = status && response.status;
 
-  return std::make_tuple(success, success ? response.image_ : std::vector<unsigned char>(), success ? response.image_.size() : 0);
+  return std::make_tuple(success, success ? response.image_ : std::vector<unsigned char>(), success ? response.stamp_ : 0.0,
+                         success ? response.image_.size() : 0);
 }
 
 //}
 
 /* GetStereoCameraData() //{ */
 
-std::tuple<bool, std::vector<unsigned char>, std::vector<unsigned char>> UedsConnector::GetStereoCameraData() {
+std::tuple<bool, std::vector<unsigned char>, std::vector<unsigned char>, double> UedsConnector::GetStereoCameraData() {
 
   Serializable::Drone::GetStereoCameraData::Request request{};
 
@@ -96,8 +97,8 @@ std::tuple<bool, std::vector<unsigned char>, std::vector<unsigned char>> UedsCon
   const auto status  = Request(request, response);
   const auto success = status && response.status;
 
-  return std::make_tuple(success, success ? response.image_left_ : std::vector<unsigned char>(),
-                         success ? response.image_right_ : std::vector<unsigned char>());
+  return std::make_tuple(success, success ? response.image_left_ : std::vector<unsigned char>(), success ? response.image_right_ : std::vector<unsigned char>(),
+                         success ? response.stamp_ : 0.0);
 }
 
 //}

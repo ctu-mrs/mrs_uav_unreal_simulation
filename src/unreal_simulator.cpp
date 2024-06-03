@@ -77,11 +77,17 @@ private:
 
   // | ------------------------- timers ------------------------- |
 
-  ros::WallTimer timer_main_;
-  void           timerMain(const ros::WallTimerEvent& event);
+  ros::WallTimer timer_dynamics_;
+  void           timerDynamics(const ros::WallTimerEvent& event);
 
   ros::WallTimer timer_status_;
   void           timerStatus(const ros::WallTimerEvent& event);
+
+  ros::WallTimer timer_time_sync_;
+  void           timerTimeSync(const ros::WallTimerEvent& event);
+
+  ros::Timer timer_unreal_sync_;
+  void       timerUnrealSync(const ros::TimerEvent& event);
 
   ros::Timer timer_lidar_;
   void       timerLidar(const ros::TimerEvent& event);
@@ -214,6 +220,17 @@ private:
   void fabricateCamInfo(void);
 
   void publishStaticTfs(void);
+
+  // how much to add to unreal time to get to our wall time
+  double        wall_time_offset_             = 0;
+  double        wall_time_offset_drift_slope_ = 0;
+  ros::WallTime last_sync_time;
+  std::mutex    mutex_wall_time_offset_;
+
+  std::vector<double> last_rgb_ue_stamp_;
+  std::vector<double> last_stereo_ue_stamp_;
+
+  double uedsToWallTime(const double ueds_time);
 };
 
 //}
@@ -232,8 +249,10 @@ void UnrealSimulator::onInit() {
 
   srand(time(NULL));
 
-  sim_time_            = ros::Time(0);
-  last_published_time_ = ros::Time(0);
+  sim_time_ = ros::Time(ros::WallTime::now().toSec());
+
+  last_published_time_  = sim_time_;
+  last_sim_time_status_ = sim_time_;
 
   it_ = std::make_shared<image_transport::ImageTransport>(nh_);
 
@@ -406,6 +425,8 @@ void UnrealSimulator::onInit() {
 
       const auto res = ueds_connectors_[i]->SetRgbCameraConfig(cameraConfig);
 
+      last_rgb_ue_stamp_.push_back(0.0);
+
       if (!res) {
         ROS_ERROR("[UnrealSimulator]: failed to set camera config for uav %lu", i + 1);
       } else {
@@ -427,10 +448,36 @@ void UnrealSimulator::onInit() {
 
       const auto res = ueds_connectors_[i]->SetStereoCameraConfig(cameraConfig);
 
+      last_stereo_ue_stamp_.push_back(0.0);
+
       if (!res) {
         ROS_ERROR("[UnrealSimulator]: failed to set camera config for uav %lu", i + 1);
       } else {
         ROS_INFO("[UnrealSimulator]: camera config set for uav%lu", i + 1);
+      }
+    }
+
+    // | -------------------- set LiDAR config -------------------- |
+
+    {
+      ueds_connector::LidarConfig lidarConfig{};
+
+      lidarConfig.BeamHorRays  = lidar_horizontal_rays_;
+      lidarConfig.BeamVertRays = lidar_vertical_rays_;
+      lidarConfig.FOVVert      = lidar_vertical_fov_;
+      lidarConfig.FOVHor       = lidar_horizontal_fov_;
+      lidarConfig.beamLength   = lidar_beam_length_;
+      lidarConfig.offset       = ueds_connector::Coordinates(stereo_offset_x_ * 100.0, stereo_offset_y_ * 100.0, stereo_offset_z_ * 100.0);
+      lidarConfig.orientation  = ueds_connector::Rotation(stereo_rotation_pitch_, stereo_rotation_roll_, stereo_rotation_yaw_);
+
+      /* LidarConfig. */
+
+      const auto res = ueds_connectors_[i]->SetLidarConfig(lidarConfig);
+
+      if (!res) {
+        ROS_ERROR("[UnrealSimulator]: failed to set lidar config for uav %lu", i + 1);
+      } else {
+        ROS_INFO("[UnrealSimulator]: lidar config set for uav%lu", i + 1);
       }
     }
   }
@@ -459,11 +506,15 @@ void UnrealSimulator::onInit() {
 
   // | ------------------------- timers ------------------------- |
 
-  timer_main_ = nh_.createWallTimer(ros::WallDuration(1.0 / (_simulation_rate_ * drs_params_.realtime_factor)), &UnrealSimulator::timerMain, this);
+  timer_dynamics_ = nh_.createWallTimer(ros::WallDuration(1.0 / (_simulation_rate_ * drs_params_.realtime_factor)), &UnrealSimulator::timerDynamics, this);
 
   timer_status_ = nh_.createWallTimer(ros::WallDuration(1.0), &UnrealSimulator::timerStatus, this);
 
+  timer_time_sync_ = nh_.createWallTimer(ros::WallDuration(1.0), &UnrealSimulator::timerTimeSync, this);
+
   timer_lidar_ = nh_.createTimer(ros::Duration(1.0 / drs_params_.lidar_rate), &UnrealSimulator::timerLidar, this);
+
+  timer_unreal_sync_ = nh_.createTimer(ros::Duration(1.0 / _simulation_rate_), &UnrealSimulator::timerUnrealSync, this);
 
   timer_seg_lidar_ = nh_.createTimer(ros::Duration(1.0 / drs_params_.lidar_rate), &UnrealSimulator::timerSegLidar, this);
 
@@ -490,9 +541,9 @@ void UnrealSimulator::onInit() {
 
 // | ------------------------- timers ------------------------- |
 
-/* timerMain() //{ */
+/* timerDynamics() //{ */
 
-void UnrealSimulator::timerMain([[maybe_unused]] const ros::WallTimerEvent& event) {
+void UnrealSimulator::timerDynamics([[maybe_unused]] const ros::WallTimerEvent& event) {
 
   if (!is_initialized_) {
     return;
@@ -505,6 +556,17 @@ void UnrealSimulator::timerMain([[maybe_unused]] const ros::WallTimerEvent& even
   double simulation_step_size = 1.0 / _simulation_rate_;
 
   sim_time_ = sim_time_ + ros::Duration(simulation_step_size);
+
+  {
+    std::scoped_lock lock(mutex_wall_time_offset_);
+
+    const double wall_dt = (event.current_real - event.last_real).toSec();
+
+    if (wall_dt > 0) {
+
+      wall_time_offset_ += wall_time_offset_drift_slope_ * wall_dt;
+    }
+  }
 
   for (size_t i = 0; i < uavs_.size(); i++) {
     uavs_[i]->makeStep(simulation_step_size);
@@ -547,8 +609,100 @@ void UnrealSimulator::timerStatus([[maybe_unused]] const ros::WallTimerEvent& ev
 
   actual_rtf_ = 0.9 * actual_rtf_ + 0.1 * last_sec_rtf;
 
-  ROS_INFO_THROTTLE(0.1, "[UnrealSimulator]: %s, desired RTF = %.2f, actual RTF = %.2f", drs_params.paused ? "paused" : "running", drs_params.realtime_factor,
-                    actual_rtf_);
+  double fps;
+
+  {
+    std::scoped_lock lock(mutex_ueds_);
+
+    bool res;
+
+    std::tie(res, fps) = ueds_game_controller_->GetFps();
+
+    if (!res) {
+      ROS_ERROR("[UnrealSimulator]: failed to get FPS from ueds");
+      return;
+    }
+  }
+
+  ROS_INFO_THROTTLE(0.1, "[UnrealSimulator]: %s, desired RTF = %.2f, actual RTF = %.2f, ueds FPS = %.2f", drs_params.paused ? "paused" : "running",
+                    drs_params.realtime_factor, actual_rtf_, fps);
+}
+
+//}
+
+/* timerUnrealSync() //{ */
+
+void UnrealSimulator::timerUnrealSync([[maybe_unused]] const ros::TimerEvent& event) {
+
+  if (!is_initialized_) {
+    return;
+  }
+
+  updateUnrealPoses();
+}
+
+//}
+
+/* timerTimeSync() //{ */
+
+void UnrealSimulator::timerTimeSync([[maybe_unused]] const ros::WallTimerEvent& event) {
+
+  if (!is_initialized_) {
+    return;
+  }
+
+  auto wall_time_offset = mrs_lib::get_mutexed(mutex_wall_time_offset_, wall_time_offset_);
+
+  const double sync_start = ros::WallTime::now().toSec();
+
+  bool   res;
+  double ueds_time;
+
+  {
+    std::scoped_lock lock(mutex_ueds_);
+
+    std::tie(res, ueds_time) = ueds_game_controller_->GetTime();
+  }
+
+  const double sync_end = ros::WallTime::now().toSec();
+
+  if (!res) {
+    ROS_ERROR("[UnrealSimulator]: failed to get ueds's time");
+    ros::shutdown();
+  }
+
+  const double true_ueds_time = ueds_time - (sync_end - sync_start) / 2.0;
+
+  const double new_wall_time_offset = sync_start - true_ueds_time;
+
+  // | --------------- time drift slope estimation -------------- |
+
+  if (event.current_real.toSec() > 0 && event.last_real.toSec() > 0) {
+
+    const double wall_dt = (event.current_real - event.last_real).toSec();
+
+    if (wall_dt > 0) {
+
+      double drift_estimate = (new_wall_time_offset - wall_time_offset) / wall_dt;
+
+      {
+        std::scoped_lock lock(mutex_wall_time_offset_);
+
+        wall_time_offset_drift_slope_ += drift_estimate;
+      }
+    }
+  }
+
+  // | ------------------------- finish ------------------------- |
+
+  {
+    std::scoped_lock lock(mutex_wall_time_offset_);
+
+    wall_time_offset_ = new_wall_time_offset;
+  }
+
+  ROS_INFO("[UnrealSimulator]: wall time %f ueds %f time offset: %f, offset slope %f s/s", sync_start, ueds_time, wall_time_offset_,
+           wall_time_offset_drift_slope_);
 }
 
 //}
@@ -570,27 +724,13 @@ void UnrealSimulator::timerLidar([[maybe_unused]] const ros::TimerEvent& event) 
     return;
   }
 
-  updateUnrealPoses();
-
   for (size_t i = 0; i < uavs_.size(); i++) {
 
     mrs_multirotor_simulator::MultirotorModel::State state = uavs_[i]->getState();
 
     bool                                   res;
     std::vector<ueds_connector::LidarData> lidarData;
-    ueds_connector::LidarConfig            lidarConfig;
     ueds_connector::Coordinates            start;
-
-    {
-      std::scoped_lock lock(mutex_ueds_);
-
-      std::tie(res, lidarConfig) = ueds_connectors_[i]->GetLidarConfig();
-    }
-
-    if (!res) {
-      ROS_ERROR_THROTTLE(1.0, "[UnrealSimulator]: [uav%d] - ERROR getLidarConfig", int(i));
-      continue;
-    }
 
     {
       std::scoped_lock lock(mutex_ueds_);
@@ -613,8 +753,8 @@ void UnrealSimulator::timerLidar([[maybe_unused]] const ros::TimerEvent& event) 
     pcl_msg.header.stamp    = ros::Time::now();
     pcl_msg.header.frame_id = "uav" + std::to_string(i + 1) + "/fcu";
 
-    pcl_msg.height   = lidarConfig.BeamVertRays;
-    pcl_msg.width    = lidarConfig.BeamHorRays;
+    pcl_msg.height   = lidar_horizontal_rays_;
+    pcl_msg.width    = lidar_vertical_rays_;
     pcl_msg.is_dense = true;
 
     // Total number of bytes per point
@@ -667,7 +807,7 @@ void UnrealSimulator::timerSegLidar([[maybe_unused]] const ros::TimerEvent& even
     return;
   }
 
-  updateUnrealPoses();
+  /* updateUnrealPoses(); */
 
   for (size_t i = 0; i < uavs_.size(); i++) {
 
@@ -675,19 +815,7 @@ void UnrealSimulator::timerSegLidar([[maybe_unused]] const ros::TimerEvent& even
 
     bool                                      res;
     std::vector<ueds_connector::LidarSegData> lidarSegData;
-    ueds_connector::LidarConfig               lidarConfig;
     ueds_connector::Coordinates               start;
-
-    {
-      std::scoped_lock lock(mutex_ueds_);
-
-      std::tie(res, lidarConfig) = ueds_connectors_[i]->GetLidarConfig();
-    }
-
-    if (!res) {
-      ROS_ERROR("[UnrealSimulator]: [uav%d] - ERROR getLidarConfig", int(i));
-      continue;
-    }
 
     {
       std::scoped_lock lock(mutex_ueds_);
@@ -790,7 +918,7 @@ void UnrealSimulator::timerRgb([[maybe_unused]] const ros::TimerEvent& event) {
     return;
   }
 
-  mrs_lib::ScopeTimer timer = mrs_lib::ScopeTimer("timerRgb()");
+  /* mrs_lib::ScopeTimer timer = mrs_lib::ScopeTimer("timerRgb()"); */
 
   auto drs_params = mrs_lib::get_mutexed(mutex_drs_params_, drs_params_);
 
@@ -799,39 +927,41 @@ void UnrealSimulator::timerRgb([[maybe_unused]] const ros::TimerEvent& event) {
     return;
   }
 
-  updateUnrealPoses();
-
-  ros::Time now = ros::Time::now();
-
   for (size_t i = 0; i < uavs_.size(); i++) {
 
     bool                       res;
     std::vector<unsigned char> cameraData;
     uint32_t                   size;
-
-    timer.checkpoint("getting_camera_data");
+    double                     stamp;
 
     {
       std::scoped_lock lock(mutex_ueds_);
 
-      std::tie(res, cameraData, size) = ueds_connectors_[i]->GetRgbCameraData();
+      std::tie(res, cameraData, stamp, size) = ueds_connectors_[i]->GetRgbCameraData();
     }
+
+    if (abs(stamp - last_rgb_ue_stamp_.at(i)) < 0.001) {
+      return;
+    }
+
+    last_rgb_ue_stamp_.at(i) = stamp;
 
     if (!res) {
       ROS_ERROR("[UnrealSimulator]: failed to obtain rgb camera from uav%lu", i + 1);
       continue;
     }
 
-    timer.checkpoint("before_decode");
-
     cv::Mat image = cv::imdecode(cameraData, cv::IMREAD_COLOR);
-
-    timer.checkpoint("after_decode");
 
     sensor_msgs::ImagePtr msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", image).toImageMsg();
 
     msg->header.frame_id = "uav" + std::to_string(i + 1) + "/rgb";
-    msg->header.stamp    = now;
+
+    const double relative_wall_age = ros::WallTime::now().toSec() - uedsToWallTime(stamp);
+
+    if (abs(relative_wall_age) < 1.0) {
+      msg->header.stamp = ros::Time(ros::Time::now().toSec() - (relative_wall_age * actual_rtf_));
+    }
 
     imp_rgb_[i].publish(msg);
 
@@ -864,21 +994,24 @@ void UnrealSimulator::timerStereo([[maybe_unused]] const ros::TimerEvent& event)
     return;
   }
 
-  updateUnrealPoses();
-
-  ros::Time now = ros::Time::now();
-
   for (size_t i = 0; i < uavs_.size(); i++) {
 
     bool                       res;
     std::vector<unsigned char> image_left;
     std::vector<unsigned char> image_right;
+    double                     stamp;
 
     {
       std::scoped_lock lock(mutex_ueds_);
 
-      std::tie(res, image_left, image_right) = ueds_connectors_[i]->GetStereoCameraData();
+      std::tie(res, image_left, image_right, stamp) = ueds_connectors_[i]->GetStereoCameraData();
     }
+
+    if (abs(stamp - last_stereo_ue_stamp_.at(i)) < 0.001) {
+      return;
+    }
+
+    last_stereo_ue_stamp_.at(i) = stamp;
 
     if (!res) {
       ROS_ERROR("[UnrealSimulator]: failed to obtain stereo camera from uav%lu", i + 1);
@@ -892,23 +1025,36 @@ void UnrealSimulator::timerStereo([[maybe_unused]] const ros::TimerEvent& event)
     sensor_msgs::ImagePtr msg_right = cv_bridge::CvImage(std_msgs::Header(), "bgr8", cv_right).toImageMsg();
 
     msg_left->header.frame_id = "uav" + std::to_string(i + 1) + "/stereo_left";
-    msg_left->header.stamp    = now;
+
+    const double relative_wall_age = ros::WallTime::now().toSec() - uedsToWallTime(stamp);
+
+    if (abs(relative_wall_age) < 1.0) {
+      msg_left->header.stamp = ros::Time(ros::Time::now().toSec() - (relative_wall_age * actual_rtf_));
+    }
 
     msg_right->header.frame_id = "uav" + std::to_string(i + 1) + "/stereo_right";
-    msg_right->header.stamp    = now;
+    msg_right->header.stamp    = msg_left->header.stamp;
 
     imp_stereo_left_[i].publish(msg_left);
     imp_stereo_right_[i].publish(msg_right);
 
-    auto camera_info = stereo_camera_info_;
+    {
+      auto camera_info = stereo_camera_info_;
 
-    camera_info.header = msg_left->header;
+      camera_info.header = msg_left->header;
 
-    ph_stereo_left_camera_info_[i].publish(camera_info);
+      ph_stereo_left_camera_info_[i].publish(camera_info);
+    }
 
-    camera_info.P[3] = -camera_info.P[0] * stereo_baseline_;
+    {
+      auto camera_info = stereo_camera_info_;
 
-    ph_stereo_right_camera_info_[i].publish(camera_info);
+      camera_info.header = msg_right->header;
+
+      camera_info.P[3] = -camera_info.P[0] * stereo_baseline_;
+
+      ph_stereo_right_camera_info_[i].publish(camera_info);
+    }
   }
 }
 
@@ -930,8 +1076,6 @@ void UnrealSimulator::timerSeg([[maybe_unused]] const ros::TimerEvent& event) {
     ROS_INFO_THROTTLE(1.0, "[UnrealSimulator]: Seg sensor disabled");
     return;
   }
-
-  updateUnrealPoses();
 
   for (size_t i = 0; i < uavs_.size(); i++) {
 
@@ -973,9 +1117,9 @@ void UnrealSimulator::callbackDrs(mrs_uav_unreal_simulation::unreal_simulatorCon
     auto old_params = mrs_lib::get_mutexed(mutex_drs_params_, drs_params_);
 
     if (!old_params.paused && config.paused) {
-      timer_main_.stop();
+      timer_dynamics_.stop();
     } else if (old_params.paused && !config.paused) {
-      timer_main_.start();
+      timer_dynamics_.start();
     }
   }
 
@@ -989,11 +1133,12 @@ void UnrealSimulator::callbackDrs(mrs_uav_unreal_simulation::unreal_simulatorCon
 
   // | ----------------- set the realtime factor ---------------- |
 
-  timer_main_.setPeriod(ros::WallDuration(1.0 / (_simulation_rate_ * config.realtime_factor)), true);
+  timer_dynamics_.setPeriod(ros::WallDuration(1.0 / (_simulation_rate_ * config.realtime_factor)), true);
 
   // | ------------------ set the camera rates ------------------ |
 
   timer_rgb_.setPeriod(ros::Duration(1.0 / config.rgb_rate));
+  timer_stereo_.setPeriod(ros::Duration(1.0 / config.stereo_rate));
   timer_seg_.setPeriod(ros::Duration(1.0 / config.rgb_segmented_rate));
   timer_lidar_.setPeriod(ros::Duration(1.0 / config.lidar_rate));
   timer_seg_lidar_.setPeriod(ros::Duration(1.0 / config.lidar_rate));
@@ -1056,20 +1201,25 @@ void UnrealSimulator::updateUnrealPoses(void) {
       pos.y = ueds_world_origins_[i].y - state.x.y() * 100.0;
       pos.z = ueds_world_origins_[i].z + state.x.z() * 100.0;
 
-      ROS_INFO("[UnrealSimulator]: setting %f %f %f", pos.x, pos.y, pos.z);
-
       ueds_connector::Rotation rot;
       rot.pitch = 180.0 * (-pitch / M_PI);
       rot.roll  = 180.0 * (roll / M_PI);
       rot.yaw   = 180.0 * (-yaw / M_PI);
 
-      {
-        mrs_lib::ScopeTimer timer = mrs_lib::ScopeTimer("SetLocationAndRotationAsync()");
-
-        const auto [res] = ueds_connectors_[i]->SetLocationAndRotationAsync(pos, rot);
-      }
+      const auto [res] = ueds_connectors_[i]->SetLocationAndRotationAsync(pos, rot);
     }
   }
+}
+
+//}
+
+/* uedsToWallTime() //{ */
+
+double UnrealSimulator::uedsToWallTime(const double ueds_time) {
+
+  auto wall_time_offset = mrs_lib::get_mutexed(mutex_wall_time_offset_, wall_time_offset_);
+
+  return ueds_time + wall_time_offset;
 }
 
 //}

@@ -105,3 +105,18 @@ std::pair<bool, float> GameModeController::GetFps() {
 }
 
 //}
+
+/* getTime() //{ */
+
+std::pair<bool, double> GameModeController::GetTime() {
+
+  Serializable::GameMode::GetTime::Request request{};
+
+  Serializable::GameMode::GetTime::Response response{};
+  const auto                                status  = Request(request, response);
+  const auto                                success = status && response.status;
+
+  return std::make_pair(success, success ? response.time : 0);
+}
+
+//}
