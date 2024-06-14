@@ -54,12 +54,12 @@ sensors:
     rotation_roll: 0.0 # [deg]
 
     rgb_segmented:
-      enabled: true
+      enabled: false
       rate: 5.0 # [Hz]
 
   stereo:
 
-    enabled: true
+    enabled: false
 
     rate: 10.0 # [Hz]
 
