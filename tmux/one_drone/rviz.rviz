@@ -299,7 +299,7 @@ Visualization Manager:
               Marker Topic: /uav1/control_manager/trajectory_original/markers
               Name: Markers
               Namespaces:
-                {}
+                "": true
               Queue Size: 100
               Value: true
           Enabled: true
@@ -423,7 +423,7 @@ Visualization Manager:
               Marker Topic: /uav1/control_manager/mpc_tracker/trajectory_processed/markers
               Name: Markers
               Namespaces:
-                {}
+                "": true
               Queue Size: 100
               Value: true
           Enabled: true
@@ -437,7 +437,9 @@ Visualization Manager:
           Marker Topic: /uav1/trajectory_generation/markers/final
           Name: final
           Namespaces:
-            {}
+            markers/final_lines: true
+            markers/final_points: true
+            markers/final_triangles: true
           Queue Size: 100
           Value: true
         - Class: rviz/MarkerArray
@@ -445,7 +447,9 @@ Visualization Manager:
           Marker Topic: /uav1/trajectory_generation/markers/original
           Name: original
           Namespaces:
-            {}
+            markers/original_lines: true
+            markers/original_points: true
+            markers/original_triangles: true
           Queue Size: 100
           Value: true
       Enabled: true
@@ -501,8 +505,8 @@ Visualization Manager:
     - Alpha: 1
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
-        Max Value: 12.268980979919434
-        Min Value: -3.3021891117095947
+        Max Value: -1.88069748878479
+        Min Value: -3.277531385421753
         Value: true
       Axis: Z
       Channel Name: intensity
@@ -563,13 +567,13 @@ Visualization Manager:
       Queue Size: 100
       Value: false
     - Class: rviz/MarkerArray
-      Enabled: false
+      Enabled: true
       Marker Topic: /uav1/octomap_local_vis/occupied_cells_vis_array
       Name: local_map
       Namespaces:
-        {}
+        map: true
       Queue Size: 100
-      Value: false
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 255; 255; 255
@@ -627,9 +631,9 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.5153989195823669
+      Pitch: 0.715398907661438
       Target Frame: uav1/fcu
-      Yaw: 2.295440196990967
+      Yaw: 2.7004404067993164
     Saved: ~
 Window Geometry:
   Displays:

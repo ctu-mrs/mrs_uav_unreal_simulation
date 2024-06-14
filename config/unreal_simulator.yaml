@@ -1,5 +1,5 @@
-simulation_rate: 100.0 # Hz
-clock_rate: 100.0 # Hz
+simulation_rate: 250.0 # Hz
+clock_rate: 250.0 # Hz
 realtime_factor: 1.0 # [-]
 
 # TODO describe
@@ -9,7 +9,7 @@ sensors:
 
   lidar:
 
-    enabled: true
+    enabled: false
 
     rate: 10.0 # [Hz]
 
@@ -34,7 +34,7 @@ sensors:
       rate: 10.0 # [Hz]
 
   rgb:
-    enabled: true
+    enabled: false
 
     rate: 30.0 # [Hz]
 
@@ -43,13 +43,13 @@ sensors:
 
     width: 640 # [px]
     height: 480 # [px]
-    fov: 90.0 # [deg]
+    fov: 120.0 # [deg]
 
     offset_x: 0.14 # [m]
     offset_y: 0.0 # [m]
     offset_z: 0.0 # [m]
 
-    rotation_pitch: 45.0 # [deg]
+    rotation_pitch: 0.0 # [deg]
     rotation_yaw: 0.0 # [deg]
     rotation_roll: 0.0 # [deg]
 

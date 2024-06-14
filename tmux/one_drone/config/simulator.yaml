@@ -13,3 +13,11 @@ uav1:
     y: 0.0 #15.0
     z: 2.0
     heading: 0
+
+sensors:
+  lidar:
+    enabled: true
+  rgb:
+    enabled: true
+  stereo:
+    enabled: true
