@@ -29,11 +29,7 @@ public:
 
   std::tuple<bool, std::vector<unsigned char>, std::vector<unsigned char>, double> GetStereoCameraData();
 
-  std::tuple<bool, std::vector<unsigned char>, uint32_t> GetCameraDepth();
-
-  std::tuple<bool, std::vector<unsigned char>, uint32_t> GetCameraSeg();
-
-  std::tuple<bool, std::vector<unsigned char>, uint32_t> GetCameraColorDepth();
+  std::tuple<bool, std::vector<unsigned char>, double, uint32_t> GetRgbSegmented();
 
   std::pair<bool, Rotation> GetRotation();
 

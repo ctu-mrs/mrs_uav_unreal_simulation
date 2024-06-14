@@ -20,7 +20,6 @@ input_mode:
   feedforward: true
 
 outputs:
-  distance_sensor:      true
   gnss:                 true
   rtk:                  true
   imu:                  true

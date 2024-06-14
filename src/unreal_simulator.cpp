@@ -98,17 +98,11 @@ private:
   ros::Timer timer_rgb_;
   void       timerRgb(const ros::TimerEvent& event);
 
+  ros::Timer timer_rgb_segmented_;
+  void       timerRgbSegmented(const ros::TimerEvent& event);
+
   ros::Timer timer_stereo_;
   void       timerStereo(const ros::TimerEvent& event);
-
-  ros::Timer timer_depth_;
-  void       timerDepth(const ros::TimerEvent& event);
-
-  ros::Timer timer_seg_;
-  void       timerSeg(const ros::TimerEvent& event);
-
-  ros::Timer timer_color_depth_;
-  void       timerColorDepth(const ros::TimerEvent& event);
 
   // | --------------------------- tfs -------------------------- |
 
@@ -169,19 +163,16 @@ private:
 
   std::vector<mrs_lib::PublisherHandler<sensor_msgs::PointCloud2>> ph_lidars_;
   std::vector<mrs_lib::PublisherHandler<sensor_msgs::PointCloud2>> ph_seg_lidars_;
-  std::vector<mrs_lib::PublisherHandler<sensor_msgs::Image>>       ph_color_depths_;
 
   std::vector<image_transport::Publisher> imp_rgb_;
   std::vector<image_transport::Publisher> imp_stereo_left_;
   std::vector<image_transport::Publisher> imp_stereo_right_;
-  std::vector<image_transport::Publisher> imp_rgbd_depth_;
   std::vector<image_transport::Publisher> imp_rgbd_segmented_;
-  std::vector<image_transport::Publisher> imp_rgbd_color_depth_;
 
   std::vector<mrs_lib::PublisherHandler<sensor_msgs::CameraInfo>> ph_rgb_camera_info_;
+  std::vector<mrs_lib::PublisherHandler<sensor_msgs::CameraInfo>> ph_rgb_seg_camera_info_;
   std::vector<mrs_lib::PublisherHandler<sensor_msgs::CameraInfo>> ph_stereo_left_camera_info_;
   std::vector<mrs_lib::PublisherHandler<sensor_msgs::CameraInfo>> ph_stereo_right_camera_info_;
-  std::vector<mrs_lib::PublisherHandler<sensor_msgs::CameraInfo>> ph_depth_info_;
 
   // | ------------------------- system ------------------------- |
 
@@ -228,6 +219,7 @@ private:
   std::mutex    mutex_wall_time_offset_;
 
   std::vector<double> last_rgb_ue_stamp_;
+  std::vector<double> last_rgb_seg_ue_stamp_;
   std::vector<double> last_stereo_ue_stamp_;
 
   double uedsToWallTime(const double ueds_time);
@@ -401,16 +393,13 @@ void UnrealSimulator::onInit() {
     imp_rgb_.push_back(it_->advertise("/" + uav_name + "/rgb/image_raw", 10));
     imp_stereo_left_.push_back(it_->advertise("/" + uav_name + "/stereo/left/image_raw", 10));
     imp_stereo_right_.push_back(it_->advertise("/" + uav_name + "/stereo/right/image_raw", 10));
-    imp_rgbd_depth_.push_back(it_->advertise("/" + uav_name + "/rgbd/depth/image_raw", 10));
-    imp_rgbd_segmented_.push_back(it_->advertise("/" + uav_name + "/rgbd/segmented/image_raw", 10));
-    imp_rgbd_color_depth_.push_back(it_->advertise("/" + uav_name + "/rgbd/color_depth/image_raw", 10));
+    imp_rgbd_segmented_.push_back(it_->advertise("/" + uav_name + "/rgb_segmented/image_raw", 10));
 
     ph_rgb_camera_info_.push_back(mrs_lib::PublisherHandler<sensor_msgs::CameraInfo>(nh_, "/" + uav_name + "/rgb/camera_info", 10));
+    ph_rgb_seg_camera_info_.push_back(mrs_lib::PublisherHandler<sensor_msgs::CameraInfo>(nh_, "/" + uav_name + "/rgb_segmented/camera_info", 10));
 
     ph_stereo_left_camera_info_.push_back(mrs_lib::PublisherHandler<sensor_msgs::CameraInfo>(nh_, "/" + uav_name + "/stereo/left/camera_info", 10));
     ph_stereo_right_camera_info_.push_back(mrs_lib::PublisherHandler<sensor_msgs::CameraInfo>(nh_, "/" + uav_name + "/stereo/right/camera_info", 10));
-
-    ph_depth_info_.push_back(mrs_lib::PublisherHandler<sensor_msgs::CameraInfo>(nh_, "/" + uav_name + "/rgbd/depth/camera_info", 10));
 
     // | ------------------ set RGB camera config ----------------- |
 
@@ -421,11 +410,12 @@ void UnrealSimulator::onInit() {
       cameraConfig.height_      = rgb_height_;
       cameraConfig.fov_         = rgb_fov_;
       cameraConfig.offset_      = ueds_connector::Coordinates(rgb_offset_x_ * 100.0, rgb_offset_y_ * 100.0, rgb_offset_z_ * 100.0);
-      cameraConfig.orientation_ = ueds_connector::Rotation(rgb_rotation_pitch_, rgb_rotation_roll_, rgb_rotation_yaw_);
+      cameraConfig.orientation_ = ueds_connector::Rotation(-rgb_rotation_pitch_, rgb_rotation_yaw_, rgb_rotation_roll_);
 
       const auto res = ueds_connectors_[i]->SetRgbCameraConfig(cameraConfig);
 
       last_rgb_ue_stamp_.push_back(0.0);
+      last_rgb_seg_ue_stamp_.push_back(0.0);
 
       if (!res) {
         ROS_ERROR("[UnrealSimulator]: failed to set camera config for uav %lu", i + 1);
@@ -444,7 +434,7 @@ void UnrealSimulator::onInit() {
       cameraConfig.fov_         = stereo_fov_;
       cameraConfig.baseline_    = stereo_baseline_;
       cameraConfig.offset_      = ueds_connector::Coordinates(stereo_offset_x_ * 100.0, stereo_offset_y_ * 100.0, stereo_offset_z_ * 100.0);
-      cameraConfig.orientation_ = ueds_connector::Rotation(stereo_rotation_pitch_, stereo_rotation_roll_, stereo_rotation_yaw_);
+      cameraConfig.orientation_ = ueds_connector::Rotation(-stereo_rotation_pitch_, stereo_rotation_yaw_, stereo_rotation_roll_);
 
       const auto res = ueds_connectors_[i]->SetStereoCameraConfig(cameraConfig);
 
@@ -466,9 +456,9 @@ void UnrealSimulator::onInit() {
       lidarConfig.BeamVertRays = lidar_vertical_rays_;
       lidarConfig.FOVVert      = lidar_vertical_fov_;
       lidarConfig.FOVHor       = lidar_horizontal_fov_;
-      lidarConfig.beamLength   = lidar_beam_length_;
-      lidarConfig.offset       = ueds_connector::Coordinates(stereo_offset_x_ * 100.0, stereo_offset_y_ * 100.0, stereo_offset_z_ * 100.0);
-      lidarConfig.orientation  = ueds_connector::Rotation(stereo_rotation_pitch_, stereo_rotation_roll_, stereo_rotation_yaw_);
+      lidarConfig.beamLength   = lidar_beam_length_ * 100.0;
+      lidarConfig.offset       = ueds_connector::Coordinates(lidar_offset_x_ * 100.0, lidar_offset_y_ * 100.0, lidar_offset_z_ * 100.0);
+      lidarConfig.orientation  = ueds_connector::Rotation(-lidar_rotation_pitch_, lidar_rotation_yaw_, lidar_rotation_roll_);
 
       /* LidarConfig. */
 
@@ -522,7 +512,7 @@ void UnrealSimulator::onInit() {
 
   timer_stereo_ = nh_.createTimer(ros::Duration(1.0 / drs_params_.stereo_rate), &UnrealSimulator::timerStereo, this);
 
-  timer_seg_ = nh_.createTimer(ros::Duration(1.0 / drs_params_.rgb_segmented_rate), &UnrealSimulator::timerSeg, this);
+  timer_rgb_segmented_ = nh_.createTimer(ros::Duration(1.0 / drs_params_.rgb_segmented_rate), &UnrealSimulator::timerRgbSegmented, this);
 
   // | -------------------- finishing methods ------------------- |
 
@@ -807,8 +797,6 @@ void UnrealSimulator::timerSegLidar([[maybe_unused]] const ros::TimerEvent& even
     return;
   }
 
-  /* updateUnrealPoses(); */
-
   for (size_t i = 0; i < uavs_.size(); i++) {
 
     mrs_multirotor_simulator::MultirotorModel::State state = uavs_[i]->getState();
@@ -1060,20 +1048,20 @@ void UnrealSimulator::timerStereo([[maybe_unused]] const ros::TimerEvent& event)
 
 //}
 
-/* timerSeg() //{ */
+/* timerRgbSegmented() //{ */
 
-void UnrealSimulator::timerSeg([[maybe_unused]] const ros::TimerEvent& event) {
+void UnrealSimulator::timerRgbSegmented([[maybe_unused]] const ros::TimerEvent& event) {
 
   if (!is_initialized_) {
     return;
   }
 
-  /* mrs_lib::ScopeTimer timer = mrs_lib::ScopeTimer("timerRgb()"); */
+  /* mrs_lib::ScopeTimer timer = mrs_lib::ScopeTimer("timerRgbSegmented()"); */
 
   auto drs_params = mrs_lib::get_mutexed(mutex_drs_params_, drs_params_);
 
   if (!drs_params_.rgb_segmented_enabled) {
-    ROS_INFO_THROTTLE(1.0, "[UnrealSimulator]: Seg sensor disabled");
+    ROS_INFO_THROTTLE(1.0, "[UnrealSimulator]: Seg RGB sensor disabled");
     return;
   }
 
@@ -1082,24 +1070,39 @@ void UnrealSimulator::timerSeg([[maybe_unused]] const ros::TimerEvent& event) {
     bool                       res;
     std::vector<unsigned char> cameraData;
     uint32_t                   size;
-
-    /* timer.checkpoint("before_getting_data"); */
+    double                     stamp;
 
     {
       std::scoped_lock lock(mutex_ueds_);
 
-      std::tie(res, cameraData, size) = ueds_connectors_[i]->GetCameraSeg();
+      std::tie(res, cameraData, stamp, size) = ueds_connectors_[i]->GetRgbSegmented();
     }
 
-    /* timer.checkpoint("after_getting_data"); */
+    if (abs(stamp - last_rgb_seg_ue_stamp_.at(i)) < 0.001) {
+      return;
+    }
 
-    cv::Mat               image = cv::imdecode(cameraData, cv::IMREAD_COLOR);
-    sensor_msgs::ImagePtr msg   = cv_bridge::CvImage(std_msgs::Header(), "bgr8", image).toImageMsg();
+    last_rgb_seg_ue_stamp_.at(i) = stamp;
 
-    msg->header.frame_id = "uav" + std::to_string(i + 1) + "/rgbd";
-    msg->header.stamp    = ros::Time::now();
+    cv::Mat image = cv::imdecode(cameraData, cv::IMREAD_COLOR);
 
-    imp_rgbd_depth_[i].publish(msg);
+    sensor_msgs::ImagePtr msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", image).toImageMsg();
+
+    msg->header.frame_id = "uav" + std::to_string(i + 1) + "/rgb";
+
+    const double relative_wall_age = ros::WallTime::now().toSec() - uedsToWallTime(stamp);
+
+    if (abs(relative_wall_age) < 1.0) {
+      msg->header.stamp = ros::Time(ros::Time::now().toSec() - (relative_wall_age * actual_rtf_));
+    }
+
+    imp_rgbd_segmented_[i].publish(msg);
+
+    auto camera_info = rgb_camera_info_;
+
+    camera_info.header = msg->header;
+
+    ph_rgb_seg_camera_info_[i].publish(camera_info);
   }
 }
 
@@ -1139,7 +1142,7 @@ void UnrealSimulator::callbackDrs(mrs_uav_unreal_simulation::unreal_simulatorCon
 
   timer_rgb_.setPeriod(ros::Duration(1.0 / config.rgb_rate));
   timer_stereo_.setPeriod(ros::Duration(1.0 / config.stereo_rate));
-  timer_seg_.setPeriod(ros::Duration(1.0 / config.rgb_segmented_rate));
+  timer_rgb_segmented_.setPeriod(ros::Duration(1.0 / config.rgb_segmented_rate));
   timer_lidar_.setPeriod(ros::Duration(1.0 / config.lidar_rate));
   timer_seg_lidar_.setPeriod(ros::Duration(1.0 / config.lidar_rate));
 
@@ -1206,7 +1209,7 @@ void UnrealSimulator::updateUnrealPoses(void) {
       rot.roll  = 180.0 * (roll / M_PI);
       rot.yaw   = 180.0 * (-yaw / M_PI);
 
-      const auto [res] = ueds_connectors_[i]->SetLocationAndRotationAsync(pos, rot);
+      ueds_connectors_[i]->SetLocationAndRotationAsync(pos, rot);
     }
   }
 }

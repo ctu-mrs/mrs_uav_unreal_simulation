@@ -84,7 +84,6 @@ private:
 
   void callbackOdom(const nav_msgs::Odometry::ConstPtr msg);
   void callbackImu(const sensor_msgs::Imu::ConstPtr msg);
-  void callbackRangefinder(const sensor_msgs::Range::ConstPtr msg);
 
   // | ----------------------- publishers ----------------------- |
 
@@ -162,7 +161,6 @@ void Api::initialize(const ros::NodeHandle& parent_nh, std::shared_ptr<mrs_uav_h
   param_loader.loadParam("input_mode/position", (bool&)_capabilities_.accepts_position_cmd);
   param_loader.loadParam("input_mode/feedforward", _feedforward_enabled_);
 
-  param_loader.loadParam("outputs/distance_sensor", (bool&)_capabilities_.produces_distance_sensor);
   param_loader.loadParam("outputs/gnss", (bool&)_capabilities_.produces_gnss);
   param_loader.loadParam("outputs/rtk", (bool&)_capabilities_.produces_rtk);
   param_loader.loadParam("outputs/imu", (bool&)_capabilities_.produces_imu);
@@ -198,8 +196,6 @@ void Api::initialize(const ros::NodeHandle& parent_nh, std::shared_ptr<mrs_uav_h
   sh_odom_ = mrs_lib::SubscribeHandler<nav_msgs::Odometry>(shopts, "simulator_odom_in", &Api::callbackOdom, this);
 
   sh_imu_ = mrs_lib::SubscribeHandler<sensor_msgs::Imu>(shopts, "simulator_imu_in", &Api::callbackImu, this);
-
-  sh_range_ = mrs_lib::SubscribeHandler<sensor_msgs::Range>(shopts, "simulator_rangefinder_in", &Api::callbackRangefinder, this);
 
   // | ----------------------- publishers ----------------------- |
 
@@ -691,24 +687,6 @@ void Api::callbackImu(const sensor_msgs::Imu::ConstPtr msg) {
   if (_capabilities_.produces_imu) {
 
     common_handlers_->publishers.publishIMU(*msg);
-  }
-}
-
-//}
-
-/* callbackRangefinder() //{ */
-
-void Api::callbackRangefinder(const sensor_msgs::Range::ConstPtr msg) {
-
-  if (!is_initialized_) {
-    return;
-  }
-
-  ROS_INFO_ONCE("[Api]: getting rangefinder");
-
-  if (_capabilities_.produces_distance_sensor) {
-
-    common_handlers_->publishers.publishDistanceSensor(*msg);
   }
 }
 

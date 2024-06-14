@@ -19,7 +19,7 @@ windows:
   - hw_api:
       layout: tiled
       panes:
-        - waitForTime; roslaunch mrs_uav_unreal_simulation hw_api.launch custom_config:=./config/hw_api.yaml
+        - waitForTime; roslaunch mrs_uav_unreal_simulation hw_api.launch
   - takeoff:
       layout: tiled
       panes:

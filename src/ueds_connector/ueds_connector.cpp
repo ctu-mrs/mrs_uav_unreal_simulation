@@ -103,40 +103,20 @@ std::tuple<bool, std::vector<unsigned char>, std::vector<unsigned char>, double>
 
 //}
 
-/* GetCameraDepth() //{ */
-std::tuple<bool, std::vector<unsigned char>, uint32_t> UedsConnector::GetCameraDepth() {
-  Serializable::Drone::GetCameraDepth::Request request{};
+/* GetRgbSegmented() //{ */
 
-  Serializable::Drone::GetCameraDepth::Response response{};
-  const auto                                    status  = Request(request, response);
-  const auto                                    success = status && response.status;
+std::tuple<bool, std::vector<unsigned char>, double, uint32_t> UedsConnector::GetRgbSegmented() {
 
-  return std::make_tuple(success, success ? response.imageData : std::vector<unsigned char>(), success ? response.imageData.size() : 0);
-}
-//}
+  Serializable::Drone::GetRgbSegCameraData::Request request{};
 
-/* GetCameraSeg() //{ */
-std::tuple<bool, std::vector<unsigned char>, uint32_t> UedsConnector::GetCameraSeg() {
-  Serializable::Drone::GetCameraSeg::Request request{};
-
-  Serializable::Drone::GetCameraSeg::Response response{};
-  const auto                                  status  = Request(request, response);
-  const auto                                  success = status && response.status;
-
-  return std::make_tuple(success, success ? response.imageData : std::vector<unsigned char>(), success ? response.imageData.size() : 0);
-}
-//}
-
-/* GetCameraColorDepth() //{ */
-std::tuple<bool, std::vector<unsigned char>, uint32_t> UedsConnector::GetCameraColorDepth() {
-  Serializable::Drone::GetCameraColorDepth::Request request{};
-
-  Serializable::Drone::GetCameraColorDepth::Response response{};
+  Serializable::Drone::GetRgbSegCameraData::Response response{};
   const auto                                         status  = Request(request, response);
   const auto                                         success = status && response.status;
 
-  return std::make_tuple(success, success ? response.imageData : std::vector<unsigned char>(), success ? response.imageData.size() : 0);
+  return std::make_tuple(success, success ? response.image_ : std::vector<unsigned char>(), success ? response.stamp_ : 0.0,
+                         success ? response.image_.size() : 0);
 }
+
 //}
 
 /* getRotation() //{ */

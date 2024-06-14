@@ -2,65 +2,83 @@ simulation_rate: 100.0 # Hz
 clock_rate: 100.0 # Hz
 realtime_factor: 1.0 # [-]
 
-g: 9.81 # [ms^-2]
-
-iterate_without_input: true
-
-input_timeout: 1.0 # [s]
-
+# TODO describe
 collisions: true
 
 sensors:
 
   lidar:
-    enabled: false
+
+    enabled: true
+
     rate: 10.0 # [Hz]
+
     horizontal_fov: 360.0 # [deg]
     vertical_fov: 90.0 # [deg]
-    horizontal_rays: 128
-    vertical_rays: 32
+
+    horizontal_rays: 128 # [-]
+    vertical_rays: 32 # [-]
+
     offset_x: 0.0 # [m]
     offset_y: 0.0 # [m]
     offset_z: 0.06 # [m]
+
     rotation_pitch: 0.0 # [deg]
-    rotation_roll: 90.0 # [deg]
+    rotation_roll: 0.0 # [deg]
     rotation_yaw: 0.0 # [deg]
-    beam_length: 1000.0 # [m]
+
+    beam_length: 20.0 # [m]
 
     lidar_segmented:
       enabled: false
       rate: 10.0 # [Hz]
 
   rgb:
-    enabled: false
-    rate: 10.0 # [Hz]
+    enabled: true
+
+    rate: 30.0 # [Hz]
+
+    # TODO not used
+    hdr: true
+
     width: 640 # [px]
     height: 480 # [px]
     fov: 90.0 # [deg]
-    offset_x: 0.14
-    offset_y: 0.0
-    offset_z: 0.0
-    rotation_pitch: 0.0
-    rotation_yaw: 0.0
-    rotation_roll: 0.0
+
+    offset_x: 0.14 # [m]
+    offset_y: 0.0 # [m]
+    offset_z: 0.0 # [m]
+
+    rotation_pitch: 45.0 # [deg]
+    rotation_yaw: 0.0 # [deg]
+    rotation_roll: 0.0 # [deg]
 
     rgb_segmented:
-      enabled: false
+      enabled: true
       rate: 5.0 # [Hz]
 
   stereo:
-    enabled: false
+
+    enabled: true
+
     rate: 10.0 # [Hz]
+
+    # TODO not used
+    hdr: true
+
     baseline: 0.1 # [m]
+
     width: 640 # [px]
     height: 480 # [px]
     fov: 90.0 # [deg]
-    offset_x: 0.14
-    offset_y: 0.0
-    offset_z: 0.0
-    rotation_pitch: 0.0
-    rotation_yaw: 0.0
-    rotation_roll: 0.0
+
+    offset_x: 0.14 # [m]
+    offset_y: 0.0 # [m]
+    offset_z: 0.0 # [m]
+
+    rotation_pitch: 20.0 # [deg]
+    rotation_yaw: 0.0 # [deg]
+    rotation_roll: 0.0 # [deg]
 
 frames:
   world:
@@ -79,15 +97,22 @@ randomization:
   enabled: false
 
   bounds:
-    x: 15.0
-    y: 15.0
-    z: 15.0
+    x: 15.0 # [m]
+    y: 15.0 # [m]
+    z: 15.0 # [m]
 
+# this virtual ground is simulated outside of Unreal
 ground:
-  enabled: true
+  enabled: false
   z: 0.0 # [m]
+
+input_timeout: 1.0 # [s]
+
+iterate_without_input: true
+
+g: 9.81 # [ms^-2]
 
 # * when enabled, this will place a temporary patch of ground just under the spawn location
 # * this patch will disappear after the total_thrust > 0.9*hover_thrust
 individual_takeoff_platform:
-  enabled: false
+  enabled: true
