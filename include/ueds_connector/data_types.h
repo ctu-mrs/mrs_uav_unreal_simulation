@@ -111,8 +111,17 @@ enum CameraCaptureModeEnum : unsigned short
 struct RgbCameraConfig
 {
   RgbCameraConfig() = default;
-  RgbCameraConfig(bool show_debug_camera, const Coordinates offset, const Rotation orientation, double fov, int width, int height)
-      : show_debug_camera_(show_debug_camera), offset_(offset), orientation_(orientation), fov_(fov), width_(width), height_(height) {
+  RgbCameraConfig(bool show_debug_camera, const Coordinates offset, const Rotation orientation, double fov, int width, int height, bool enable_temporal_aa,
+                  bool enable_raytracing, bool enable_hdr)
+      : show_debug_camera_(show_debug_camera),
+        offset_(offset),
+        orientation_(orientation),
+        fov_(fov),
+        width_(width),
+        height_(height),
+        enable_temporal_aa_(enable_temporal_aa),
+        enable_raytracing_(enable_raytracing),
+        enable_hdr_(enable_hdr) {
   }
 
   bool show_debug_camera_;
@@ -125,13 +134,27 @@ struct RgbCameraConfig
 
   int width_;
   int height_;
+
+  bool enable_temporal_aa_;
+  bool enable_raytracing_;
+  bool enable_hdr_;
 };
 
 struct StereoCameraConfig
 {
   StereoCameraConfig() = default;
-  StereoCameraConfig(bool show_debug_camera, const Coordinates offset, const Rotation orientation, double fov, int width, int height, double baseline)
-      : show_debug_camera_(show_debug_camera), offset_(offset), orientation_(orientation), fov_(fov), width_(width), height_(height), baseline_(baseline) {
+  StereoCameraConfig(bool show_debug_camera, const Coordinates offset, const Rotation orientation, double fov, int width, int height, double baseline,
+                     bool enable_temporal_aa, bool enable_raytracing, bool enable_hdr)
+      : show_debug_camera_(show_debug_camera),
+        offset_(offset),
+        orientation_(orientation),
+        fov_(fov),
+        width_(width),
+        height_(height),
+        baseline_(baseline),
+        enable_temporal_aa_(enable_temporal_aa),
+        enable_raytracing_(enable_raytracing),
+        enable_hdr_(enable_hdr) {
   }
 
   bool show_debug_camera_;
@@ -146,6 +169,10 @@ struct StereoCameraConfig
   int height_;
 
   double baseline_;
+
+  bool enable_temporal_aa_;
+  bool enable_raytracing_;
+  bool enable_hdr_;
 };
 
 }  // namespace ueds_connector

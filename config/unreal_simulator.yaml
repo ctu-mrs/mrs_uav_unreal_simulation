@@ -21,8 +21,8 @@ sensors:
     horizontal_fov: 360.0 # [deg]
     vertical_fov: 90.0 # [deg]
 
-    horizontal_rays: 128 # [-]
-    vertical_rays: 32 # [-]
+    horizontal_rays: 256 # [-]
+    vertical_rays: 128 # [-]
 
     offset_x: 0.0 # [m]
     offset_y: 0.0 # [m]
@@ -34,6 +34,8 @@ sensors:
 
     beam_length: 20.0 # [m]
 
+    show_beams: false # TODO broken
+
     lidar_segmented:
       enabled: false
       rate: 10.0 # [Hz]
@@ -43,8 +45,9 @@ sensors:
 
     rate: 30.0 # [Hz]
 
-    # TODO not used
-    hdr: true
+    enable_hdr: true
+    enable_temporal_aa: true
+    enable_raytracing: true
 
     width: 640 # [px]
     height: 480 # [px]
@@ -68,8 +71,9 @@ sensors:
 
     rate: 10.0 # [Hz]
 
-    # TODO not used
-    hdr: true
+    enable_hdr: true
+    enable_temporal_aa: true
+    enable_raytracing: true
 
     baseline: 0.1 # [m]
 

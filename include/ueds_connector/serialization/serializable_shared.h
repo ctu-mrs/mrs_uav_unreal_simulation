@@ -103,6 +103,7 @@ enum MessageType : unsigned short
   get_rgb_seg_camera_data         = 18,
   get_lidar_seg                   = 19,
   set_location_and_rotation_async = 20,
+  get_crash_state                 = 21,
 };
 
 /* struct LidarConfig //{ */
@@ -113,10 +114,11 @@ struct LidarConfig
   bool   ShowBeams;
   double BeamLength;
 
-  double BeamHorRays;
-  double BeamVertRays;
+  int BeamHorRays;
+  int BeamVertRays;
 
   double Frequency;
+
   double OffsetX;
   double OffsetY;
   double OffsetZ;
@@ -159,9 +161,14 @@ struct RgbCameraConfig
   int width_;
   int height_;
 
+  bool enable_temporal_aa_;
+  bool enable_raytracing_;
+  bool enable_hdr_;
+
   template <class Archive>
   void serialize(Archive& archive) {
-    archive(show_debug_camera_, offset_x_, offset_y_, offset_z_, rotation_pitch_, rotation_yaw_, rotation_roll_, fov_, width_, height_);
+    archive(show_debug_camera_, offset_x_, offset_y_, offset_z_, rotation_pitch_, rotation_yaw_, rotation_roll_, fov_, width_, height_, enable_temporal_aa_,
+            enable_raytracing_, enable_hdr_);
   }
 };
 
@@ -188,9 +195,14 @@ struct StereoCameraConfig
 
   double baseline_;
 
+  bool enable_temporal_aa_;
+  bool enable_raytracing_;
+  bool enable_hdr_;
+
   template <class Archive>
   void serialize(Archive& archive) {
-    archive(show_debug_camera_, offset_x_, offset_y_, offset_z_, rotation_pitch_, rotation_yaw_, rotation_roll_, fov_, width_, height_, baseline_);
+    archive(show_debug_camera_, offset_x_, offset_y_, offset_z_, rotation_pitch_, rotation_yaw_, rotation_roll_, fov_, width_, height_, baseline_,
+            enable_temporal_aa_, enable_raytracing_, enable_hdr_);
   }
 };
 
@@ -817,6 +829,34 @@ struct Response : public Common::NetworkResponse
 
 //}
 
+/* GetCrashState //{ */
+
+namespace GetCrashState
+{
+struct Request : public Common::NetworkRequest
+{
+  Request() : Common::NetworkRequest(static_cast<unsigned short>(MessageType::get_crash_state)) {
+  }
+};
+
+struct Response : public Common::NetworkResponse
+{
+  Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::get_crash_state)) {
+  }
+  explicit Response(bool _status) : Common::NetworkResponse(MessageType::get_crash_state, _status) {
+  }
+
+  bool crashed;
+
+  template <class Archive>
+  void serialize(Archive& archive) {
+    archive(cereal::base_class<Common::NetworkResponse>(this), crashed);
+  }
+};
+}  // namespace GetCrashState
+
+//}
+
 }  // namespace Drone
 
 namespace GameMode
@@ -830,6 +870,7 @@ enum MessageType : unsigned short
   set_camera_capture_mode = 6,
   get_fps                 = 7,
   get_time                = 8,
+  get_api_version         = 9,
 };
 
 namespace GetDrones
@@ -974,6 +1015,27 @@ struct Response : public Common::NetworkResponse
   }
 };
 }  // namespace GetFps
+
+namespace GetApiVersion
+{
+struct Request : public Common::NetworkRequest
+{
+  Request() : Common::NetworkRequest(MessageType::get_api_version){};
+};
+
+struct Response : public Common::NetworkResponse
+{
+  Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::get_api_version)){};
+  explicit Response(bool _status) : Common::NetworkResponse(MessageType::get_api_version, _status){};
+
+  int api_version;
+
+  template <class Archive>
+  void serialize(Archive& archive) {
+    archive(cereal::base_class<Common::NetworkResponse>(this), api_version);
+  }
+};
+}  // namespace GetApiVersion
 
 namespace GetTime
 {

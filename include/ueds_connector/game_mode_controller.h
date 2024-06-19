@@ -30,6 +30,8 @@ public:
 
   std::pair<bool, float> GetFps();
 
+  std::pair<bool, int> GetApiVersion();
+
   std::pair<bool, double> GetTime();
 };
 

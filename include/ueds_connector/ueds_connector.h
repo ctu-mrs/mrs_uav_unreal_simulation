@@ -23,6 +23,8 @@ public:
 
   std::pair<bool, Coordinates> GetLocation();
 
+  std::pair<bool, bool> GetCrashState();
+
   std::tuple<bool, Coordinates, bool, Coordinates> SetLocation(const Coordinates& coordinates, bool checkCollisions);
 
   std::tuple<bool, std::vector<unsigned char>, double, uint32_t> GetRgbCameraData();

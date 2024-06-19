@@ -106,6 +106,21 @@ std::pair<bool, float> GameModeController::GetFps() {
 
 //}
 
+/* getApiVersion() //{ */
+
+std::pair<bool, int> GameModeController::GetApiVersion() {
+
+  Serializable::GameMode::GetApiVersion::Request request{};
+
+  Serializable::GameMode::GetApiVersion::Response response{};
+  const auto                                      status  = Request(request, response);
+  const auto                                      success = status && response.status;
+
+  return std::make_pair(success, success ? response.api_version : 0);
+}
+
+//}
+
 /* getTime() //{ */
 
 std::pair<bool, double> GameModeController::GetTime() {

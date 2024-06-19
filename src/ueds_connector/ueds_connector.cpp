@@ -38,6 +38,23 @@ std::pair<bool, Coordinates> UedsConnector::GetLocation() {
 
 //}
 
+/* getCrashState() //{ */
+
+std::pair<bool, bool> UedsConnector::GetCrashState() {
+
+  Serializable::Drone::GetCrashState::Request request{};
+
+  Serializable::Drone::GetCrashState::Response response{};
+  const auto                                   status  = Request(request, response);
+  const auto                                   success = status && response.status;
+
+  bool crashed = response.crashed;
+
+  return std::make_pair(success, crashed);
+}
+
+//}
+
 /* setLocation() //{ */
 
 std::tuple<bool, Coordinates, bool, Coordinates> UedsConnector::SetLocation(const Coordinates& coordinate, bool checkCollisions) {
@@ -396,6 +413,10 @@ std::pair<bool, RgbCameraConfig> UedsConnector::GetRgbCameraConfig() {
 
     config.width_  = response.config.width_;
     config.height_ = response.config.height_;
+
+    config.enable_temporal_aa_ = response.config.enable_temporal_aa_;
+    config.enable_hdr_         = response.config.enable_hdr_;
+    config.enable_raytracing_  = response.config.enable_raytracing_;
   }
 
   return std::make_pair(success, config);
@@ -429,6 +450,10 @@ std::pair<bool, StereoCameraConfig> UedsConnector::GetStereoCameraConfig() {
     config.height_ = response.config.height_;
 
     config.baseline_ = response.config.baseline_;
+
+    config.enable_temporal_aa_ = response.config.enable_temporal_aa_;
+    config.enable_hdr_         = response.config.enable_hdr_;
+    config.enable_raytracing_  = response.config.enable_raytracing_;
   }
 
   return std::make_pair(success, config);
@@ -457,6 +482,10 @@ bool UedsConnector::SetRgbCameraConfig(const RgbCameraConfig& config) {
 
   request.config.width_  = config.width_;
   request.config.height_ = config.height_;
+
+  request.config.enable_temporal_aa_ = config.enable_temporal_aa_;
+  request.config.enable_hdr_         = config.enable_hdr_;
+  request.config.enable_raytracing_  = config.enable_raytracing_;
 
   Serializable::Drone::SetRgbCameraConfig::Response response{};
 
@@ -491,6 +520,10 @@ bool UedsConnector::SetStereoCameraConfig(const StereoCameraConfig& config) {
   request.config.height_ = config.height_;
 
   request.config.baseline_ = config.baseline_;
+
+  request.config.enable_temporal_aa_ = config.enable_temporal_aa_;
+  request.config.enable_hdr_         = config.enable_hdr_;
+  request.config.enable_raytracing_  = config.enable_raytracing_;
 
   Serializable::Drone::SetStereoCameraConfig::Response response{};
 

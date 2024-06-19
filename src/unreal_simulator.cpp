@@ -44,6 +44,12 @@
 
 //}
 
+/* defines //{ */
+
+#define API_VERSION 1
+
+//}
+
 using PCLPoint           = pcl::PointXYZ;
 using PCLPointCloud      = pcl::PointCloud<PCLPoint>;
 using PCLPointCloudColor = pcl::PointCloud<pcl::PointXYZRGB>;
@@ -137,6 +143,7 @@ private:
   double lidar_rotation_roll_;
   double lidar_rotation_yaw_;
   double lidar_beam_length_;
+  bool   lidar_show_beams_;
 
   int    rgb_width_;
   int    rgb_height_;
@@ -147,6 +154,9 @@ private:
   double rgb_rotation_pitch_;
   double rgb_rotation_yaw_;
   double rgb_rotation_roll_;
+  bool   rgb_enable_hdr_;
+  bool   rgb_enable_temporal_aa_;
+  bool   rgb_enable_raytracing_;
 
   double stereo_baseline_;
   int    stereo_width_;
@@ -158,6 +168,9 @@ private:
   double stereo_rotation_pitch_;
   double stereo_rotation_yaw_;
   double stereo_rotation_roll_;
+  bool   stereo_enable_hdr_;
+  bool   stereo_enable_temporal_aa_;
+  bool   stereo_enable_raytracing_;
 
   // | ----------------------- publishers ----------------------- |
 
@@ -210,6 +223,8 @@ private:
   std::vector<ueds_connector::Coordinates> ueds_world_origins_;
 
   void updateUnrealPoses(void);
+
+  void checkForCrash(void);
 
   void fabricateCamInfo(void);
 
@@ -289,6 +304,7 @@ void UnrealSimulator::onInit() {
   param_loader.loadParam("sensors/lidar/rotation_roll", lidar_rotation_roll_);
   param_loader.loadParam("sensors/lidar/rotation_yaw", lidar_rotation_yaw_);
   param_loader.loadParam("sensors/lidar/beam_length", lidar_beam_length_);
+  param_loader.loadParam("sensors/lidar/show_beams", lidar_show_beams_);
 
   param_loader.loadParam("sensors/rgb/enabled", drs_params_.rgb_enabled);
   param_loader.loadParam("sensors/rgb/rate", drs_params_.rgb_rate);
@@ -305,6 +321,9 @@ void UnrealSimulator::onInit() {
   param_loader.loadParam("sensors/rgb/rotation_pitch", rgb_rotation_pitch_);
   param_loader.loadParam("sensors/rgb/rotation_roll", rgb_rotation_roll_);
   param_loader.loadParam("sensors/rgb/rotation_yaw", rgb_rotation_yaw_);
+  param_loader.loadParam("sensors/rgb/enable_hdr", rgb_enable_hdr_);
+  param_loader.loadParam("sensors/rgb/enable_temporal_aa", rgb_enable_temporal_aa_);
+  param_loader.loadParam("sensors/rgb/enable_raytracing", rgb_enable_raytracing_);
 
   param_loader.loadParam("sensors/stereo/enabled", drs_params_.stereo_enabled);
   param_loader.loadParam("sensors/stereo/rate", drs_params_.stereo_rate);
@@ -319,6 +338,9 @@ void UnrealSimulator::onInit() {
   param_loader.loadParam("sensors/stereo/rotation_pitch", stereo_rotation_pitch_);
   param_loader.loadParam("sensors/stereo/rotation_roll", stereo_rotation_roll_);
   param_loader.loadParam("sensors/stereo/rotation_yaw", stereo_rotation_yaw_);
+  param_loader.loadParam("sensors/stereo/enable_hdr", stereo_enable_hdr_);
+  param_loader.loadParam("sensors/stereo/enable_temporal_aa", stereo_enable_temporal_aa_);
+  param_loader.loadParam("sensors/stereo/enable_raytracing", stereo_enable_raytracing_);
 
   double clock_rate;
   param_loader.loadParam("clock_rate", clock_rate);
@@ -338,7 +360,7 @@ void UnrealSimulator::onInit() {
     uavs_.push_back(std::make_unique<mrs_multirotor_simulator::UavSystemRos>(nh_, uav_name));
   }
 
-  // | ----------------------- Unreal sim ----------------------- |
+  // | ----------- initialize the Unreal Sim connector ---------- |
 
   ueds_game_controller_ = std::make_unique<ueds_connector::GameModeController>(LOCALHOST, 8000);
 
@@ -354,6 +376,32 @@ void UnrealSimulator::onInit() {
 
     ros::Duration(1.0).sleep();
   }
+
+  // | ------------------ check the API version ----------------- |
+
+  auto [res, ueds_api_version] = ueds_game_controller_->GetApiVersion();
+
+  if (!res) {
+    ROS_ERROR("[UnrealSimulator]: could not obtain the ueds API version");
+    ros::shutdown();
+  }
+
+  if (ueds_api_version != API_VERSION) {
+
+    ROS_ERROR("[UnrealSimulator]: the API versions don't match! (ROS side '%d' != Unreal side '%d')", API_VERSION, ueds_api_version);
+    ROS_ERROR("[UnrealSimulator]:");
+    ROS_ERROR("[UnrealSimulator]: Solution:");
+    ROS_ERROR("[UnrealSimulator]:           1. make sure the mrs_uav_unreal_simulation package is up to date");
+    ROS_ERROR("[UnrealSimulator]:              sudo apt update && sudo apt upgrade");
+    ROS_ERROR("[UnrealSimulator]:");
+    ROS_ERROR("[UnrealSimulator]:           2. make sure you have the right version of the Unreal Simulator 'game'");
+    ROS_ERROR("[UnrealSimulator]:              download at: https://github.com/ctu-mrs/mrs_uav_unreal_simulation");
+    ROS_ERROR("[UnrealSimulator]:");
+
+    ros::shutdown();
+  }
+
+  // | --------------------- Spawn the UAVs --------------------- |
 
   for (size_t i = 0; i < uav_names.size(); i++) {
 
@@ -412,11 +460,14 @@ void UnrealSimulator::onInit() {
     {
       ueds_connector::RgbCameraConfig cameraConfig{};
 
-      cameraConfig.width_       = rgb_width_;
-      cameraConfig.height_      = rgb_height_;
-      cameraConfig.fov_         = rgb_fov_;
-      cameraConfig.offset_      = ueds_connector::Coordinates(rgb_offset_x_ * 100.0, rgb_offset_y_ * 100.0, rgb_offset_z_ * 100.0);
-      cameraConfig.orientation_ = ueds_connector::Rotation(-rgb_rotation_pitch_, rgb_rotation_yaw_, rgb_rotation_roll_);
+      cameraConfig.width_              = rgb_width_;
+      cameraConfig.height_             = rgb_height_;
+      cameraConfig.fov_                = rgb_fov_;
+      cameraConfig.offset_             = ueds_connector::Coordinates(rgb_offset_x_ * 100.0, rgb_offset_y_ * 100.0, rgb_offset_z_ * 100.0);
+      cameraConfig.orientation_        = ueds_connector::Rotation(-rgb_rotation_pitch_, rgb_rotation_yaw_, rgb_rotation_roll_);
+      cameraConfig.enable_raytracing_  = rgb_enable_raytracing_;
+      cameraConfig.enable_hdr_         = rgb_enable_hdr_;
+      cameraConfig.enable_temporal_aa_ = rgb_enable_temporal_aa_;
 
       const auto res = ueds_connectors_[i]->SetRgbCameraConfig(cameraConfig);
 
@@ -435,12 +486,15 @@ void UnrealSimulator::onInit() {
     {
       ueds_connector::StereoCameraConfig cameraConfig{};
 
-      cameraConfig.width_       = stereo_width_;
-      cameraConfig.height_      = stereo_height_;
-      cameraConfig.fov_         = stereo_fov_;
-      cameraConfig.baseline_    = stereo_baseline_;
-      cameraConfig.offset_      = ueds_connector::Coordinates(stereo_offset_x_ * 100.0, stereo_offset_y_ * 100.0, stereo_offset_z_ * 100.0);
-      cameraConfig.orientation_ = ueds_connector::Rotation(-stereo_rotation_pitch_, stereo_rotation_yaw_, stereo_rotation_roll_);
+      cameraConfig.width_              = stereo_width_;
+      cameraConfig.height_             = stereo_height_;
+      cameraConfig.fov_                = stereo_fov_;
+      cameraConfig.baseline_           = stereo_baseline_;
+      cameraConfig.offset_             = ueds_connector::Coordinates(stereo_offset_x_ * 100.0, stereo_offset_y_ * 100.0, stereo_offset_z_ * 100.0);
+      cameraConfig.orientation_        = ueds_connector::Rotation(-stereo_rotation_pitch_, stereo_rotation_yaw_, stereo_rotation_roll_);
+      cameraConfig.enable_raytracing_  = stereo_enable_raytracing_;
+      cameraConfig.enable_hdr_         = stereo_enable_hdr_;
+      cameraConfig.enable_temporal_aa_ = stereo_enable_temporal_aa_;
 
       const auto res = ueds_connectors_[i]->SetStereoCameraConfig(cameraConfig);
 
@@ -465,6 +519,7 @@ void UnrealSimulator::onInit() {
       lidarConfig.beamLength   = lidar_beam_length_ * 100.0;
       lidarConfig.offset       = ueds_connector::Coordinates(lidar_offset_x_ * 100.0, lidar_offset_y_ * 100.0, lidar_offset_z_ * 100.0);
       lidarConfig.orientation  = ueds_connector::Rotation(-lidar_rotation_pitch_, lidar_rotation_yaw_, lidar_rotation_roll_);
+      lidarConfig.showBeams    = lidar_show_beams_;
 
       /* LidarConfig. */
 
@@ -655,6 +710,10 @@ void UnrealSimulator::timerStatus([[maybe_unused]] const ros::WallTimerEvent& ev
     timer_dynamics_.setPeriod(ros::WallDuration(1.0 / (_simulation_rate_ * drs_params.realtime_factor)), false);
   }
 
+  if (_collisions_) {
+    checkForCrash();
+  }
+
   ROS_INFO_THROTTLE(0.1, "[UnrealSimulator]: %s, desired RTF = %.2f, actual RTF = %.2f, ueds FPS = %.2f", drs_params.paused ? "paused" : "running", ueds_rtf_,
                     actual_rtf_, fps);
 }
@@ -734,8 +793,8 @@ void UnrealSimulator::timerTimeSync([[maybe_unused]] const ros::WallTimerEvent& 
     last_sync_time_ = ros::WallTime::now();
   }
 
-  ROS_INFO("[UnrealSimulator]: wall time %f ueds %f time offset: %f, offset slope %f s/s", sync_start, ueds_time, wall_time_offset_,
-           wall_time_offset_drift_slope_);
+  ROS_DEBUG("[UnrealSimulator]: wall time %f ueds %f time offset: %f, offset slope %f s/s", sync_start, ueds_time, wall_time_offset_,
+            wall_time_offset_drift_slope_);
 }
 
 //}
@@ -1248,6 +1307,35 @@ void UnrealSimulator::updateUnrealPoses(void) {
       rot.yaw   = 180.0 * (-yaw / M_PI);
 
       ueds_connectors_[i]->SetLocationAndRotationAsync(pos, rot);
+    }
+  }
+}
+
+//}
+
+/* checkForCrash() //{ */
+
+void UnrealSimulator::checkForCrash(void) {
+
+  // | ------------ set each UAV's position in unreal ----------- |
+
+  {
+    std::scoped_lock lock(mutex_ueds_);
+
+    for (size_t i = 0; i < uavs_.size(); i++) {
+
+      auto [res, crashed] = ueds_connectors_[i]->GetCrashState();
+
+      if (!res) {
+        ROS_ERROR_THROTTLE(1.0, "[UnrealSimulator]: failed to obtain crash state for uav%lu", i + 1);
+      }
+
+      if (res && crashed && !uavs_[i]->hasCrashed()) {
+
+        ROS_WARN_THROTTLE(1.0, "[UnrealSimulator]: uav%lu crashed", i + 1);
+
+        uavs_[i]->crash();
+      }
     }
   }
 }
