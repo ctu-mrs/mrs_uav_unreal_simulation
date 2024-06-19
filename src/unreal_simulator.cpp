@@ -116,10 +116,13 @@ private:
   geometry_msgs::TransformStamped rgb_camera_tf_;
   geometry_msgs::TransformStamped stereo_camera_tf_;
 
-  // | ------------------------ rtf check ----------------------- |
+  // | --------------------------- rtf -------------------------- |
 
   double    actual_rtf_ = 1.0;
   ros::Time last_sim_time_status_;
+
+  double     desired_rtf_ = 1.0;
+  std::mutex mutex_desired_rtf_;
 
   // | ------------------------- sensors ------------------------ |
 
@@ -215,8 +218,10 @@ private:
   // how much to add to unreal time to get to our wall time
   double        wall_time_offset_             = 0;
   double        wall_time_offset_drift_slope_ = 0;
-  ros::WallTime last_sync_time;
+  ros::WallTime last_sync_time_;
   std::mutex    mutex_wall_time_offset_;
+
+  double ueds_fps_ = 0;
 
   std::vector<double> last_rgb_ue_stamp_;
   std::vector<double> last_rgb_seg_ue_stamp_;
@@ -263,6 +268,7 @@ void UnrealSimulator::onInit() {
 
   param_loader.loadParam("simulation_rate", _simulation_rate_);
   param_loader.loadParam("realtime_factor", drs_params_.realtime_factor);
+  param_loader.loadParam("dynamic_rtf", drs_params_.dynamic_rtf);
   param_loader.loadParam("frames/world/name", _world_frame_name_);
 
   param_loader.loadParam("collisions", _collisions_);
@@ -614,8 +620,43 @@ void UnrealSimulator::timerStatus([[maybe_unused]] const ros::WallTimerEvent& ev
     }
   }
 
-  ROS_INFO_THROTTLE(0.1, "[UnrealSimulator]: %s, desired RTF = %.2f, actual RTF = %.2f, ueds FPS = %.2f", drs_params.paused ? "paused" : "running",
-                    drs_params.realtime_factor, actual_rtf_, fps);
+  // filter out the ueds fps
+  const double fps_filter_const = 0.9;
+  ueds_fps_                     = fps_filter_const * ueds_fps_ + (1.0 - fps_filter_const) * fps;
+
+  // get the currently requires highest sensor rate
+  double highest_fps = 0;
+
+  if (drs_params.rgb_rate > highest_fps) {
+    highest_fps = drs_params.rgb_rate;
+  }
+
+  if (drs_params.stereo_rate > highest_fps) {
+    highest_fps = drs_params.stereo_rate;
+  }
+
+  if (drs_params.lidar_rate > highest_fps) {
+    highest_fps = drs_params.lidar_rate;
+  }
+
+  if (drs_params.rgb_segmented_rate > highest_fps) {
+    highest_fps = drs_params.rgb_segmented_rate;
+  }
+
+  if (drs_params.lidar_seg_rate > highest_fps) {
+    highest_fps = drs_params.lidar_seg_rate;
+  }
+
+  double ueds_rtf_ = ueds_fps_ / highest_fps;
+
+  if (drs_params.dynamic_rtf && ueds_rtf_ < drs_params.realtime_factor) {
+    timer_dynamics_.setPeriod(ros::WallDuration(1.0 / (_simulation_rate_ * ueds_rtf_)), false);
+  } else {
+    timer_dynamics_.setPeriod(ros::WallDuration(1.0 / (_simulation_rate_ * drs_params.realtime_factor)), false);
+  }
+
+  ROS_INFO_THROTTLE(0.1, "[UnrealSimulator]: %s, desired RTF = %.2f, actual RTF = %.2f, ueds FPS = %.2f", drs_params.paused ? "paused" : "running", ueds_rtf_,
+                    actual_rtf_, fps);
 }
 
 //}
@@ -689,6 +730,8 @@ void UnrealSimulator::timerTimeSync([[maybe_unused]] const ros::WallTimerEvent& 
     std::scoped_lock lock(mutex_wall_time_offset_);
 
     wall_time_offset_ = new_wall_time_offset;
+
+    last_sync_time_ = ros::WallTime::now();
   }
 
   ROS_INFO("[UnrealSimulator]: wall time %f ueds %f time offset: %f, offset slope %f s/s", sync_start, ueds_time, wall_time_offset_,
@@ -710,7 +753,6 @@ void UnrealSimulator::timerLidar([[maybe_unused]] const ros::TimerEvent& event) 
   auto drs_params = mrs_lib::get_mutexed(mutex_drs_params_, drs_params_);
 
   if (!drs_params_.lidar_enabled) {
-    ROS_INFO_THROTTLE(1.0, "[UnrealSimulator]: LiDAR sensor disabled");
     return;
   }
 
@@ -793,7 +835,6 @@ void UnrealSimulator::timerSegLidar([[maybe_unused]] const ros::TimerEvent& even
   auto drs_params = mrs_lib::get_mutexed(mutex_drs_params_, drs_params_);
 
   if (!drs_params_.lidar_seg_enabled) {
-    ROS_INFO_THROTTLE(1.0, "[UnrealSimulator]: Segmentation LiDAR sensor disabled");
     return;
   }
 
@@ -911,7 +952,6 @@ void UnrealSimulator::timerRgb([[maybe_unused]] const ros::TimerEvent& event) {
   auto drs_params = mrs_lib::get_mutexed(mutex_drs_params_, drs_params_);
 
   if (!drs_params_.rgb_enabled) {
-    ROS_INFO_THROTTLE(1.0, "[UnrealSimulator]: RGB sensor disabled");
     return;
   }
 
@@ -978,7 +1018,6 @@ void UnrealSimulator::timerStereo([[maybe_unused]] const ros::TimerEvent& event)
   auto drs_params = mrs_lib::get_mutexed(mutex_drs_params_, drs_params_);
 
   if (!drs_params_.stereo_enabled) {
-    ROS_INFO_THROTTLE(1.0, "[UnrealSimulator]: Stereo camera disabled");
     return;
   }
 
@@ -1061,7 +1100,6 @@ void UnrealSimulator::timerRgbSegmented([[maybe_unused]] const ros::TimerEvent& 
   auto drs_params = mrs_lib::get_mutexed(mutex_drs_params_, drs_params_);
 
   if (!drs_params_.rgb_segmented_enabled) {
-    ROS_INFO_THROTTLE(1.0, "[UnrealSimulator]: Seg RGB sensor disabled");
     return;
   }
 

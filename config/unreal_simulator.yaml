@@ -1,6 +1,11 @@
 simulation_rate: 250.0 # Hz
 clock_rate: 250.0 # Hz
+
+# desired realtime factor
 realtime_factor: 1.0 # [-]
+
+# if true, the RTF is automatically set such that the fastest sensor is always rendered at the desired rate
+dynamic_rtf: true
 
 # TODO describe
 collisions: true
