@@ -472,7 +472,7 @@ Visualization Manager:
       Name: rgb
       Normalize Range: true
       Queue Size: 2
-      Transport Hint: compressed
+      Transport Hint: raw
       Unreliable: false
       Value: true
     - Class: rviz/Image
