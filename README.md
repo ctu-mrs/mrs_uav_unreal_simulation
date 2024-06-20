@@ -5,14 +5,6 @@
 * A dedicated NVidia GPU (at least MX450, RTX is recommended) or a comparable AMD GPU
 * 3 GB of HDD space
 
-## TODO
-
-* UAVs don't see eachother in their cameras / LiDARS
-* ability to switch worlds in C++ from the ROS side
-* ability to switch graphics scaling in C++ from the ROS side
-* finer settings of the graphics scaling
-* adding weather effects
-
 ## The Maps
 
 | Map Name        |                               |
@@ -73,3 +65,12 @@ roscd mrs_uav_unreal_simulation
 ./tmux/one_drone/start.sh
 ```
 10. The first start might require hitting "CTRL+C" in the `roscore` tab of the tmux session. The roscore is always stuck for the first time after rebooting the computer.
+
+## TODO
+
+* UAVs don't see eachother in their cameras / LiDARS
+* possible coloring of the depth pointcloud using the segmented RGB image
+* ability to switch worlds in C++ from the ROS side
+* ability to switch graphics scaling in C++ from the ROS side
+* finer settings of the graphics scaling than (low, middle, etc).
+* adding weather effects controllable form the ROS side
