@@ -38,10 +38,14 @@ windows:
           custom_config:=./config/custom_config.yaml
           world_config:=./config/world_config.yaml
           network_config:=./config/network_config.yaml
+  - stereo:
+      layout: tiled
+      panes:
+        - waitForHw; roslaunch mrs_uav_unreal_simulation stereo_image_proc.launch
   - mapping:
       layout: tiled
       panes:
-        - waitForHw; roslaunch ./mapplan.launch
+        - waitForHw; roslaunch mrs_uav_unreal_simulation mapplan.launch
           config_octomap_server:=./config/octomap_server.yaml
           config_octomap_planner:=./config/octomap_planner.yaml
   - goto:

@@ -1,5 +1,0 @@
-safe_obstacle_distance: 0.5 # [m]
-euclidean_distance_cutoff: 0.5 # [m]
-max_altitude: 4.0 # [m]
-subt_planner:
-  use: false

@@ -19,14 +19,14 @@ windows:
   - hw_api:
       layout: tiled
       panes:
-        - export UAV_NAME=uav1; waitForTime; roslaunch mrs_uav_unreal_simulation hw_api.launch custom_config:=./config/hw_api.yaml
-        - export UAV_NAME=uav2; waitForTime; roslaunch mrs_uav_unreal_simulation hw_api.launch custom_config:=./config/hw_api.yaml
+        - export UAV_NAME=uav1; waitForTime; roslaunch mrs_uav_unreal_simulation hw_api.launch
+        - export UAV_NAME=uav2; waitForTime; roslaunch mrs_uav_unreal_simulation hw_api.launch
   - takeoff:
       layout: tiled
       panes:
-        - export UAV_NAME=uav1; waitForHw; roslaunch mrs_uav_autostart automatic_start.launch custom_config:=./config/automatic_start.yaml
+        - export UAV_NAME=uav1; waitForHw; roslaunch mrs_uav_autostart automatic_start.launch
         - export UAV_NAME=uav1; waitForControl; rosservice call /$UAV_NAME/hw_api/arming 1; sleep 2; rosservice call /$UAV_NAME/hw_api/offboard
-        - export UAV_NAME=uav2; waitForHw; roslaunch mrs_uav_autostart automatic_start.launch custom_config:=./config/automatic_start.yaml
+        - export UAV_NAME=uav2; waitForHw; roslaunch mrs_uav_autostart automatic_start.launch
         - export UAV_NAME=uav2; waitForControl; rosservice call /$UAV_NAME/hw_api/arming 1; sleep 2; rosservice call /$UAV_NAME/hw_api/offboard
         # - waitForControl; rosservice call /$UAV_NAME/hw_api/arming 1; rosservice call /$UAV_NAME/uav_manager/midair_activation
   - status:
@@ -48,19 +48,6 @@ windows:
           world_config:=./config/world_config.yaml
           network_config:=./config/network_config.yaml
 
-  - mapping:
-      layout: tiled
-      panes:
-        - export UAV_NAME=uav1; waitForHw; roslaunch ./mapplan.launch
-          config_octomap_server:=./config/octomap_server.yaml
-          config_octomap_planner:=./config/octomap_planner.yaml
-        - export UAV_NAME=uav2; waitForHw; roslaunch ./mapplan.launch
-          config_octomap_server:=./config/octomap_server.yaml
-          config_octomap_planner:=./config/octomap_planner.yaml
-  - goto:
-      layout: tiled
-      panes:
-        - 'history -s rosservice call /$UAV_NAME/octomap_planner/goto \"goal: \[0.0, 60.0, 2.0, 0.0\]\"'
   - rviz:
       layout: tiled
       panes:

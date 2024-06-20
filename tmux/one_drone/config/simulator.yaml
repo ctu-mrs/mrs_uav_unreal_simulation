@@ -1,7 +1,3 @@
-simulation_rate: 250.0 # [Hz]
-clock_rate: 250 # [Hz]
-realtime_factor: 1.0 # [Hz]
-
 uav_names: [
   "uav1",
 ]
@@ -9,8 +5,8 @@ uav_names: [
 uav1:
   type: "x500"
   spawn:
-    x: 0.0 #10.0
-    y: 0.0 #15.0
+    x: 0.0
+    y: 0.0
     z: 2.0
     heading: 0
 
