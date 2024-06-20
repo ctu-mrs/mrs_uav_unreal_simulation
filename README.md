@@ -5,13 +5,28 @@
 * A dedicated NVidia GPU (at least MX450, RTX is recommended) or a comparable AMD GPU
 * 3 GB of HDD space
 
-## The maps
+## TODO
 
-| Map Name  |                         |
-|-----------|-------------------------|
-| Valley    | ![](.fig/valley.jpg)    |
-| Forest    | ![](.fig/forest.jpg)    |
-| Warehouse | ![](.fig/warehouse.jpg) |
+* UAVs don't see eachother in their cameras / LiDARS
+* ability to switch worlds in C++ from the ROS side
+* ability to switch graphics scaling in C++ from the ROS side
+* finer settings of the graphics scaling
+* + weather effects
+
+## The Maps
+
+| Map Name        |                               |
+|-----------------|-------------------------------|
+| Valley          | ![](.fig/valley.jpg)          |
+| Forest          | ![](.fig/forest.jpg)          |
+| Infinite Forest | ![](.fig/infinite_forest.jpg) |
+| Warehouse       | ![](.fig/warehouse.jpg)       |
+| Cave            | ![](.fig/cave.jpg)            |
+| Erding Airbase  | ![](.fig/erding_airbase.jpg)  |
+
+## Controls
+
+* `m`/`ESC` - show menu for switching graphics and worlds
 
 ## Installation
 
