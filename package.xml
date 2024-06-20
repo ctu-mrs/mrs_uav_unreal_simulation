@@ -2,7 +2,7 @@
 <package format="2">
 
   <name>mrs_uav_unreal_simulation</name>
-  <version>1.0.0</version>
+  <version>1.0.1</version>
   <description>The MRS UnrealEngine simulator</description>
 
   <author email="tomas.baca@fel.cvut.cz">Tomas Baca</author>
