@@ -23,7 +23,7 @@ windows:
   - takeoff:
       layout: tiled
       panes:
-        - waitForHw; roslaunch mrs_uav_autostart automatic_start.launch custom_config:=./config/automatic_start.yaml
+        - waitForHw; roslaunch mrs_uav_autostart automatic_start.launch
         - waitForControl; rosservice call /$UAV_NAME/hw_api/arming 1; sleep 2; rosservice call /$UAV_NAME/hw_api/offboard
         # - waitForControl; rosservice call /$UAV_NAME/hw_api/arming 1; rosservice call /$UAV_NAME/uav_manager/midair_activation
   - status:
