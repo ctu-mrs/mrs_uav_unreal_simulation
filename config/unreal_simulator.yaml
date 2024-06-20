@@ -28,6 +28,7 @@ sensors:
     offset_y: 0.0 # [m]
     offset_z: 0.06 # [m]
 
+    # TODO which Tait-Bryan convention is it in?
     rotation_pitch: 0.0 # [deg]
     rotation_roll: 0.0 # [deg]
     rotation_yaw: 0.0 # [deg]
@@ -57,6 +58,7 @@ sensors:
     offset_y: 0.0 # [m]
     offset_z: 0.0 # [m]
 
+    # TODO which Tait-Bryan convention is it in?
     rotation_pitch: 0.0 # [deg]
     rotation_yaw: 0.0 # [deg]
     rotation_roll: 0.0 # [deg]
@@ -85,6 +87,7 @@ sensors:
     offset_y: 0.0 # [m]
     offset_z: 0.0 # [m]
 
+    # TODO which Tait-Bryan convention is it in?
     rotation_pitch: 20.0 # [deg]
     rotation_yaw: 0.0 # [deg]
     rotation_roll: 0.0 # [deg]
@@ -98,7 +101,7 @@ frames:
     publish_tf: false
   rangefinder:
     name: "garmin"
-    publish_tf: true
+    publish_tf: false
 
 # randomization of the initial conditions around the desired spawn point
 randomization:
@@ -110,7 +113,7 @@ randomization:
     y: 15.0 # [m]
     z: 15.0 # [m]
 
-# this virtual ground is simulated outside of Unreal
+# this virtual ground is simulated outside of Unreal, therefore should be turned off
 ground:
   enabled: false
   z: 0.0 # [m]

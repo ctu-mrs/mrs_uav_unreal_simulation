@@ -22,7 +22,7 @@
 ```bash
 sudo apt install ros-noetic-mrs-uav-unreal-simulation
 ```
-3. Download the and untar [Unreal Engine Drone Simulator](https://nasmrs.felk.cvut.cz/index.php/s/kfuWK1KS9h7oJ0I)
+3. Download the and unpack [Unreal Engine Drone Simulator](https://nasmrs.felk.cvut.cz/index.php/s/MnGARsSwnpeVy5z)
 4. Launch the UE5 Simulator by `./ueds.sh`. Alternatively, start it in a headless mode via `./ueds.sh -renderOffScreen`.
 5. Start the MRS UAV System UE5 endpoint
 ```bash
@@ -53,10 +53,11 @@ hostAddressLoopback=true
 ```bash
 sudo apt install ros-noetic-mrs-uav-unreal-simulation
 ```
-7. Download and unzip the [Unreal Engine Drone Simulator](https://nasmrs.felk.cvut.cz/index.php/s/qLVIlBxtk8VCj5q)
+7. Download and unpack the [Unreal Engine Drone Simulator](https://nasmrs.felk.cvut.cz/index.php/s/MnGARsSwnpeVy5z)
 8. Start the Unreal Engine Drone Simulator
 9. Start the MRS UAV System UE5 endpoint
 ```bash
 roscd mrs_uav_unreal_simulation
 ./tmux/one_drone/start.sh
 ```
+10. The first start might require hitting "CTRL+C" in the `roscore` tab of the tmux session. The roscore is always stuck for the first time after rebooting the computer.
