@@ -127,9 +127,6 @@ private:
   double    actual_rtf_ = 1.0;
   ros::Time last_sim_time_status_;
 
-  double     desired_rtf_ = 1.0;
-  std::mutex mutex_desired_rtf_;
-
   // | ------------------------- sensors ------------------------ |
 
   double lidar_horizontal_fov_;
@@ -381,12 +378,7 @@ void UnrealSimulator::onInit() {
 
   auto [res, ueds_api_version] = ueds_game_controller_->GetApiVersion();
 
-  if (!res) {
-    ROS_ERROR("[UnrealSimulator]: could not obtain the ueds API version");
-    ros::shutdown();
-  }
-
-  if (ueds_api_version != API_VERSION) {
+  if (!res || ueds_api_version != API_VERSION) {
 
     ROS_ERROR("[UnrealSimulator]: the API versions don't match! (ROS side '%d' != Unreal side '%d')", API_VERSION, ueds_api_version);
     ROS_ERROR("[UnrealSimulator]:");
@@ -620,7 +612,9 @@ void UnrealSimulator::timerDynamics([[maybe_unused]] const ros::WallTimerEvent& 
   }
 
   for (size_t i = 0; i < uavs_.size(); i++) {
-    uavs_[i]->makeStep(simulation_step_size);
+    if (!uavs_[i]->hasCrashed()) {
+      uavs_[i]->makeStep(simulation_step_size);
+    }
   }
 
   publishPoses();
@@ -702,19 +696,17 @@ void UnrealSimulator::timerStatus([[maybe_unused]] const ros::WallTimerEvent& ev
     highest_fps = drs_params.lidar_seg_rate;
   }
 
-  double ueds_rtf_ = ueds_fps_ / highest_fps;
+  const double ueds_rtf_ = ueds_fps_ / highest_fps;
 
-  if (drs_params.dynamic_rtf && ueds_rtf_ < drs_params.realtime_factor) {
-    timer_dynamics_.setPeriod(ros::WallDuration(1.0 / (_simulation_rate_ * ueds_rtf_)), false);
-  } else {
-    timer_dynamics_.setPeriod(ros::WallDuration(1.0 / (_simulation_rate_ * drs_params.realtime_factor)), false);
-  }
+  const double desired_rtf = (drs_params.dynamic_rtf && ueds_rtf_ < drs_params.realtime_factor) ? ueds_rtf_ : drs_params.realtime_factor;
+
+  timer_dynamics_.setPeriod(ros::WallDuration(1.0 / (_simulation_rate_ * desired_rtf)), false);
 
   if (_collisions_) {
     checkForCrash();
   }
 
-  ROS_INFO_THROTTLE(0.1, "[UnrealSimulator]: %s, desired RTF = %.2f, actual RTF = %.2f, ueds FPS = %.2f", drs_params.paused ? "paused" : "running", ueds_rtf_,
+  ROS_INFO_THROTTLE(0.1, "[UnrealSimulator]: %s, desired RTF = %.2f, actual RTF = %.2f, ueds FPS = %.2f", drs_params.paused ? "paused" : "running", desired_rtf,
                     actual_rtf_, fps);
 }
 
@@ -927,6 +919,7 @@ void UnrealSimulator::timerSegLidar([[maybe_unused]] const ros::TimerEvent& even
       point.x = dir.x();
       point.y = -dir.y();  // convert left-hand to right-hand coordinates
       point.z = dir.z();
+
       switch (ray.segmentation) {
         case 0: {
           point.r = 0;
