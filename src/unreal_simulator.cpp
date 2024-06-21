@@ -1521,6 +1521,22 @@ void UnrealSimulator::publishStaticTfs(void) {
       catch (...) {
         ROS_ERROR("[UnrealSimulator]: could not publish rgb tf");
       }
+
+      // | ------------- print the tf matrix for kalibr ------------- |
+
+      ROS_INFO("[UnrealSimulator]: RGB camera-imu chain for kalibr config:");
+      printf("cam0:\n");
+      printf("  T_imu_cam:\n");
+      printf("    - [%f, %f, %f, %f]\n", final_tf(0, 0), final_tf(0, 1), final_tf(0, 2), tf.transform.translation.x);
+      printf("    - [%f, %f, %f, %f]\n", final_tf(1, 0), final_tf(1, 1), final_tf(1, 2), tf.transform.translation.y);
+      printf("    - [%f, %f, %f, %f]\n", final_tf(2, 0), final_tf(2, 1), final_tf(2, 2), tf.transform.translation.z);
+      printf("    - [%f, %f, %f, %f]\n", 0.0, 0.0, 0.0, 1.0);
+      printf("  cam_overlaps: [0]\n");
+      printf("  camera_model: pinhole\n");
+      printf("  distortion_coeffs: [0.0, 0.0, 0.0, 0.0]\n");
+      printf("  distortion_model: radtan\n");
+      printf("  intrinsics: [%f, %f, %f, %f]\n", rgb_camera_info_.K[0], rgb_camera_info_.K[4], rgb_camera_info_.K[2], rgb_camera_info_.K[5]);
+      printf("  resolution: [%d, %d]\n", rgb_width_, rgb_height_);
     }
 
     // | ----------------------- stereo left ---------------------- |
@@ -1550,6 +1566,22 @@ void UnrealSimulator::publishStaticTfs(void) {
       catch (...) {
         ROS_ERROR("[UnrealSimulator]: could not publish stereo left tf");
       }
+
+      // | ------------- print the tf matrix for kalibr ------------- |
+
+      ROS_INFO("[UnrealSimulator]: Stereo left camera-imu chain for kalibr config:");
+      printf("cam0:\n");
+      printf("  T_imu_cam:\n");
+      printf("    - [%f, %f, %f, %f]\n", final_tf(0, 0), final_tf(0, 1), final_tf(0, 2), tf.transform.translation.x);
+      printf("    - [%f, %f, %f, %f]\n", final_tf(1, 0), final_tf(1, 1), final_tf(1, 2), tf.transform.translation.y);
+      printf("    - [%f, %f, %f, %f]\n", final_tf(2, 0), final_tf(2, 1), final_tf(2, 2), tf.transform.translation.z);
+      printf("    - [%f, %f, %f, %f]\n", 0.0, 0.0, 0.0, 1.0);
+      printf("  cam_overlaps: [0]\n");
+      printf("  camera_model: pinhole\n");
+      printf("  distortion_coeffs: [0.0, 0.0, 0.0, 0.0]\n");
+      printf("  distortion_model: radtan\n");
+      printf("  intrinsics: [%f, %f, %f, %f]\n", stereo_camera_info_.K[0], stereo_camera_info_.K[4], stereo_camera_info_.K[2], stereo_camera_info_.K[5]);
+      printf("  resolution: [%d, %d]\n", stereo_width_, stereo_height_);
     }
 
     {
@@ -1577,6 +1609,22 @@ void UnrealSimulator::publishStaticTfs(void) {
       catch (...) {
         ROS_ERROR("[UnrealSimulator]: could not publish stereo right tf");
       }
+
+      // | ------------- print the tf matrix for kalibr ------------- |
+
+      ROS_INFO("[UnrealSimulator]: Stereo right camera-imu chain for kalibr config:");
+      printf("cam0:\n");
+      printf("  T_imu_cam:\n");
+      printf("    - [%f, %f, %f, %f]\n", final_tf(0, 0), final_tf(0, 1), final_tf(0, 2), tf.transform.translation.x);
+      printf("    - [%f, %f, %f, %f]\n", final_tf(1, 0), final_tf(1, 1), final_tf(1, 2), tf.transform.translation.y);
+      printf("    - [%f, %f, %f, %f]\n", final_tf(2, 0), final_tf(2, 1), final_tf(2, 2), tf.transform.translation.z);
+      printf("    - [%f, %f, %f, %f]\n", 0.0, 0.0, 0.0, 1.0);
+      printf("  cam_overlaps: [0]\n");
+      printf("  camera_model: pinhole\n");
+      printf("  distortion_coeffs: [0.0, 0.0, 0.0, 0.0]\n");
+      printf("  distortion_model: radtan\n");
+      printf("  intrinsics: [%f, %f, %f, %f]\n", stereo_camera_info_.K[0], stereo_camera_info_.K[4], stereo_camera_info_.K[2], stereo_camera_info_.K[5]);
+      printf("  resolution: [%d, %d]\n", stereo_width_, stereo_height_);
     }
   }
 }
