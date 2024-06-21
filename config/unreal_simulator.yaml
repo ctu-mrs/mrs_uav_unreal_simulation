@@ -40,7 +40,7 @@ sensors:
       enabled: true
 
       std_at_1m: 0.01 # [m]
-      std_slope: 0.2 [-] # multiplies std_at_1m for each meter of measured distances
+      std_slope: 0.2 # [-] # multiplies std_at_1m for each meter of measured distances
 
     show_beams: false # TODO broken
 

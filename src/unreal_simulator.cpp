@@ -42,6 +42,8 @@
 #include <pcl_conversions/pcl_conversions.h>
 #include <pcl/common/transforms.h>
 
+#include <random>
+
 //}
 
 /* defines //{ */
@@ -240,6 +242,8 @@ private:
   std::vector<double> last_stereo_ue_stamp_;
 
   double uedsToWallTime(const double ueds_time);
+
+  std::default_random_engine rng;
 };
 
 //}
@@ -289,6 +293,9 @@ void UnrealSimulator::onInit() {
   param_loader.loadParam("sensors/lidar/rate", drs_params_.lidar_rate);
   param_loader.loadParam("sensors/lidar/lidar_segmented/enabled", drs_params_.lidar_seg_enabled);
   param_loader.loadParam("sensors/lidar/lidar_segmented/rate", drs_params_.lidar_seg_rate);
+  param_loader.loadParam("sensors/lidar/noise/enabled", drs_params_.lidar_noise_enabled);
+  param_loader.loadParam("sensors/lidar/noise/std_at_1m", drs_params_.lidar_std_at_1m);
+  param_loader.loadParam("sensors/lidar/noise/std_slope", drs_params_.lidar_std_slope);
 
   param_loader.loadParam("sensors/lidar/horizontal_fov", lidar_horizontal_fov_);
   param_loader.loadParam("sensors/lidar/vertical_fov", lidar_vertical_fov_);
@@ -854,7 +861,18 @@ void UnrealSimulator::timerLidar([[maybe_unused]] const ros::TimerEvent& event) 
 
       tf::Vector3 dir = tf::Vector3(ray.directionX, ray.directionY, ray.directionZ);
 
-      dir = dir.normalized() * (ray.distance / 100.0);
+      double ray_distance = ray.distance / 100.0;
+
+      if (drs_params.lidar_noise_enabled && ray_distance > 0) {
+
+        const double std = ray_distance * drs_params.lidar_std_slope * drs_params.lidar_std_at_1m;
+
+        std::normal_distribution<double> distribution(0, std);
+
+        ray_distance += distribution(rng);
+      }
+
+      dir = dir.normalized() * ray_distance;
 
       *iterX         = dir.x();
       *iterY         = -dir.y();  // convert left-hand to right-hand coordinates
@@ -913,8 +931,21 @@ void UnrealSimulator::timerSegLidar([[maybe_unused]] const ros::TimerEvent& even
     for (const ueds_connector::LidarSegData& ray : lidarSegData) {
 
       pcl::PointXYZRGB point;
-      tf::Vector3      dir = tf::Vector3(ray.directionX, ray.directionY, ray.directionZ);
-      dir                  = dir.normalized() * (ray.distance / 100.0);
+
+      tf::Vector3 dir = tf::Vector3(ray.directionX, ray.directionY, ray.directionZ);
+
+      double ray_distance = ray.distance / 100.0;
+
+      if (drs_params.lidar_noise_enabled && ray_distance > 0) {
+
+        const double std = ray_distance * drs_params.lidar_std_slope * drs_params.lidar_std_at_1m;
+
+        std::normal_distribution<double> distribution(0, std);
+
+        ray_distance += distribution(rng);
+      }
+
+      dir = dir.normalized() * ray_distance;
 
       point.x = dir.x();
       point.y = -dir.y();  // convert left-hand to right-hand coordinates
