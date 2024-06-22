@@ -457,13 +457,16 @@ struct Request : public Common::NetworkRequest
   double x;
   double y;
   double z;
+
   double pitch;
   double yaw;
   double roll;
 
+  bool should_collide;
+
   template <class Archive>
   void serialize(Archive& archive) {
-    archive(cereal::base_class<Common::NetworkRequest>(this), x, y, z, pitch, yaw, roll);
+    archive(cereal::base_class<Common::NetworkRequest>(this), x, y, z, pitch, yaw, roll, should_collide);
   }
 };
 
@@ -509,13 +512,16 @@ struct Request : public Common::NetworkRequest
   double x;
   double y;
   double z;
+
   double pitch;
   double yaw;
   double roll;
 
+  bool should_collide;
+
   template <class Archive>
   void serialize(Archive& archive) {
-    archive(cereal::base_class<Common::NetworkRequest>(this), x, y, z, pitch, yaw, roll);
+    archive(cereal::base_class<Common::NetworkRequest>(this), x, y, z, pitch, yaw, roll, should_collide);
   }
 };
 

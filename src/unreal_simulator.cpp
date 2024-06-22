@@ -48,7 +48,7 @@
 
 /* defines //{ */
 
-#define API_VERSION 1
+#define API_VERSION 2
 
 //}
 
@@ -221,7 +221,7 @@ private:
 
   std::vector<ueds_connector::Coordinates> ueds_world_origins_;
 
-  void updateUnrealPoses(void);
+  void updateUnrealPoses(const bool teleport_without_collision);
 
   void checkForCrash(void);
 
@@ -532,6 +532,10 @@ void UnrealSimulator::onInit() {
     }
   }
 
+  ROS_INFO("[UnrealSimulator]: teleporting the UAVs to their spawn positions");
+
+  updateUnrealPoses(true);
+
   ROS_INFO("[UnrealSimulator]: Unreal UAVs are initialized");
 
   // | --------------- dynamic reconfigure server --------------- |
@@ -727,7 +731,7 @@ void UnrealSimulator::timerUnrealSync([[maybe_unused]] const ros::TimerEvent& ev
     return;
   }
 
-  updateUnrealPoses();
+  updateUnrealPoses(false);
 }
 
 //}
@@ -1306,7 +1310,7 @@ void UnrealSimulator::publishPoses(void) {
 
 /* updateUnrealPoses() //{ */
 
-void UnrealSimulator::updateUnrealPoses(void) {
+void UnrealSimulator::updateUnrealPoses(const bool teleport_without_collision) {
 
   // | ------------ set each UAV's position in unreal ----------- |
 
@@ -1330,7 +1334,7 @@ void UnrealSimulator::updateUnrealPoses(void) {
       rot.roll  = 180.0 * (roll / M_PI);
       rot.yaw   = 180.0 * (-yaw / M_PI);
 
-      ueds_connectors_[i]->SetLocationAndRotationAsync(pos, rot);
+      ueds_connectors_[i]->SetLocationAndRotationAsync(pos, rot, !teleport_without_collision && _collisions_);
     }
   }
 }

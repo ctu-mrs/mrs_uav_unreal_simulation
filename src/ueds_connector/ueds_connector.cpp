@@ -191,15 +191,20 @@ std::tuple<bool, Rotation, bool, Coordinates> UedsConnector::SetRotation(const R
 
 /* setLocationAndRotation() //{ */
 
-std::tuple<bool, Coordinates, Rotation, bool, Coordinates> UedsConnector::SetLocationAndRotation(const Coordinates& coordinate, const Rotation& rotation) {
+std::tuple<bool, Coordinates, Rotation, bool, Coordinates> UedsConnector::SetLocationAndRotation(const Coordinates& coordinate, const Rotation& rotation,
+                                                                                                 const bool should_collide) {
 
   Serializable::Drone::SetLocationAndRotation::Request request{};
-  request.x     = coordinate.x;
-  request.y     = coordinate.y;
-  request.z     = coordinate.z;
+
+  request.x = coordinate.x;
+  request.y = coordinate.y;
+  request.z = coordinate.z;
+
   request.pitch = rotation.pitch;
   request.yaw   = rotation.yaw;
   request.roll  = rotation.roll;
+
+  request.should_collide = should_collide;
 
   Serializable::Drone::SetLocationAndRotation::Response response{};
   const auto                                            status  = Request(request, response);
@@ -230,19 +235,23 @@ std::tuple<bool, Coordinates, Rotation, bool, Coordinates> UedsConnector::SetLoc
 
 /* setLocationAndRotationAsync() //{ */
 
-std::tuple<bool> UedsConnector::SetLocationAndRotationAsync(const Coordinates& coordinate, const Rotation& rotation) {
+std::tuple<bool> UedsConnector::SetLocationAndRotationAsync(const Coordinates& coordinate, const Rotation& rotation, const bool should_collide) {
 
   Serializable::Drone::SetLocationAndRotationAsync::Request request{};
-  request.x     = coordinate.x;
-  request.y     = coordinate.y;
-  request.z     = coordinate.z;
+
+  request.x = coordinate.x;
+  request.y = coordinate.y;
+  request.z = coordinate.z;
+
   request.pitch = rotation.pitch;
   request.yaw   = rotation.yaw;
   request.roll  = rotation.roll;
 
-  Serializable::Drone::SetLocationAndRotation::Response response{};
-  const auto                                            status  = Request(request, response);
-  const auto                                            success = status && response.status;
+  request.should_collide = should_collide;
+
+  Serializable::Drone::SetLocationAndRotationAsync::Response response{};
+  const auto                                                 status  = Request(request, response);
+  const auto                                                 success = status && response.status;
 
   return std::make_tuple(success);
 }
