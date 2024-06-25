@@ -64,6 +64,7 @@
 
     <remap from="~arm_in" to="~arm" />
     <remap from="~offboard_in" to="~offboard" />
+    <remap from="~set_realtime_factor_in" to="~set_realtime_factor" />
 
   </node>
 
