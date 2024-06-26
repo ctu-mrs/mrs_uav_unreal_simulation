@@ -112,6 +112,12 @@ private:
   ros::Timer timer_stereo_;
   void       timerStereo(const ros::TimerEvent& event);
 
+  // | --------------------- service servers -------------------- |
+
+  ros::ServiceServer service_server_realtime_factor_;
+
+  bool callbackSetRealtimeFactor(mrs_msgs::Float64Srv::Request& req, mrs_msgs::Float64Srv::Response& res);
+
   // | --------------------------- tfs -------------------------- |
 
   tf2_ros::StaticTransformBroadcaster static_broadcaster_;
@@ -557,6 +563,10 @@ void UnrealSimulator::onInit() {
   ph_clock_ = mrs_lib::PublisherHandler<rosgraph_msgs::Clock>(nh_, "clock_out", 10, false);
 
   ph_poses_ = mrs_lib::PublisherHandler<geometry_msgs::PoseArray>(nh_, "uav_poses_out", 10, false);
+
+  // | --------------------- service servers -------------------- |
+
+  service_server_realtime_factor_ = nh_.advertiseService("set_realtime_factor_in", &UnrealSimulator::callbackSetRealtimeFactor, this);
 
   // | ------------------------- timers ------------------------- |
 
@@ -1438,8 +1448,8 @@ void UnrealSimulator::fabricateCamInfo(void) {
 
   // | ------------------------- stereo ------------------------- |
 
-  stereo_camera_info_.height = stereo_width_;
-  stereo_camera_info_.width  = stereo_height_;
+  stereo_camera_info_.width  = stereo_width_;
+  stereo_camera_info_.height = stereo_height_;
 
   // distortion
   stereo_camera_info_.distortion_model = "plumb_bob";
@@ -1631,6 +1641,30 @@ void UnrealSimulator::publishStaticTfs(void) {
       printf("  resolution: [%d, %d]\n", stereo_width_, stereo_height_);
     }
   }
+}
+
+//}
+
+/* callbackSetRealtimeFactor() //{ */
+
+bool UnrealSimulator::callbackSetRealtimeFactor(mrs_msgs::Float64Srv::Request& req, mrs_msgs::Float64Srv::Response& res) {
+
+  if (!is_initialized_) {
+    return false;
+  }
+
+  auto params = mrs_lib::get_mutexed(mutex_drs_params_, drs_params_);
+
+  params.realtime_factor = req.value;
+
+  drs_->updateConfig(params);
+
+  mrs_lib::set_mutexed(mutex_drs_params_, params, drs_params_);
+
+  res.message = "new realtime factor set";
+  res.success = true;
+
+  return true;
 }
 
 //}
