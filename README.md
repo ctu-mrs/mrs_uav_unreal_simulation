@@ -8,11 +8,11 @@
 
 ## The Maps
 
-| Map Name        |                               |
-|-----------------|-------------------------------|
-| Valley          | ![](.fig/valley.jpg)          |
-| Forest          | ![](.fig/forest.jpg)          |
-| Warehouse       | ![](.fig/warehouse.jpg)       |
+| Map Name  |                         | Map Name       |                               |
+|-----------|-------------------------|----------------|-------------------------------|
+| Valley    | ![](.fig/valley.jpg)    | Cave           | ![](.fig/cave.jpg)            |
+| Forest    | ![](.fig/forest.jpg)    | Erding Airbase | ![](.fig/erding_airbase.jpg)  |
+| Warehouse | ![](.fig/warehouse.jpg) | Infinit forest | ![](.fig/infinite_forest.jpg) |
 
 ## Controls
 
