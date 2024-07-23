@@ -1072,7 +1072,12 @@ void UnrealSimulator::timerRgb([[maybe_unused]] const ros::TimerEvent& event) {
     last_rgb_ue_stamp_.at(i) = stamp;
 
     if (!res) {
-      ROS_ERROR("[UnrealSimulator]: failed to obtain rgb camera from uav%lu", i + 1);
+      ROS_WARN("[UnrealSimulator]: failed to obtain rgb camera from uav%lu", i + 1);
+      continue;
+    }
+
+    if (cameraData.empty()) {
+      ROS_WARN("[UnrealSimulator]: rgb camera from uav%lu is empty!", i + 1);
       continue;
     }
 
@@ -1138,7 +1143,12 @@ void UnrealSimulator::timerStereo([[maybe_unused]] const ros::TimerEvent& event)
     last_stereo_ue_stamp_.at(i) = stamp;
 
     if (!res) {
-      ROS_ERROR("[UnrealSimulator]: failed to obtain stereo camera from uav%lu", i + 1);
+      ROS_WARN("[UnrealSimulator]: failed to obtain stereo camera from uav%lu", i + 1);
+      continue;
+    }
+
+    if (image_left.empty() || image_right.empty()) {
+      ROS_WARN("[UnrealSimulator]: stereo camera data from uav%lu is empty!", i + 1);
       continue;
     }
 
@@ -1218,6 +1228,16 @@ void UnrealSimulator::timerRgbSegmented([[maybe_unused]] const ros::TimerEvent& 
     }
 
     last_rgb_seg_ue_stamp_.at(i) = stamp;
+
+    if (!res) {
+      ROS_WARN("[UnrealSimulator]: failed to obtain rgb camera from uav%lu", i + 1);
+      continue;
+    }
+
+    if (cameraData.empty()) {
+      ROS_WARN("[UnrealSimulator]: rgb segmented camera from uav%lu is empty!", i + 1);
+      continue;
+    }
 
     cv::Mat image = cv::imdecode(cameraData, cv::IMREAD_COLOR);
 
