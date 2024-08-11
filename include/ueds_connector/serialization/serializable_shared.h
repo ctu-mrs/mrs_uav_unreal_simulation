@@ -104,6 +104,7 @@ enum MessageType : unsigned short
   get_lidar_seg                   = 19,
   set_location_and_rotation_async = 20,
   get_crash_state                 = 21,
+  get_lidar_int                   = 22,
 };
 
 /* struct LidarConfig //{ */
@@ -632,6 +633,53 @@ struct Response : public Common::NetworkResponse
   }
 };
 }  // namespace GetLidarSegData
+
+//}
+
+/* GetLidarIntData //{ */
+
+namespace GetLidarIntData
+{
+struct LidarIntData
+{
+  LidarIntData() = default;
+
+  double distance;
+  double directionX;
+  double directionY;
+  double directionZ;
+  int    intensity;
+  template <class Archive>
+  void serialize(Archive& archive) {
+    archive(distance, directionX, directionY, directionZ, intensity);
+  }
+};
+
+struct Request : public Common::NetworkRequest
+{
+  Request() : Common::NetworkRequest(static_cast<unsigned short>(MessageType::get_lidar_int)) {
+  }
+};
+
+struct Response : public Common::NetworkResponse
+{
+  Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::get_lidar_int)) {
+  }
+  explicit Response(bool _status) : Common::NetworkResponse(MessageType::get_lidar_int, _status) {
+  }
+
+  double startX;
+  double startY;
+  double startZ;
+
+  std::vector<LidarIntData> lidarIntData;
+
+  template <class Archive>
+  void serialize(Archive& archive) {
+    archive(cereal::base_class<Common::NetworkResponse>(this), startX, startY, startZ, lidarIntData);
+  }
+};
+}  // namespace GetLidarIntData
 
 //}
 

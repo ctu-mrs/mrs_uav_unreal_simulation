@@ -13,6 +13,11 @@ uav1:
 sensors:
   lidar:
     enabled: true
+    horizontal_rays: 128 # [-]
+    vertical_rays: 64 # [-]
+    lidar_intensity:
+      enabled: true 
+      rate: 1.0 # [Hz]
   rgb:
     enabled: true
   stereo:
