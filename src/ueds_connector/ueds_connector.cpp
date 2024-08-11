@@ -9,6 +9,7 @@ using kissnet::socket_status;
 using ueds_connector::Coordinates;
 using ueds_connector::LidarConfig;
 using ueds_connector::LidarData;
+using ueds_connector::LidarIntData;
 using ueds_connector::LidarSegData;
 using ueds_connector::RgbCameraConfig;
 using ueds_connector::Rotation;
@@ -262,6 +263,7 @@ std::tuple<bool> UedsConnector::SetLocationAndRotationAsync(const Coordinates& c
 
 std::tuple<bool, std::vector<LidarData>, Coordinates> UedsConnector::GetLidarData() {
 
+  std::cout << "GetLidarData()" << std::endl;
   Serializable::Drone::GetLidarData::Request request{};
 
   Serializable::Drone::GetLidarData::Response response{};
@@ -326,6 +328,43 @@ std::tuple<bool, std::vector<LidarSegData>, Coordinates> UedsConnector::GetLidar
 
   // std::cout << "Get lidar data drone controller: " << success << std::endl;
   return std::make_tuple(success, lidarSegData, start);
+}
+//}
+
+/* getLidarIntData() //{ */
+
+std::tuple<bool, std::vector<LidarIntData>, Coordinates> UedsConnector::GetLidarIntData() {
+ 
+  std::cout << "GetLidarIntData()" << std::endl;
+
+  Serializable::Drone::GetLidarIntData::Request request{};
+
+  Serializable::Drone::GetLidarIntData::Response response{};
+  const auto                                     status  = Request(request, response);
+  const auto                                     success = status && response.status;
+  std::vector<LidarIntData>                      lidarIntData;
+  Coordinates                                    start{};
+
+  if (success) {
+
+    const auto arrSize = response.lidarIntData.size();
+    lidarIntData.resize(arrSize);
+
+    for (size_t i = 0; i < arrSize; i++) {
+      lidarIntData[i]            = LidarIntData{};
+      lidarIntData[i].distance   = response.lidarIntData[i].distance;
+      lidarIntData[i].directionX = response.lidarIntData[i].directionX;
+      lidarIntData[i].directionY = response.lidarIntData[i].directionY;
+      lidarIntData[i].directionZ = response.lidarIntData[i].directionZ;
+      lidarIntData[i].intensity  = response.lidarIntData[i].intensity;
+    }
+
+    start.x = response.startX;
+    start.y = response.startY;
+    start.z = response.startZ;
+  }
+
+  return std::make_tuple(success, lidarIntData, start);
 }
 //}
 

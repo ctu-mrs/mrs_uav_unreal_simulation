@@ -52,9 +52,10 @@
 
 //}
 
-using PCLPoint           = pcl::PointXYZ;
-using PCLPointCloud      = pcl::PointCloud<PCLPoint>;
-using PCLPointCloudColor = pcl::PointCloud<pcl::PointXYZRGB>;
+using PCLPoint               = pcl::PointXYZ;
+using PCLPointCloud          = pcl::PointCloud<PCLPoint>;
+using PCLPointCloudColor     = pcl::PointCloud<pcl::PointXYZRGB>;
+using PCLPointCloudIntensity = pcl::PointCloud<pcl::PointXYZI>;
 namespace mrs_uav_unreal_simulation
 {
 
@@ -102,6 +103,9 @@ private:
 
   ros::Timer timer_seg_lidar_;
   void       timerSegLidar(const ros::TimerEvent& event);
+
+  ros::Timer timer_int_lidar_;
+  void       timerIntLidar(const ros::TimerEvent& event);
 
   ros::Timer timer_rgb_;
   void       timerRgb(const ros::TimerEvent& event);
@@ -177,6 +181,15 @@ private:
   bool   stereo_enable_temporal_aa_;
   bool   stereo_enable_raytracing_;
 
+  double lidar_int_grass;
+  double lidar_int_road;
+  double lidar_int_tree;
+  double lidar_int_building;
+  double lidar_int_fence;
+  double lidar_int_dirt_road;
+  double lidar_int_other;
+  bool   lidar_int_noise;
+
   // | ----------------------- publishers ----------------------- |
 
   mrs_lib::PublisherHandler<rosgraph_msgs::Clock>     ph_clock_;
@@ -184,6 +197,7 @@ private:
 
   std::vector<mrs_lib::PublisherHandler<sensor_msgs::PointCloud2>> ph_lidars_;
   std::vector<mrs_lib::PublisherHandler<sensor_msgs::PointCloud2>> ph_seg_lidars_;
+  std::vector<mrs_lib::PublisherHandler<sensor_msgs::PointCloud2>> ph_int_lidars_;
 
   std::vector<image_transport::Publisher> imp_rgb_;
   std::vector<image_transport::Publisher> imp_stereo_left_;
@@ -304,6 +318,8 @@ void UnrealSimulator::onInit() {
   param_loader.loadParam("sensors/lidar/rate", drs_params_.lidar_rate);
   param_loader.loadParam("sensors/lidar/lidar_segmented/enabled", drs_params_.lidar_seg_enabled);
   param_loader.loadParam("sensors/lidar/lidar_segmented/rate", drs_params_.lidar_seg_rate);
+  param_loader.loadParam("sensors/lidar/lidar_intensity/enabled", drs_params_.lidar_int_enabled);
+  param_loader.loadParam("sensors/lidar/lidar_intensity/rate", drs_params_.lidar_int_rate);
   param_loader.loadParam("sensors/lidar/noise/enabled", drs_params_.lidar_noise_enabled);
   param_loader.loadParam("sensors/lidar/noise/std_at_1m", drs_params_.lidar_std_at_1m);
   param_loader.loadParam("sensors/lidar/noise/std_slope", drs_params_.lidar_std_slope);
@@ -356,6 +372,15 @@ void UnrealSimulator::onInit() {
   param_loader.loadParam("sensors/stereo/enable_hdr", stereo_enable_hdr_);
   param_loader.loadParam("sensors/stereo/enable_temporal_aa", stereo_enable_temporal_aa_);
   param_loader.loadParam("sensors/stereo/enable_raytracing", stereo_enable_raytracing_);
+
+  param_loader.loadParam("sensors/lidar_intensity/values/grass", lidar_int_grass);
+  param_loader.loadParam("sensors/lidar_intensity/values/road", lidar_int_road);
+  param_loader.loadParam("sensors/lidar_intensity/values/tree", lidar_int_tree);
+  param_loader.loadParam("sensors/lidar_intensity/values/building", lidar_int_building);
+  param_loader.loadParam("sensors/lidar_intensity/values/fence", lidar_int_fence);
+  param_loader.loadParam("sensors/lidar_intensity/values/dirt_road", lidar_int_dirt_road);
+  param_loader.loadParam("sensors/lidar_intensity/values/other", lidar_int_other);
+  param_loader.loadParam("sensors/lidar_intensity/noise/enabled", lidar_int_noise);
 
   double clock_rate;
   param_loader.loadParam("clock_rate", clock_rate);
@@ -497,6 +522,7 @@ void UnrealSimulator::onInit() {
 
     ph_lidars_.push_back(mrs_lib::PublisherHandler<sensor_msgs::PointCloud2>(nh_, "/" + uav_name + "/lidar/points", 10));
     ph_seg_lidars_.push_back(mrs_lib::PublisherHandler<sensor_msgs::PointCloud2>(nh_, "/" + uav_name + "/lidar_segmented/points", 10));
+    ph_int_lidars_.push_back(mrs_lib::PublisherHandler<sensor_msgs::PointCloud2>(nh_, "/" + uav_name + "/lidar_intensity/points", 10));
 
     imp_rgb_.push_back(it_->advertise("/" + uav_name + "/rgb/image_raw", 10));
     imp_stereo_left_.push_back(it_->advertise("/" + uav_name + "/stereo/left/image_raw", 10));
@@ -631,6 +657,8 @@ void UnrealSimulator::onInit() {
 
   timer_seg_lidar_ = nh_.createTimer(ros::Duration(1.0 / drs_params_.lidar_rate), &UnrealSimulator::timerSegLidar, this);
 
+  timer_int_lidar_ = nh_.createTimer(ros::Duration(1.0 / drs_params_.lidar_rate), &UnrealSimulator::timerIntLidar, this);
+
   timer_rgb_ = nh_.createTimer(ros::Duration(1.0 / drs_params_.rgb_rate), &UnrealSimulator::timerRgb, this);
 
   timer_stereo_ = nh_.createTimer(ros::Duration(1.0 / drs_params_.stereo_rate), &UnrealSimulator::timerStereo, this);
@@ -764,6 +792,10 @@ void UnrealSimulator::timerStatus([[maybe_unused]] const ros::WallTimerEvent& ev
 
   if (drs_params.lidar_seg_rate > highest_fps) {
     highest_fps = drs_params.lidar_seg_rate;
+  }
+
+  if (drs_params.lidar_int_rate > highest_fps) {
+    highest_fps = drs_params.lidar_int_rate;
   }
 
   const double ueds_rtf_ = ueds_fps_ / highest_fps;
@@ -1085,6 +1117,113 @@ void UnrealSimulator::timerSegLidar([[maybe_unused]] const ros::TimerEvent& even
 
 //}
 
+/* timerIntLidar() //{ */
+
+void UnrealSimulator::timerIntLidar([[maybe_unused]] const ros::TimerEvent& event) {
+
+  if (!is_initialized_) {
+    return;
+  }
+
+  /* mrs_lib::ScopeTimer timer = mrs_lib::ScopeTimer("timerLidar()"); */
+
+  auto drs_params = mrs_lib::get_mutexed(mutex_drs_params_, drs_params_);
+
+  if (!drs_params_.lidar_int_enabled) {
+    return;
+  }
+
+  for (size_t i = 0; i < uavs_.size(); i++) {
+
+    mrs_multirotor_simulator::MultirotorModel::State state = uavs_[i]->getState();
+
+    bool                                      res;
+    std::vector<ueds_connector::LidarIntData> lidarIntData;
+    ueds_connector::Coordinates               start;
+
+    {
+      std::scoped_lock lock(mutex_ueds_);
+
+      std::tie(res, lidarIntData, start) = ueds_connectors_[i]->GetLidarIntData();
+    }
+
+    if (!res) {
+      ROS_ERROR("[UnrealSimulator]: [uav%d] - ERROR getLidarIntData", int(i));
+      continue;
+    }
+
+    PCLPointCloudIntensity pcl_cloud;
+
+    for (const ueds_connector::LidarIntData& ray : lidarIntData) {
+
+      pcl::PointXYZI point;
+
+      tf::Vector3 dir = tf::Vector3(ray.directionX, ray.directionY, ray.directionZ);
+
+      double ray_distance = ray.distance / 100.0;
+
+      if (drs_params.lidar_noise_enabled && ray_distance > 0) {
+
+        const double std = ray_distance * drs_params.lidar_std_slope * drs_params.lidar_std_at_1m;
+
+        std::normal_distribution<double> distribution(0, std);
+
+        ray_distance += distribution(rng);
+      }
+
+      dir = dir.normalized() * ray_distance;
+
+      point.x = dir.x();
+      point.y = -dir.y();  // convert left-hand to right-hand coordinates
+      point.z = dir.z();
+      /* TODO: add the noise to the intensity */
+      switch (ray.intensity) {
+        case 0: {
+          point.intensity = lidar_int_other;
+          break;
+        }
+        case 1: {
+          point.intensity = lidar_int_grass;
+          break;
+        }
+        case 2: {
+          point.intensity = lidar_int_road;
+          break;
+        }
+        case 3: {
+          point.intensity = lidar_int_tree;
+          break;
+        }
+        case 4: {
+          point.intensity = lidar_int_building;
+          break;
+        }
+        case 5: {
+          point.intensity = lidar_int_fence;
+          break;
+        }
+        case 6: {
+          point.intensity = lidar_int_dirt_road;
+          break;
+        }
+      }
+
+
+      point.intensity = ray.intensity;
+      pcl_cloud.push_back(point);
+    }
+
+    sensor_msgs::PointCloud2 pcl_msg;
+    pcl::toROSMsg(pcl_cloud, pcl_msg);
+    pcl_msg.header.stamp    = ros::Time::now();
+    pcl_msg.header.frame_id = "uav" + std::to_string(i + 1) + "/fcu";
+
+    ph_int_lidars_[i].publish(pcl_msg);
+  }
+}  // namespace mrs_uav_unreal_simulation
+
+//}
+
 /* timerRgb() //{ */
 
 void UnrealSimulator::timerRgb([[maybe_unused]] const ros::TimerEvent& event) {
@@ -1350,6 +1489,7 @@ void UnrealSimulator::callbackDrs(mrs_uav_unreal_simulation::unreal_simulatorCon
   timer_rgb_segmented_.setPeriod(ros::Duration(1.0 / config.rgb_segmented_rate));
   timer_lidar_.setPeriod(ros::Duration(1.0 / config.lidar_rate));
   timer_seg_lidar_.setPeriod(ros::Duration(1.0 / config.lidar_rate));
+  timer_int_lidar_.setPeriod(ros::Duration(1.0 / config.lidar_rate));
 
   ROS_INFO("[UnrealSimulator]: DRS updated params");
 }
