@@ -81,9 +81,9 @@ sensors:
       rate: 10.0 # [Hz]
 
     lidar_intensity:
-      enabled: false 
+      enabled: false
       rate: 10.0 # [Hz]
-      
+
       values:
         grass: 50
         road: 7

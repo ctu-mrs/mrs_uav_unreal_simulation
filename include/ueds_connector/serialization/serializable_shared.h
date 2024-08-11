@@ -1155,7 +1155,7 @@ enum GraphicsSettingsEnum : unsigned short
   EPIC = 3,
   CINEMATIC = 4
 };
-  
+
 namespace SetGraphicsSettings
 {
   struct Request : public Common::NetworkRequest
@@ -1175,7 +1175,7 @@ namespace SetGraphicsSettings
     Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::set_graphics_settings)){};
     explicit Response(bool _status) : Common::NetworkResponse(MessageType::set_graphics_settings, _status){};
   };
-  
+
 }// namespace SetGraphicsSettings
 
 enum WorldLevelEnum : unsigned short

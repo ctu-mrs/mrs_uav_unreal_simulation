@@ -16,9 +16,9 @@ sensors:
     horizontal_rays: 128 # [-]
     vertical_rays: 64 # [-]
     lidar_intensity:
-      enabled: true 
+      enabled: true
       rate: 10.0 # [Hz]
-      
+
       values:
         grass: 50
         road: 7

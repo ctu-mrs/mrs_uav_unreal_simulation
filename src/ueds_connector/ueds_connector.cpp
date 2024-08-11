@@ -343,7 +343,7 @@ std::tuple<bool, std::vector<LidarSegData>, Coordinates> UedsConnector::GetLidar
 /* getLidarIntData() //{ */
 
 std::tuple<bool, std::vector<LidarIntData>, Coordinates> UedsConnector::GetLidarIntData() {
- 
+
   /* std::cout << "GetLidarIntData()" << std::endl; */
 
   Serializable::Drone::GetLidarIntData::Request request{};

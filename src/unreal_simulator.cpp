@@ -531,9 +531,9 @@ void UnrealSimulator::onInit() {
     mrs_multirotor_simulator::MultirotorModel::State uav_state = uavs_[i]->getState();
 
     ueds_connector::Coordinates pos = position2ue(uav_state.x, ueds_world_origin_);
-    
+
     ROS_INFO("[UnrealSimulator]: %s spawning at [%.2lf, %.2lf, %.2lf] ...", uav_name.c_str(), uav_state.x.x(), uav_state.x.y(), uav_state.x.z());
-    
+
     auto [resSpawn, port] = ueds_game_controller_->SpawnDroneAtLocation(pos);
     //auto [resSpawn, port] = ueds_game_controller_->SpawnDrone();
 
@@ -556,13 +556,13 @@ void UnrealSimulator::onInit() {
       ROS_ERROR("[UnrealSimulator]: %s - Error connecting to drone controller, connect_result was %d", uav_name.c_str(), connect_result);
       ros::shutdown();
 
-    } 
+    }
     else {
 
       ROS_INFO("[UnrealSimulator]: %s - Connection succeed: %d", uav_name.c_str(), connect_result);
-      
+
       // ROS_INFO("[UnrealSimulator]: wait until UAV fall on the ground ... && uptade their world origin");
-      
+
       // std::this_thread::sleep_for(std::chrono::seconds(3));
 
       // const auto [res, location] = ueds_connector->GetLocation();
@@ -1663,7 +1663,7 @@ void UnrealSimulator::updateUnrealPoses(const bool teleport_without_collision) {
 
 ueds_connector::Coordinates UnrealSimulator::position2ue(const Eigen::Vector3d &pos, const ueds_connector::Coordinates &ueds_world_origin){
   ueds_connector::Coordinates pos_ue;
-  
+
   pos_ue.x = ueds_world_origin.x + pos.x() * 100.0;
   pos_ue.y = ueds_world_origin.y - pos.y() * 100.0;
   pos_ue.z = ueds_world_origin.z + pos.z() * 100.0;
