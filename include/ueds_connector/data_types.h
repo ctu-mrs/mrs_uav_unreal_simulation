@@ -67,6 +67,21 @@ struct LidarSegData
   }
 };
 
+struct LidarIntData
+{
+  LidarIntData() = default;
+
+  double      distance;
+  double      directionX;
+  double      directionY;
+  double      directionZ;
+  int      intensity;
+  std::string toString() const {
+    return "(distance: " + std::to_string(distance) + ", directionX: " + std::to_string(directionX) + ", directionY: " + std::to_string(directionY) +
+           ", directionZ: " + std::to_string(directionZ) + ", intensity: " + std::to_string(intensity) + ")";
+  }
+};
+
 struct LidarConfig
 {
   LidarConfig() = default;

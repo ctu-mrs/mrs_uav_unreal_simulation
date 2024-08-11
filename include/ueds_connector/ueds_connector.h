@@ -46,6 +46,8 @@ public:
   std::tuple<bool, std::vector<LidarData>, Coordinates> GetLidarData();
 
   std::tuple<bool, std::vector<LidarSegData>, Coordinates> GetLidarSegData();
+  
+  std::tuple<bool, std::vector<LidarIntData>, Coordinates> GetLidarIntData();
 
   std::pair<bool, LidarConfig> GetLidarConfig();
 
