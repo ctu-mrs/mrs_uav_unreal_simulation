@@ -877,6 +877,8 @@ enum MessageType : unsigned short
   get_fps                 = 7,
   get_time                = 8,
   get_api_version         = 9,
+  set_graphics_settings   = 10,
+  switch_world_level      = 11
 };
 
 namespace GetDrones
@@ -1000,6 +1002,37 @@ struct Response : public Common::NetworkResponse
   explicit Response(bool _status) : Common::NetworkResponse(MessageType::set_camera_capture_mode, _status){};
 };
 }  // namespace SetCameraCaptureMode
+
+enum GraphicsSettingsEnum : unsigned short
+{
+  LOW = 0,
+  MEDIUM = 1,
+  HIGH = 2,
+  EPIC = 3,
+  CINEMATIC = 4
+};
+  
+namespace SetGraphicsSettings
+{
+  struct Request : public Common::NetworkRequest
+  {
+    Request() : Common::NetworkRequest(MessageType::set_graphics_settings){};
+
+    GraphicsSettingsEnum  graphicsSettings;
+
+    template <class Archive>
+    void serialize(Archive& archive) {
+    archive(cereal::base_class<Common::NetworkRequest>(this), graphicsSettings);
+  }
+  };
+
+  struct Response : public Common::NetworkResponse
+  {
+    Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::set_graphics_settings)){};
+    explicit Response(bool _status) : Common::NetworkResponse(MessageType::set_graphics_settings, _status){};
+  };
+  
+}// namespace SetGraphicsSettings
 
 namespace GetFps
 {

@@ -7,6 +7,7 @@
 #include <vector>
 
 #include <ueds_connector/socket_client.h>
+#include <ueds_connector/serialization/serializable_shared.h>
 
 namespace ueds_connector
 {
@@ -33,6 +34,8 @@ public:
   std::pair<bool, int> GetApiVersion();
 
   std::pair<bool, double> GetTime();
+  
+  bool SetGraphicsSettings(const Serializable::GameMode::GraphicsSettingsEnum& graphicsSettings);
 };
 
 }  // namespace ueds_connector

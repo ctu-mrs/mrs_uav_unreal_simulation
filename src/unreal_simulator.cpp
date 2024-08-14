@@ -406,6 +406,15 @@ void UnrealSimulator::onInit() {
     ros::shutdown();
   }
 
+  Serializable::GameMode::GraphicsSettingsEnum graphicsSettings = Serializable::GameMode::GraphicsSettingsEnum::LOW;
+  res = ueds_game_controller_->SetGraphicsSettings(graphicsSettings);
+
+  if(res){
+    ROS_INFO("[UnrealSimulator]: Graphical Settings was set succesfully to '%d'", graphicsSettings);
+  }else{
+    ROS_ERROR("[UnrealSimulator]: Graphical Settings was not set succesfully to '%d'", graphicsSettings);
+  }
+
   // | --------------------- Spawn the UAVs --------------------- |
 
   for (size_t i = 0; i < uav_names.size(); i++) {

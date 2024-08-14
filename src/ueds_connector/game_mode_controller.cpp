@@ -91,6 +91,20 @@ bool GameModeController::SetCameraCaptureMode(const CameraCaptureModeEnum& camer
 
 //}
 
+/* setGraphicsSettings() {*/
+bool GameModeController::SetGraphicsSettings(const Serializable::GameMode::GraphicsSettingsEnum& graphicsSettings) {
+
+  Serializable::GameMode::SetGraphicsSettings::Request request{};
+  request.graphicsSettings = static_cast<Serializable::GameMode::GraphicsSettingsEnum>(graphicsSettings);
+
+  Serializable::GameMode::SetGraphicsSettings::Response response{};
+  const auto                                             status  = Request(request, response);
+  const auto                                             success = status && response.status;
+
+  return success;
+}
+//}
+
 /* getFps() //{ */
 
 std::pair<bool, float> GameModeController::GetFps() {
