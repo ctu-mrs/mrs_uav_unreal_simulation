@@ -1023,7 +1023,7 @@ namespace SetGraphicsSettings
     template <class Archive>
     void serialize(Archive& archive) {
     archive(cereal::base_class<Common::NetworkRequest>(this), graphicsSettings);
-  }
+    }
   };
 
   struct Response : public Common::NetworkResponse
@@ -1033,6 +1033,37 @@ namespace SetGraphicsSettings
   };
   
 }// namespace SetGraphicsSettings
+
+enum WorldLevelEnum : unsigned short
+{
+  VALLEY,
+  FOREST,
+  INFINITE_FOREST,
+  WAREHOUSE,
+  CAVE,
+  ERDING_AIRBASE
+};
+
+namespace SwitchWorldLevel
+{
+  struct Request : public Common::NetworkRequest
+  {
+    Request() : Common::NetworkRequest(MessageType::switch_world_level){};
+
+    WorldLevelEnum worldLevelEnum;
+
+    template <class Archive>
+    void serialize(Archive& archive) {
+    archive(cereal::base_class<Common::NetworkRequest>(this), worldLevelEnum);
+    }
+  };
+
+  struct Response : public Common::NetworkResponse
+  {
+    Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::switch_world_level)){};
+    explicit Response(bool _status) : Common::NetworkResponse(MessageType::switch_world_level, _status){};
+  };
+}// namespace SwitchWorldLevel
 
 namespace GetFps
 {

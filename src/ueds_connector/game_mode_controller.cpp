@@ -105,6 +105,20 @@ bool GameModeController::SetGraphicsSettings(const Serializable::GameMode::Graph
 }
 //}
 
+/* SwitchWorldLevel() {*/
+bool GameModeController::SwitchWorldLevel(const Serializable::GameMode::WorldLevelEnum& worldLevelEnum){
+
+  Serializable::GameMode::SwitchWorldLevel::Request request{};
+  request.worldLevelEnum = static_cast<Serializable::GameMode::WorldLevelEnum>(worldLevelEnum);
+
+  Serializable::GameMode::SwitchWorldLevel::Response response{};
+  const auto                                             status  = Request(request, response);
+  const auto                                             success = status && response.status;
+
+  return success;
+}
+//}
+
 /* getFps() //{ */
 
 std::pair<bool, float> GameModeController::GetFps() {

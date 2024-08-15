@@ -242,6 +242,8 @@ private:
   std::mutex    mutex_wall_time_offset_;
 
   double ueds_fps_ = 0;
+  int ueds_world_level_name_enum_ = 2U;
+  int ueds_graphics_settings_enum_ = 0U;
 
   std::vector<double> last_rgb_ue_stamp_;
   std::vector<double> last_rgb_seg_ue_stamp_;
@@ -287,6 +289,9 @@ void UnrealSimulator::onInit() {
 
   param_loader.addYamlFileFromParam("config");
   param_loader.addYamlFileFromParam("config_uavs");
+
+  param_loader.loadParam("ueds_graphics_settings_enum", ueds_graphics_settings_enum_);
+  param_loader.loadParam("ueds_world_level_name_enum", ueds_world_level_name_enum_);
 
   param_loader.loadParam("simulation_rate", _simulation_rate_);
   param_loader.loadParam("realtime_factor", drs_params_.realtime_factor);
@@ -406,7 +411,41 @@ void UnrealSimulator::onInit() {
     ros::shutdown();
   }
 
-  Serializable::GameMode::GraphicsSettingsEnum graphicsSettings = Serializable::GameMode::GraphicsSettingsEnum::LOW;
+  // | --------------------- Set graphical settings and choose World Level --------------------- |
+
+  Serializable::GameMode::WorldLevelEnum worldLevelEnum = Serializable::GameMode::WorldLevelEnum(ueds_world_level_name_enum_);
+  res = ueds_game_controller_->SwitchWorldLevel(worldLevelEnum);
+  if(res){
+    ROS_INFO("[UnrealSimulator] World was switched succesfully.");
+  }else{
+    ROS_ERROR("[UnrealSimulator] World was not switched succesfully.");
+  }
+
+  res = ueds_game_controller_->Disconnect();
+  if(res){
+    ROS_INFO("[UnrealSimulator] ueds_game_controller_ was Disconnected succesfully.");
+  }else{
+    ROS_ERROR("[UnrealSimulator] ueds_game_controller_ was not Disconnected succesfully.");
+  }
+
+  ROS_WARN("SLEEP START");
+  //ros::Duration(1.0).sleep();
+  std::this_thread::sleep_for(std::chrono::seconds(1));
+  ROS_WARN("SLEEP STOP");
+
+  //ueds_game_controller_ = std::make_unique<ueds_connector::GameModeController>(LOCALHOST, 8000);
+  while (true) {
+    bool connect_result = ueds_game_controller_->Connect();
+    if (connect_result != 1) {
+      ROS_ERROR("[UnrealSimulator]: Error connecting to Unreal's game mode controller, connect_result was %d", connect_result);
+    } else {
+      break;
+    }
+    //ros::Duration(1.0).sleep();
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+  }
+
+  Serializable::GameMode::GraphicsSettingsEnum graphicsSettings = Serializable::GameMode::GraphicsSettingsEnum(ueds_graphics_settings_enum_);
   res = ueds_game_controller_->SetGraphicsSettings(graphicsSettings);
 
   if(res){
@@ -421,6 +460,7 @@ void UnrealSimulator::onInit() {
 
     const std::string uav_name = uav_names[i];
 
+    ROS_INFO("[UnrealSimulator]: %s spawning .......", uav_name.c_str());
     const auto [resSpawn, port] = ueds_game_controller_->SpawnDrone();
 
     if (!resSpawn) {

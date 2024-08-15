@@ -36,6 +36,8 @@ public:
   std::pair<bool, double> GetTime();
   
   bool SetGraphicsSettings(const Serializable::GameMode::GraphicsSettingsEnum& graphicsSettings);
+
+  bool SwitchWorldLevel(const Serializable::GameMode::WorldLevelEnum& worldLevelEnum);
 };
 
 }  // namespace ueds_connector

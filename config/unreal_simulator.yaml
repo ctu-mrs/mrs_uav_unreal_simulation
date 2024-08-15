@@ -10,6 +10,21 @@ dynamic_rtf: true
 # TODO describe
 collisions: true
 
+#  0 - LOW
+#  1 - MEDIUM
+#  2 - HIGH
+#  4 - EPIC
+#  5 - CINEMATIC
+ueds_graphics_settings_enum: 0
+
+# 0 -  VALLEY,
+# 1 -  FOREST,
+# 2 -  INFINITE_FOREST,
+# 3 -  WAREHOUSE,
+# 4 -  CAVE,
+# 5 -  ERDING_AIRBASE
+ueds_world_level_name_enum: 2
+
 sensors:
 
   lidar:
