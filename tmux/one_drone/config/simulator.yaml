@@ -17,7 +17,19 @@ sensors:
     vertical_rays: 64 # [-]
     lidar_intensity:
       enabled: true 
-      rate: 1.0 # [Hz]
+      rate: 10.0 # [Hz]
+      
+      values:
+        grass: 50
+        road: 7
+        tree: 90
+        building: 70
+        fence: 40
+        dirt_road: 30
+        other: 155
+
+      noise:
+        enabled: true
   rgb:
     enabled: true
   stereo:
