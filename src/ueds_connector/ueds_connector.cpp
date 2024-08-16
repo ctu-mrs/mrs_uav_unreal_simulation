@@ -263,7 +263,7 @@ std::tuple<bool> UedsConnector::SetLocationAndRotationAsync(const Coordinates& c
 
 std::tuple<bool, std::vector<LidarData>, Coordinates> UedsConnector::GetLidarData() {
 
-  std::cout << "GetLidarData()" << std::endl;
+  /* std::cout << "GetLidarData()" << std::endl; */
   Serializable::Drone::GetLidarData::Request request{};
 
   Serializable::Drone::GetLidarData::Response response{};
@@ -344,7 +344,7 @@ std::tuple<bool, std::vector<LidarSegData>, Coordinates> UedsConnector::GetLidar
 
 std::tuple<bool, std::vector<LidarIntData>, Coordinates> UedsConnector::GetLidarIntData() {
  
-  std::cout << "GetLidarIntData()" << std::endl;
+  /* std::cout << "GetLidarIntData()" << std::endl; */
 
   Serializable::Drone::GetLidarIntData::Request request{};
 
