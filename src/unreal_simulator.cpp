@@ -193,6 +193,7 @@ private:
   double lidar_int_other;
   bool   lidar_int_noise;
 
+
   // | ----------------------- publishers ----------------------- |
 
   mrs_lib::PublisherHandler<rosgraph_msgs::Clock>     ph_clock_;
@@ -389,14 +390,16 @@ void UnrealSimulator::onInit() {
   param_loader.loadParam("sensors/stereo/enable_temporal_aa", stereo_enable_temporal_aa_);
   param_loader.loadParam("sensors/stereo/enable_raytracing", stereo_enable_raytracing_);
 
-  param_loader.loadParam("sensors/lidar/lidar_intensity/values/grass", lidar_int_grass);
-  param_loader.loadParam("sensors/lidar/lidar_intensity/values/road", lidar_int_road);
-  param_loader.loadParam("sensors/lidar/lidar_intensity/values/tree", lidar_int_tree);
-  param_loader.loadParam("sensors/lidar/lidar_intensity/values/building", lidar_int_building);
-  param_loader.loadParam("sensors/lidar/lidar_intensity/values/fence", lidar_int_fence);
-  param_loader.loadParam("sensors/lidar/lidar_intensity/values/dirt_road", lidar_int_dirt_road);
-  param_loader.loadParam("sensors/lidar/lidar_intensity/values/other", lidar_int_other);
-  param_loader.loadParam("sensors/lidar/lidar_intensity/noise/enabled", lidar_int_noise);
+  param_loader.loadParam("sensors/lidar/lidar_intensity/values/grass", drs_params_.lidar_int_value_grass);
+  param_loader.loadParam("sensors/lidar/lidar_intensity/values/road", drs_params_.lidar_int_value_road);
+  param_loader.loadParam("sensors/lidar/lidar_intensity/values/tree", drs_params_.lidar_int_value_tree);
+  param_loader.loadParam("sensors/lidar/lidar_intensity/values/building", drs_params_.lidar_int_value_building);
+  param_loader.loadParam("sensors/lidar/lidar_intensity/values/fence", drs_params_.lidar_int_value_fence);
+  param_loader.loadParam("sensors/lidar/lidar_intensity/values/dirt_road", drs_params_.lidar_int_value_dirt_road);
+  param_loader.loadParam("sensors/lidar/lidar_intensity/values/other", drs_params_.lidar_int_value_other);
+  param_loader.loadParam("sensors/lidar/lidar_intensity/noise/enabled", drs_params_.lidar_int_noise_enabled);
+  param_loader.loadParam("sensors/lidar/lidar_intensity/noise/std_at_1m", drs_params_.lidar_int_std_at_1m);
+  param_loader.loadParam("sensors/lidar/lidar_intensity/noise/std_slope", drs_params_.lidar_int_std_slope);
 
   double clock_rate;
   param_loader.loadParam("clock_rate", clock_rate);
@@ -1272,35 +1275,42 @@ void UnrealSimulator::timerIntLidar([[maybe_unused]] const ros::TimerEvent& even
       /* TODO: add the noise to the intensity */
       switch (ray.intensity) {
         case 0: {
-          point.intensity = lidar_int_other;
+          point.intensity = drs_params_.lidar_int_value_other;
           break;
         }
         case 1: {
-          point.intensity = lidar_int_grass;
+          point.intensity = drs_params_.lidar_int_value_grass;
           break;
         }
         case 2: {
-          point.intensity = lidar_int_road;
+          point.intensity = drs_params_.lidar_int_value_road;
           break;
         }
         case 3: {
-          point.intensity = lidar_int_tree;
+          point.intensity = drs_params_.lidar_int_value_tree;
           break;
         }
         case 4: {
-          point.intensity = lidar_int_building;
+          point.intensity = drs_params_.lidar_int_value_building;
           break;
         }
         case 5: {
-          point.intensity = lidar_int_fence;
+          point.intensity = drs_params_.lidar_int_value_fence;
           break;
         }
         case 6: {
-          point.intensity = lidar_int_dirt_road;
+          point.intensity = drs_params_.lidar_int_value_dirt_road;
           break;
         }
       }
+      if (drs_params.lidar_int_noise_enabled && ray_distance > 0) {
+        const double                     intensity_std = ray_distance * drs_params.lidar_int_std_slope * drs_params.lidar_int_std_at_1m;
+        std::normal_distribution<double> intensity_distribution(0, intensity_std);
+        point.intensity += intensity_distribution(rng);
 
+        // Clamp intensity to a reasonable range (e.g., 0-255)
+        point.intensity = std::clamp(point.intensity, 0.0f, 255.0f);
+      }
       pcl_cloud.push_back(point);
     }
 
