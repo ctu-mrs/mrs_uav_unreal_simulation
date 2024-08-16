@@ -63,6 +63,9 @@ sensors:
 
       noise:
         enabled: true
+        std_at_1m: 0.59 # [-]
+        std_slope: 0.81 # [-] # multiplies std_at_1m for each meter of measured distances
+
 
   rgb:
     enabled: false
