@@ -373,14 +373,14 @@ void UnrealSimulator::onInit() {
   param_loader.loadParam("sensors/stereo/enable_temporal_aa", stereo_enable_temporal_aa_);
   param_loader.loadParam("sensors/stereo/enable_raytracing", stereo_enable_raytracing_);
 
-  param_loader.loadParam("sensors/lidar_intensity/values/grass", lidar_int_grass);
-  param_loader.loadParam("sensors/lidar_intensity/values/road", lidar_int_road);
-  param_loader.loadParam("sensors/lidar_intensity/values/tree", lidar_int_tree);
-  param_loader.loadParam("sensors/lidar_intensity/values/building", lidar_int_building);
-  param_loader.loadParam("sensors/lidar_intensity/values/fence", lidar_int_fence);
-  param_loader.loadParam("sensors/lidar_intensity/values/dirt_road", lidar_int_dirt_road);
-  param_loader.loadParam("sensors/lidar_intensity/values/other", lidar_int_other);
-  param_loader.loadParam("sensors/lidar_intensity/noise/enabled", lidar_int_noise);
+  param_loader.loadParam("sensors/lidar/lidar_intensity/values/grass", lidar_int_grass);
+  param_loader.loadParam("sensors/lidar/lidar_intensity/values/road", lidar_int_road);
+  param_loader.loadParam("sensors/lidar/lidar_intensity/values/tree", lidar_int_tree);
+  param_loader.loadParam("sensors/lidar/lidar_intensity/values/building", lidar_int_building);
+  param_loader.loadParam("sensors/lidar/lidar_intensity/values/fence", lidar_int_fence);
+  param_loader.loadParam("sensors/lidar/lidar_intensity/values/dirt_road", lidar_int_dirt_road);
+  param_loader.loadParam("sensors/lidar/lidar_intensity/values/other", lidar_int_other);
+  param_loader.loadParam("sensors/lidar/lidar_intensity/noise/enabled", lidar_int_noise);
 
   double clock_rate;
   param_loader.loadParam("clock_rate", clock_rate);
@@ -1208,8 +1208,6 @@ void UnrealSimulator::timerIntLidar([[maybe_unused]] const ros::TimerEvent& even
         }
       }
 
-
-      point.intensity = ray.intensity;
       pcl_cloud.push_back(point);
     }
 
