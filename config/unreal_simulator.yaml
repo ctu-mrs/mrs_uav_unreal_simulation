@@ -37,8 +37,8 @@ sensors:
     horizontal_fov: 360.0 # [deg]
     vertical_fov: 90.0 # [deg]
 
-    horizontal_rays: 256 # [-]
-    vertical_rays: 128 # [-]
+    horizontal_rays: 128 # [-]
+    vertical_rays: 64 # [-]
 
     offset_x: 0.0 # [m]
     offset_y: 0.0 # [m]
