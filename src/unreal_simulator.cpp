@@ -241,9 +241,9 @@ private:
   ros::WallTime last_sync_time_;
   std::mutex    mutex_wall_time_offset_;
 
-  double ueds_fps_ = 0;
-  int ueds_world_level_name_enum_ = 2U;
-  int ueds_graphics_settings_enum_ = 0U;
+  double ueds_fps_                    = 0;
+  int    ueds_world_level_name_enum_  = 2U;
+  int    ueds_graphics_settings_enum_ = 0U;
 
   std::vector<double> last_rgb_ue_stamp_;
   std::vector<double> last_rgb_seg_ue_stamp_;
@@ -414,26 +414,26 @@ void UnrealSimulator::onInit() {
   // | --------------------- Set graphical settings and choose World Level --------------------- |
 
   Serializable::GameMode::WorldLevelEnum worldLevelEnum = Serializable::GameMode::WorldLevelEnum(ueds_world_level_name_enum_);
-  res = ueds_game_controller_->SwitchWorldLevel(worldLevelEnum);
-  if(res){
+  res                                                   = ueds_game_controller_->SwitchWorldLevel(worldLevelEnum);
+  if (res) {
     ROS_INFO("[UnrealSimulator] World was switched succesfully.");
-  }else{
+  } else {
     ROS_ERROR("[UnrealSimulator] World was not switched succesfully.");
   }
 
   res = ueds_game_controller_->Disconnect();
-  if(res){
+  if (res) {
     ROS_INFO("[UnrealSimulator] ueds_game_controller_ was Disconnected succesfully.");
-  }else{
+  } else {
     ROS_ERROR("[UnrealSimulator] ueds_game_controller_ was not Disconnected succesfully.");
   }
 
   ROS_WARN("SLEEP START");
-  //ros::Duration(1.0).sleep();
+  // ros::Duration(1.0).sleep();
   std::this_thread::sleep_for(std::chrono::seconds(1));
   ROS_WARN("SLEEP STOP");
 
-  //ueds_game_controller_ = std::make_unique<ueds_connector::GameModeController>(LOCALHOST, 8000);
+  // ueds_game_controller_ = std::make_unique<ueds_connector::GameModeController>(LOCALHOST, 8000);
   while (true) {
     bool connect_result = ueds_game_controller_->Connect();
     if (connect_result != 1) {
@@ -441,16 +441,16 @@ void UnrealSimulator::onInit() {
     } else {
       break;
     }
-    //ros::Duration(1.0).sleep();
+    // ros::Duration(1.0).sleep();
     std::this_thread::sleep_for(std::chrono::seconds(1));
   }
 
   Serializable::GameMode::GraphicsSettingsEnum graphicsSettings = Serializable::GameMode::GraphicsSettingsEnum(ueds_graphics_settings_enum_);
-  res = ueds_game_controller_->SetGraphicsSettings(graphicsSettings);
+  res                                                           = ueds_game_controller_->SetGraphicsSettings(graphicsSettings);
 
-  if(res){
+  if (res) {
     ROS_INFO("[UnrealSimulator]: Graphical Settings was set succesfully to '%d'", graphicsSettings);
-  }else{
+  } else {
     ROS_ERROR("[UnrealSimulator]: Graphical Settings was not set succesfully to '%d'", graphicsSettings);
   }
 
@@ -1288,9 +1288,10 @@ void UnrealSimulator::timerRgbSegmented([[maybe_unused]] const ros::TimerEvent& 
       continue;
     }
 
-    cv::Mat image = cv::imdecode(cameraData, cv::IMREAD_COLOR);
-
-    sensor_msgs::ImagePtr msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", image).toImageMsg();
+    /* cv::Mat               image = cv::imdecode(cameraData, cv::IMREAD_COLOR); */
+    cv::Mat image = cv::Mat(rgb_height_, rgb_width_, CV_8UC3, cameraData.data());
+    /* cv::cvtColor(image, image, cv::COLOR_BGR2RGB); */
+    sensor_msgs::ImagePtr msg   = cv_bridge::CvImage(std_msgs::Header(), "bgr8", image).toImageMsg();
 
     msg->header.frame_id = "uav" + std::to_string(i + 1) + "/rgb";
 
