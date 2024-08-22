@@ -11,6 +11,7 @@
 
 #include <mrs_lib/param_loader.h>
 #include <mrs_lib/publisher_handler.h>
+#include <mrs_lib/subscribe_handler.h>
 #include <mrs_lib/scope_timer.h>
 #include <mrs_lib/transform_broadcaster.h>
 #include <tf2_ros/static_transform_broadcaster.h>
@@ -195,6 +196,10 @@ private:
   std::vector<mrs_lib::PublisherHandler<sensor_msgs::CameraInfo>> ph_stereo_left_camera_info_;
   std::vector<mrs_lib::PublisherHandler<sensor_msgs::CameraInfo>> ph_stereo_right_camera_info_;
 
+  // | ----------------------- subscribers ----------------------- |
+  
+  std::vector<mrs_lib::SubscribeHandler<>> 
+
   // | ------------------------- system ------------------------- |
 
   std::vector<std::shared_ptr<mrs_multirotor_simulator::UavSystemRos>> uavs_;
@@ -365,6 +370,11 @@ void UnrealSimulator::onInit() {
   std::vector<std::string> uav_names;
 
   param_loader.loadParam("uav_names", uav_names);
+  
+  // uav_real_name
+  
+  std::vector<std::string> real_uav_names;
+  param_loader.loadParam("real_uav_names", real_uav_names);
 
   for (size_t i = 0; i < uav_names.size(); i++) {
 

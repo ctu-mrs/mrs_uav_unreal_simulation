@@ -1,6 +1,9 @@
 uav_names: [
   "uav1",
 ]
+real_uav_names: [
+  "uav1",
+]
 
 uav1:
   type: "x500"
