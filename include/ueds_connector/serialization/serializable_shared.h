@@ -1041,7 +1041,8 @@ enum WorldLevelEnum : unsigned short
   INFINITE_FOREST,
   WAREHOUSE,
   CAVE,
-  ERDING_AIRBASE
+  ERDING_AIRBASE,
+  TEMESVAR
 };
 
 namespace SwitchWorldLevel

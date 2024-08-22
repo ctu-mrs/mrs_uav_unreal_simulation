@@ -17,13 +17,14 @@ collisions: true
 #  5 - CINEMATIC
 ueds_graphics_settings_enum: 0
 
-# 0 -  VALLEY,
-# 1 -  FOREST,
-# 2 -  INFINITE_FOREST,
-# 3 -  WAREHOUSE,
-# 4 -  CAVE,
+# 0 -  VALLEY
+# 1 -  FOREST
+# 2 -  INFINITE_FOREST
+# 3 -  WAREHOUSE
+# 4 -  CAVE
 # 5 -  ERDING_AIRBASE
-ueds_world_level_name_enum: 2
+# 6 -  TEMESVAR :D
+ueds_world_level_name_enum: 6
 
 sensors:
 
