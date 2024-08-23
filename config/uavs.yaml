@@ -5,6 +5,8 @@ real_uav_names: [
   "uav1",
 ]
 
+hil: false
+
 uav1:
   type: "x500"
   spawn:
