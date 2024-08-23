@@ -202,6 +202,17 @@ private:
   std::vector<mrs_lib::SubscribeHandler<nav_msgs::Odometry>> sh_odoms_;
   std::vector<mrs_lib::SubscribeHandler<sensor_msgs::Imu>> sh_imus_;
 
+
+  // | ----------------------- callbacks ----------------------- |
+  
+  /* void callbackOdometry(const nav_msgs::Odometry::ConstPtr& msg, const size_t uav_idx); */
+  /* void callbackImu(const sensor_msgs::Imu::ConstPtr& msg, const size_t uav_idx); */
+
+
+  // | ----------------------- timeouts ----------------------- |
+   
+  void timeoutOdometry(const std::string &topic, const ros::Time &last_msg, const size_t uav_idx);
+  void timeoutImu(const std::string &topic, const ros::Time &last_msg, const size_t uav_idx);
   // | ------------------------- system ------------------------- |
 
   std::vector<std::shared_ptr<mrs_multirotor_simulator::UavSystemRos>> uavs_;
@@ -522,9 +533,12 @@ void UnrealSimulator::onInit() {
     ph_stereo_left_camera_info_.push_back(mrs_lib::PublisherHandler<sensor_msgs::CameraInfo>(nh_, "/" + uav_name + "/stereo/left/camera_info", 10));
     ph_stereo_right_camera_info_.push_back(mrs_lib::PublisherHandler<sensor_msgs::CameraInfo>(nh_, "/" + uav_name + "/stereo/right/camera_info", 10));
 
-     
-    sh_odoms_.push_back(mrs_lib::SubscribeHandler<nav_msgs::Odometry>(nh_, "/" + real_uav_name + "/estimation_manager/odom_main", 10));
-    sh_imus_.push_back(mrs_lib::SubscribeHandler<sensor_msgs::Imu>(nh_, "/" + real_uav_name + "/hw_api/imu", 10));
+ sh_odoms_.push_back(mrs_lib::SubscribeHandler<nav_msgs::Odometry>(nh_, "/" + real_uav_name + "/estimation_manager/odom_main", ros::Duration(2.0), 
+    [this, i](const std::string& topic, const ros::Time& last_msg) { timeoutOdometry(topic, last_msg, i); }));
+sh_imus_.push_back(mrs_lib::SubscribeHandler<sensor_msgs::Imu>(nh_, "/" + real_uav_name + "/hw_api/imu", ros::Duration(2.0), 
+    [this, i](const std::string& topic, const ros::Time& last_msg) { timeoutImu(topic, last_msg, i); }));     
+    /* sh_odoms_.push_back(mrs_lib::SubscribeHandler<nav_msgs::Odometry>(nh_, "/" + real_uav_name + "/estimation_manager/odom_main", ros::Duration(2.0), &UnrealSimulator::timeoutOdometry, this, i)); */ 
+    /* sh_imus_.push_back(mrs_lib::SubscribeHandler<sensor_msgs::Imu>(nh_, "/" + real_uav_name + "/hw_api/imu", ros::Duration(2.0), &UnrealSimulator::timeoutImu, this, i)); */ 
     // | ------------------ set RGB camera config ----------------- |
 
     {
@@ -1372,6 +1386,24 @@ void UnrealSimulator::callbackDrs(mrs_uav_unreal_simulation::unreal_simulatorCon
 
 //}
 
+
+// | ------------------------ timeouts ----------------------- |
+
+  void UnrealSimulator::timeoutOdometry(const std::string &topic, const ros::Time &last_msg, const size_t uav_idx){
+      if(is_initialized_){
+        return;}
+      if(!sh_odoms_[uav_idx].hasMsg()){
+        return;}
+      ROS_WARN_THROTTLE(1.0, "[UnrealSimulator]: timeout on topic %s", topic.c_str());
+  }
+  void UnrealSimulator::timeoutImu(const std::string &topic, const ros::Time &last_msg, const size_t uav_idx){
+      if(is_initialized_){
+        return;}
+      if(!sh_odoms_[uav_idx].hasMsg()){
+        return;}
+      ROS_WARN_THROTTLE(1.0, "[UnrealSimulator]: timeout on topic %s", topic.c_str());
+  }
+
 // | ------------------------ routines ------------------------ |
 
 /* publishPoses() //{ */
@@ -1414,6 +1446,10 @@ void UnrealSimulator::updateUnrealPoses(const bool teleport_without_collision) {
     std::scoped_lock lock(mutex_ueds_);
 
     for (size_t i = 0; i < uavs_.size(); i++) {
+      auto odom = sh_odoms_[i].getMsg();
+      auto imu = sh_imus_[i].getMsg();
+      
+      
       mrs_multirotor_simulator::MultirotorModel::State state;
       if(!_hil_){
        state = uavs_[i]->getState();
@@ -1421,18 +1457,19 @@ void UnrealSimulator::updateUnrealPoses(const bool teleport_without_collision) {
        // x ... position
        // R ... orientation
        // v ... velocity
-       // omega ... angular velocity 
+       // om6 ega ... angular velocity 
        
        // get the position from the sh_odoms_ 
-       state.x = sh_odoms_[i].pose.pose.position;
-       state.R = sh_odoms_[i].pose.pose.orientation;
+       state.x = Eigen::Vector3d(odom->pose.pose.position.x, odom->pose.pose.position.y, odom->pose.pose.position.z);
+       /* state.R = mrs_lib::AttitudeConverter(odom.pose.pose.orientation).; */
        
        // get the velocity from the  sh_imus_
-       state.v = sh_imus_[i].linear_acceleration;
-       state.omega = sh_imus_[i].angular_velocity;
+       state.v = Eigen::Vector3d(imu->linear_acceleration.x, imu->linear_acceleration.y, imu->linear_acceleration.z);
+       /* state.omega = */ 
+       state.omega = Eigen::Vector3d(imu->angular_velocity.x, imu->angular_velocity.y, imu->angular_velocity.z); 
 
       } 
-      auto [roll, pitch, yaw] = mrs_lib::AttitudeConverter(state.R).getExtrinsicRPY();
+      auto [roll, pitch, yaw] = mrs_lib::AttitudeConverter(odom->pose.pose.orientation).getExtrinsicRPY();
 
       ueds_connector::Coordinates pos;
 
