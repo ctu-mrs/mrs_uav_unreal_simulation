@@ -385,7 +385,7 @@ void UnrealSimulator::onInit() {
   param_loader.loadParam("uav_names", uav_names);
   
   // uav_real_name
-  
+  param_loader.loadParam("hil", _hil_);  
   std::vector<std::string> real_uav_names;
   param_loader.loadParam("real_uav_names", real_uav_names);
 
@@ -1451,6 +1451,7 @@ void UnrealSimulator::updateUnrealPoses(const bool teleport_without_collision) {
       
       
       mrs_multirotor_simulator::MultirotorModel::State state;
+      double roll, pitch, yaw; 
       if(!_hil_){
        state = uavs_[i]->getState();
       auto [roll, pitch, yaw] = mrs_lib::AttitudeConverter(state.R).getExtrinsicRPY();
