@@ -878,7 +878,8 @@ enum MessageType : unsigned short
   get_time                = 8,
   get_api_version         = 9,
   set_graphics_settings   = 10,
-  switch_world_level      = 11
+  switch_world_level      = 11,
+  set_forest_density      = 12
 };
 
 namespace GetDrones
@@ -904,6 +905,28 @@ struct Response : public Common::NetworkResponse
   }
 };
 }  // namespace GetDrones
+
+namespace SetForestDensity
+{
+struct Request : public Common::NetworkRequest
+{
+  Request() : Common::NetworkRequest(MessageType::set_forest_density){};
+
+  int Density_Level;
+
+  template <class Archive>
+  void serialize(Archive& archive) {
+    archive(cereal::base_class<Common::NetworkRequest>(this), Density_Level);
+  }
+};
+
+struct Response : public Common::NetworkResponse
+{
+  Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::set_forest_density)){};
+  explicit Response(bool _status) : Common::NetworkResponse(MessageType::set_forest_density, _status){};
+};
+};  // namespace SetForestDensity
+
 
 namespace SpawnDrone
 {

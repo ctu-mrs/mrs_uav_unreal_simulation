@@ -55,6 +55,22 @@ bool GameModeController::RemoveDrone(const int port) {
 
 //}
 
+/* removeDrone() //{ */
+
+bool GameModeController::SetForestDensity(const int DensityLevel) {
+
+  Serializable::GameMode::SetForestDensity::Request request{};
+  request.Density_Level = DensityLevel;
+
+  Serializable::GameMode::SetForestDensity::Response response{};
+  const auto                                    status  = Request(request, response);
+  const auto                                    success = status && response.status;
+
+  return success;
+}
+
+//}
+
 /* getCameraCaptureMode() //{ */
 
 std::pair<bool, CameraCaptureModeEnum> GameModeController::GetCameraCaptureMode() {

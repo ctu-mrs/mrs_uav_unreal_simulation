@@ -242,8 +242,9 @@ private:
   std::mutex    mutex_wall_time_offset_;
 
   double ueds_fps_                    = 0;
-  int    ueds_world_level_name_enum_  = 2U;
-  int    ueds_graphics_settings_enum_ = 0U;
+  int    ueds_world_level_name_enum_  = 2;
+  int    ueds_graphics_settings_enum_ = 0;
+  int    ueds_forest_density_          = 5;
 
   std::vector<double> last_rgb_ue_stamp_;
   std::vector<double> last_rgb_seg_ue_stamp_;
@@ -292,6 +293,7 @@ void UnrealSimulator::onInit() {
 
   param_loader.loadParam("ueds_graphics_settings_enum", ueds_graphics_settings_enum_);
   param_loader.loadParam("ueds_world_level_name_enum", ueds_world_level_name_enum_);
+  param_loader.loadParam("ueds_forest_density", ueds_forest_density_);
 
   param_loader.loadParam("simulation_rate", _simulation_rate_);
   param_loader.loadParam("realtime_factor", drs_params_.realtime_factor);
@@ -452,6 +454,15 @@ void UnrealSimulator::onInit() {
     ROS_INFO("[UnrealSimulator]: Graphical Settings was set succesfully to '%d'", graphicsSettings);
   } else {
     ROS_ERROR("[UnrealSimulator]: Graphical Settings was not set succesfully to '%d'", graphicsSettings);
+  }
+
+  // | --------------------- These graphical settings influence onle Forest Game World --------------------- |
+
+  res = ueds_game_controller_->SetForestDensity(ueds_forest_density_);
+  if (res) {
+    ROS_INFO("[UnrealSimulator]: Forest Density was set succesfully to '%d'", ueds_forest_density_);
+  } else {
+    ROS_ERROR("[UnrealSimulator]: Forest Density wasn't set succesfully to '%d'", ueds_forest_density_);
   }
 
   // | --------------------- Spawn the UAVs --------------------- |

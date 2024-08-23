@@ -38,6 +38,8 @@ public:
   bool SetGraphicsSettings(const Serializable::GameMode::GraphicsSettingsEnum& graphicsSettings);
 
   bool SwitchWorldLevel(const Serializable::GameMode::WorldLevelEnum& worldLevelEnum);
+
+  bool SetForestDensity(const int DensityLevel);
 };
 
 }  // namespace ueds_connector
