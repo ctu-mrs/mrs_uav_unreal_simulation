@@ -76,6 +76,7 @@ private:
 
   double _simulation_rate_;
   bool   _collisions_;
+  bool _hil_; 
 
   ros::Time  sim_time_;
   std::mutex mutex_sim_time_;
@@ -198,7 +199,8 @@ private:
 
   // | ----------------------- subscribers ----------------------- |
   
-  std::vector<mrs_lib::SubscribeHandler<>> 
+  std::vector<mrs_lib::SubscribeHandler<nav_msgs::Odometry>> sh_odoms_;
+  std::vector<mrs_lib::SubscribeHandler<sensor_msgs::Imu>> sh_imus_;
 
   // | ------------------------- system ------------------------- |
 
@@ -469,6 +471,7 @@ void UnrealSimulator::onInit() {
   for (size_t i = 0; i < uav_names.size(); i++) {
 
     const std::string uav_name = uav_names[i];
+    const std::string real_uav_name = real_uav_names[i];
 
     ROS_INFO("[UnrealSimulator]: %s spawning .......", uav_name.c_str());
     const auto [resSpawn, port] = ueds_game_controller_->SpawnDrone();
@@ -519,6 +522,9 @@ void UnrealSimulator::onInit() {
     ph_stereo_left_camera_info_.push_back(mrs_lib::PublisherHandler<sensor_msgs::CameraInfo>(nh_, "/" + uav_name + "/stereo/left/camera_info", 10));
     ph_stereo_right_camera_info_.push_back(mrs_lib::PublisherHandler<sensor_msgs::CameraInfo>(nh_, "/" + uav_name + "/stereo/right/camera_info", 10));
 
+     
+    sh_odoms_.push_back(mrs_lib::SubscribeHandler<nav_msgs::Odometry>(nh_, "/" + real_uav_name + "/estimation_manager/odom_main", 10));
+    sh_imus_.push_back(mrs_lib::SubscribeHandler<sensor_msgs::Imu>(nh_, "/" + real_uav_name + "/hw_api/imu", 10));
     // | ------------------ set RGB camera config ----------------- |
 
     {
@@ -1408,9 +1414,24 @@ void UnrealSimulator::updateUnrealPoses(const bool teleport_without_collision) {
     std::scoped_lock lock(mutex_ueds_);
 
     for (size_t i = 0; i < uavs_.size(); i++) {
+      mrs_multirotor_simulator::MultirotorModel::State state;
+      if(!_hil_){
+       state = uavs_[i]->getState();
+      }else{
+       // x ... position
+       // R ... orientation
+       // v ... velocity
+       // omega ... angular velocity 
+       
+       // get the position from the sh_odoms_ 
+       state.x = sh_odoms_[i].pose.pose.position;
+       state.R = sh_odoms_[i].pose.pose.orientation;
+       
+       // get the velocity from the  sh_imus_
+       state.v = sh_imus_[i].linear_acceleration;
+       state.omega = sh_imus_[i].angular_velocity;
 
-      mrs_multirotor_simulator::MultirotorModel::State state = uavs_[i]->getState();
-
+      } 
       auto [roll, pitch, yaw] = mrs_lib::AttitudeConverter(state.R).getExtrinsicRPY();
 
       ueds_connector::Coordinates pos;
