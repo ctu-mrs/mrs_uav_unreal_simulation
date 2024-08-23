@@ -1453,11 +1453,12 @@ void UnrealSimulator::updateUnrealPoses(const bool teleport_without_collision) {
       mrs_multirotor_simulator::MultirotorModel::State state;
       if(!_hil_){
        state = uavs_[i]->getState();
+      auto [roll, pitch, yaw] = mrs_lib::AttitudeConverter(state.R).getExtrinsicRPY();
       }else{
        // x ... position
        // R ... orientation
        // v ... velocity
-       // om6 ega ... angular velocity 
+       // omega ... angular velocity 
        
        // get the position from the sh_odoms_ 
        state.x = Eigen::Vector3d(odom->pose.pose.position.x, odom->pose.pose.position.y, odom->pose.pose.position.z);
@@ -1467,9 +1468,10 @@ void UnrealSimulator::updateUnrealPoses(const bool teleport_without_collision) {
        state.v = Eigen::Vector3d(imu->linear_acceleration.x, imu->linear_acceleration.y, imu->linear_acceleration.z);
        /* state.omega = */ 
        state.omega = Eigen::Vector3d(imu->angular_velocity.x, imu->angular_velocity.y, imu->angular_velocity.z); 
+      
+      auto [roll, pitch, yaw] = mrs_lib::AttitudeConverter(odom->pose.pose.orientation).getExtrinsicRPY();
 
       } 
-      auto [roll, pitch, yaw] = mrs_lib::AttitudeConverter(odom->pose.pose.orientation).getExtrinsicRPY();
 
       ueds_connector::Coordinates pos;
 
