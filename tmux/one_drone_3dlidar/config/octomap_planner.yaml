@@ -1,0 +1,13 @@
+trajectory_generator:
+  relax_heading: false # if true, constraints on heading dynamics are ignored during trajectory generation process
+  use_heading: true # if false heading is ignored during trajectory tracking
+  heading_offset: 0.0 # [rad] offset of desired heading to direction of flight
+  turn_in_flight_direction: false # sample heading reference in direction of flight
+
+planning_tree:
+  resolution: 0.4
+
+unknown_is_occupied: false # if false, planning through unknown space is enabled 
+
+min_altitude: 1.0 # [m]
+max_altitude: 6.0 # [m]

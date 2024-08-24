@@ -2,8 +2,8 @@ hw_interface_plugin: "mrs_uav_unreal_simulation/Api"
 
 gnss:
   utm_zone: "32U"
-  utm_x: 717652.458
-  utm_y: 5355604.146
+  utm_x: 446293.62
+  utm_y: 5467958.49
   amsl: 460.0
 
 input_mode:

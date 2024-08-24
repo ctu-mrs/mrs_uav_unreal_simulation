@@ -1,0 +1,74 @@
+# do not modify these
+root: ./
+name: simulation
+socket_name: mrs
+attach: false
+tmux_options: -f /etc/ctu-mrs/tmux.conf
+# you can modify these
+pre_window: export UAV_NAME=uav1; export RUN_TYPE=simulation; export UAV_TYPE=x500
+startup_window: drz_planning 
+windows:
+  - roscore:
+      layout: tiled
+      panes:
+        - roscore
+  - simulator:
+      layout: tiled
+      panes:
+        - waitForRos; roslaunch mrs_uav_unreal_simulation unreal_simulator.launch custom_config:=./config/simulator.yaml
+  - hw_api:
+      layout: tiled
+      panes:
+        - waitForTime; roslaunch mrs_uav_unreal_simulation hw_api.launch
+  - status:
+      layout: tiled
+      panes:
+        - waitForHw; roslaunch mrs_uav_status status.launch
+  - core:
+      layout: tiled
+      panes:
+        - waitForHw; roslaunch mrs_uav_core core.launch
+          platform_config:=`rospack find mrs_uav_gazebo_simulation`/config/mrs_uav_system/$UAV_TYPE.yaml
+          custom_config:=./config/custom_config.yaml
+          world_config:=./config/world_config.yaml
+          network_config:=./config/network_config.yaml
+  - takeoff:
+      layout: tiled
+      panes:
+        - waitForHw; roslaunch mrs_uav_autostart automatic_start.launch
+        - 'waitForControl; rosservice call /$UAV_NAME/hw_api/arming 1; sleep 2; rosservice call /$UAV_NAME/hw_api/offboard'
+  - goto:
+      layout: tiled
+      panes:
+        - 'history -s rosservice call /$UAV_NAME/control_manager/goto \"goal: \[0.0, 10.0, 1.5, 0.0\]\"'
+  - mapplan:
+      layout: tiled
+      panes:
+        - waitForControl; roslaunch mrs_uav_unreal_simulation mapplan.launch
+          config_octomap_server:=./config/octomap_server.yaml
+          config_pcl_filter_ouster:=./config/ouster_filter_mapping.yaml
+          config_octomap_planner:=./config/octomap_planner.yaml
+  - zigzagger:
+      layout: tiled
+      panes:
+        - waitForControl; roslaunch zigzagger zigzagger.launch network_config:=./config/network_config.yaml
+  - drz_planning:
+      layout: tiled
+      panes:
+        - waitForControl; roslaunch drz_planning drz_mrs_planner.launch
+        - 'history -s rosservice call /$UAV_NAME/zigzagger/trigger'
+  - rviz:
+      layout: tiled
+      panes:
+        # - waitForControl; rosrun rviz rviz -d ./config/rviz.rviz
+        - waitForControl; rosrun rviz rviz -d ./config/my_planner.rviz
+        - waitForControl; roslaunch mrs_rviz_plugins load_robot.launch
+        - waitForControl; roslaunch mrs_rviz_plugins rviz_interface.launch
+  - layout:
+      layout: tiled
+      panes:
+        - waitForControl; sleep 3; ~/.i3/layout_manager.sh ./layout.json
+  # - bag:
+  #     layout:
+  #     panes:
+  #       - 'history -s rosbag record -a'

@@ -11,7 +11,6 @@
 
 #include <mrs_lib/param_loader.h>
 #include <mrs_lib/publisher_handler.h>
-#include <mrs_lib/subscribe_handler.h>
 #include <mrs_lib/scope_timer.h>
 #include <mrs_lib/transform_broadcaster.h>
 #include <tf2_ros/static_transform_broadcaster.h>
@@ -76,7 +75,6 @@ private:
 
   double _simulation_rate_;
   bool   _collisions_;
-  bool _hil_; 
 
   ros::Time  sim_time_;
   std::mutex mutex_sim_time_;
@@ -85,10 +83,15 @@ private:
 
   std::string _world_frame_name_;
 
+  bool hitl;
+
+  std::vector<std::string> real_uav_names;
   // | ------------------------- timers ------------------------- |
 
   ros::WallTimer timer_dynamics_;
   void           timerDynamics(const ros::WallTimerEvent& event);
+
+  void timerHitlDynamics(const ros::WallTimerEvent& event);
 
   ros::WallTimer timer_status_;
   void           timerStatus(const ros::WallTimerEvent& event);
@@ -197,22 +200,11 @@ private:
   std::vector<mrs_lib::PublisherHandler<sensor_msgs::CameraInfo>> ph_stereo_left_camera_info_;
   std::vector<mrs_lib::PublisherHandler<sensor_msgs::CameraInfo>> ph_stereo_right_camera_info_;
 
-  // | ----------------------- subscribers ----------------------- |
-  
+  // | ------------------------- subscribers ------------------------- |
+
   std::vector<mrs_lib::SubscribeHandler<nav_msgs::Odometry>> sh_odoms_;
-  std::vector<mrs_lib::SubscribeHandler<sensor_msgs::Imu>> sh_imus_;
+  std::vector<mrs_lib::SubscribeHandler<sensor_msgs::Imu>>   sh_imus_;
 
-
-  // | ----------------------- callbacks ----------------------- |
-  
-  /* void callbackOdometry(const nav_msgs::Odometry::ConstPtr& msg, const size_t uav_idx); */
-  /* void callbackImu(const sensor_msgs::Imu::ConstPtr& msg, const size_t uav_idx); */
-
-
-  // | ----------------------- timeouts ----------------------- |
-   
-  void timeoutOdometry(const std::string &topic, const ros::Time &last_msg, const size_t uav_idx);
-  void timeoutImu(const std::string &topic, const ros::Time &last_msg, const size_t uav_idx);
   // | ------------------------- system ------------------------- |
 
   std::vector<std::shared_ptr<mrs_multirotor_simulator::UavSystemRos>> uavs_;
@@ -224,6 +216,8 @@ private:
   // | ------------------------- methods ------------------------ |
 
   void publishPoses(void);
+
+  void publishHitlPoses(void);
 
   // | --------------- dynamic reconfigure server --------------- |
 
@@ -246,6 +240,8 @@ private:
   std::vector<ueds_connector::Coordinates> ueds_world_origins_;
 
   void updateUnrealPoses(const bool teleport_without_collision);
+
+  void updateUnrealPosesHitl(const bool teleport_without_collision);
 
   void checkForCrash(void);
 
@@ -377,25 +373,36 @@ void UnrealSimulator::onInit() {
 
   double clock_rate;
   param_loader.loadParam("clock_rate", clock_rate);
-
   drs_params_.paused = false;
 
   std::vector<std::string> uav_names;
 
   param_loader.loadParam("uav_names", uav_names);
-  
-  // uav_real_name
-  param_loader.loadParam("hil", _hil_);  
-  std::vector<std::string> real_uav_names;
-  param_loader.loadParam("real_uav_names", real_uav_names);
+
+
+  // | ------------------------- HITL ------------------------- |
+
+  param_loader.loadParam("hitl", hitl);
+  if (hitl) {
+    param_loader.loadParam("real_uav_names", real_uav_names);
+    for (size_t i = 0; i < real_uav_names.size(); i++) {
+      ROS_INFO("[UnrealSimulator]: HW in the loop initializing '%s'", real_uav_names[i].c_str());
+      sh_odoms_.push_back(mrs_lib::SubscribeHandler<nav_msgs::Odometry>(nh_, "/" + real_uav_names[i] + "/estimation_manager/odom_main"));
+      sh_imus_.push_back(mrs_lib::SubscribeHandler<sensor_msgs::Imu>(nh_, "/" + real_uav_names[i] + "/hw_api/imu"));
+    }
+  }
+
 
   for (size_t i = 0; i < uav_names.size(); i++) {
 
     std::string uav_name = uav_names[i];
+    if (!hitl) {
+      ROS_INFO("[UnrealSimulator]: initializing '%s'", uav_name.c_str());
 
-    ROS_INFO("[UnrealSimulator]: initializing '%s'", uav_name.c_str());
-
-    uavs_.push_back(std::make_unique<mrs_multirotor_simulator::UavSystemRos>(nh_, uav_name));
+      uavs_.push_back(std::make_unique<mrs_multirotor_simulator::UavSystemRos>(nh_, uav_name));
+    } else {
+      uavs_.push_back(nullptr);
+    }
   }
 
   // | ----------- initialize the Unreal Sim connector ---------- |
@@ -482,7 +489,6 @@ void UnrealSimulator::onInit() {
   for (size_t i = 0; i < uav_names.size(); i++) {
 
     const std::string uav_name = uav_names[i];
-    const std::string real_uav_name = real_uav_names[i];
 
     ROS_INFO("[UnrealSimulator]: %s spawning .......", uav_name.c_str());
     const auto [resSpawn, port] = ueds_game_controller_->SpawnDrone();
@@ -533,12 +539,6 @@ void UnrealSimulator::onInit() {
     ph_stereo_left_camera_info_.push_back(mrs_lib::PublisherHandler<sensor_msgs::CameraInfo>(nh_, "/" + uav_name + "/stereo/left/camera_info", 10));
     ph_stereo_right_camera_info_.push_back(mrs_lib::PublisherHandler<sensor_msgs::CameraInfo>(nh_, "/" + uav_name + "/stereo/right/camera_info", 10));
 
- sh_odoms_.push_back(mrs_lib::SubscribeHandler<nav_msgs::Odometry>(nh_, "/" + real_uav_name + "/estimation_manager/odom_main", ros::Duration(2.0), 
-    [this, i](const std::string& topic, const ros::Time& last_msg) { timeoutOdometry(topic, last_msg, i); }));
-sh_imus_.push_back(mrs_lib::SubscribeHandler<sensor_msgs::Imu>(nh_, "/" + real_uav_name + "/hw_api/imu", ros::Duration(2.0), 
-    [this, i](const std::string& topic, const ros::Time& last_msg) { timeoutImu(topic, last_msg, i); }));     
-    /* sh_odoms_.push_back(mrs_lib::SubscribeHandler<nav_msgs::Odometry>(nh_, "/" + real_uav_name + "/estimation_manager/odom_main", ros::Duration(2.0), &UnrealSimulator::timeoutOdometry, this, i)); */ 
-    /* sh_imus_.push_back(mrs_lib::SubscribeHandler<sensor_msgs::Imu>(nh_, "/" + real_uav_name + "/hw_api/imu", ros::Duration(2.0), &UnrealSimulator::timeoutImu, this, i)); */ 
     // | ------------------ set RGB camera config ----------------- |
 
     {
@@ -619,7 +619,11 @@ sh_imus_.push_back(mrs_lib::SubscribeHandler<sensor_msgs::Imu>(nh_, "/" + real_u
 
   ROS_INFO("[UnrealSimulator]: teleporting the UAVs to their spawn positions");
 
-  updateUnrealPoses(true);
+  if (hitl) {
+    updateUnrealPosesHitl(true);
+  } else {
+    updateUnrealPoses(true);
+  }
 
   ROS_INFO("[UnrealSimulator]: Unreal UAVs are initialized");
 
@@ -648,8 +652,12 @@ sh_imus_.push_back(mrs_lib::SubscribeHandler<sensor_msgs::Imu>(nh_, "/" + real_u
   service_server_realtime_factor_ = nh_.advertiseService("set_realtime_factor_in", &UnrealSimulator::callbackSetRealtimeFactor, this);
 
   // | ------------------------- timers ------------------------- |
-
-  timer_dynamics_ = nh_.createWallTimer(ros::WallDuration(1.0 / (_simulation_rate_ * drs_params_.realtime_factor)), &UnrealSimulator::timerDynamics, this);
+  if (!hitl) {
+    timer_dynamics_ = nh_.createWallTimer(ros::WallDuration(1.0 / (_simulation_rate_ * drs_params_.realtime_factor)), &UnrealSimulator::timerDynamics, this);
+  } else {
+    /* TODO: needs fixing to solve the realtime_factor not being 1*/
+    timer_dynamics_ = nh_.createWallTimer(ros::WallDuration(1.0 / (_simulation_rate_ * drs_params_.realtime_factor)), &UnrealSimulator::timerHitlDynamics, this);
+  }
 
   timer_status_ = nh_.createWallTimer(ros::WallDuration(1.0), &UnrealSimulator::timerStatus, this);
 
@@ -718,6 +726,57 @@ void UnrealSimulator::timerDynamics([[maybe_unused]] const ros::WallTimerEvent& 
   }
 
   publishPoses();
+
+  // | ---------------------- publish time ---------------------- |
+
+  if ((sim_time_ - last_published_time_).toSec() >= _clock_min_dt_) {
+
+    rosgraph_msgs::Clock ros_time;
+
+    ros_time.clock.fromSec(sim_time_.toSec());
+
+    ph_clock_.publish(ros_time);
+
+    last_published_time_ = sim_time_;
+  }
+}
+
+//}
+
+/* timerHitlDynamics() //{ */
+
+void UnrealSimulator::timerHitlDynamics([[maybe_unused]] const ros::WallTimerEvent& event) {
+
+  if (!is_initialized_) {
+    return;
+  }
+
+  ROS_INFO_ONCE("[UnrealSimulator]: main timer spinning");
+
+  // | ------------------ make simulation step ------------------ |
+
+  double simulation_step_size = 1.0 / _simulation_rate_;
+
+  sim_time_ = sim_time_ + ros::Duration(simulation_step_size);
+
+  {
+    std::scoped_lock lock(mutex_wall_time_offset_);
+
+    const double wall_dt = (event.current_real - event.last_real).toSec();
+
+    if (wall_dt > 0) {
+
+      wall_time_offset_ += wall_time_offset_drift_slope_ * wall_dt;
+    }
+  }
+
+  for (size_t i = 0; i < uavs_.size(); i++) {
+    if (!uavs_[i]->hasCrashed()) {
+      uavs_[i]->makeStep(simulation_step_size);
+    }
+  }
+
+  publishHitlPoses();
 
   // | ---------------------- publish time ---------------------- |
 
@@ -819,8 +878,11 @@ void UnrealSimulator::timerUnrealSync([[maybe_unused]] const ros::TimerEvent& ev
   if (!is_initialized_) {
     return;
   }
-
-  updateUnrealPoses(false);
+  if (hitl) {
+    updateUnrealPosesHitl(false);
+  } else {
+    updateUnrealPoses(false);
+  }
 }
 
 //}
@@ -908,9 +970,9 @@ void UnrealSimulator::timerLidar([[maybe_unused]] const ros::TimerEvent& event) 
   }
 
   for (size_t i = 0; i < uavs_.size(); i++) {
-
-    mrs_multirotor_simulator::MultirotorModel::State state = uavs_[i]->getState();
-
+    if (!hitl) {
+      mrs_multirotor_simulator::MultirotorModel::State state = uavs_[i]->getState();
+    }
     bool                                   res;
     std::vector<ueds_connector::LidarData> lidarData;
     ueds_connector::Coordinates            start;
@@ -1001,8 +1063,10 @@ void UnrealSimulator::timerSegLidar([[maybe_unused]] const ros::TimerEvent& even
   }
 
   for (size_t i = 0; i < uavs_.size(); i++) {
-
-    mrs_multirotor_simulator::MultirotorModel::State state = uavs_[i]->getState();
+    if (!hitl) {
+      /* TODO: does this have to even be here? */
+      mrs_multirotor_simulator::MultirotorModel::State state = uavs_[i]->getState();
+    }
 
     bool                                      res;
     std::vector<ueds_connector::LidarSegData> lidarSegData;
@@ -1321,7 +1385,7 @@ void UnrealSimulator::timerRgbSegmented([[maybe_unused]] const ros::TimerEvent& 
     /* cv::Mat               image = cv::imdecode(cameraData, cv::IMREAD_COLOR); */
     cv::Mat image = cv::Mat(rgb_height_, rgb_width_, CV_8UC3, cameraData.data());
     /* cv::cvtColor(image, image, cv::COLOR_BGR2RGB); */
-    sensor_msgs::ImagePtr msg   = cv_bridge::CvImage(std_msgs::Header(), "bgr8", image).toImageMsg();
+    sensor_msgs::ImagePtr msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", image).toImageMsg();
 
     msg->header.frame_id = "uav" + std::to_string(i + 1) + "/rgb";
 
@@ -1386,24 +1450,6 @@ void UnrealSimulator::callbackDrs(mrs_uav_unreal_simulation::unreal_simulatorCon
 
 //}
 
-
-// | ------------------------ timeouts ----------------------- |
-
-  void UnrealSimulator::timeoutOdometry(const std::string &topic, const ros::Time &last_msg, const size_t uav_idx){
-      if(is_initialized_){
-        return;}
-      if(!sh_odoms_[uav_idx].hasMsg()){
-        return;}
-      ROS_WARN_THROTTLE(1.0, "[UnrealSimulator]: timeout on topic %s", topic.c_str());
-  }
-  void UnrealSimulator::timeoutImu(const std::string &topic, const ros::Time &last_msg, const size_t uav_idx){
-      if(is_initialized_){
-        return;}
-      if(!sh_odoms_[uav_idx].hasMsg()){
-        return;}
-      ROS_WARN_THROTTLE(1.0, "[UnrealSimulator]: timeout on topic %s", topic.c_str());
-  }
-
 // | ------------------------ routines ------------------------ |
 
 /* publishPoses() //{ */
@@ -1436,6 +1482,35 @@ void UnrealSimulator::publishPoses(void) {
 
 //}
 
+/* publishHitlPoses() //{ */
+
+void UnrealSimulator::publishHitlPoses(void) {
+
+  auto sim_time = mrs_lib::get_mutexed(mutex_sim_time_, sim_time_);
+
+  geometry_msgs::PoseArray pose_array;
+
+  pose_array.header.stamp    = sim_time;
+  pose_array.header.frame_id = _world_frame_name_;
+
+  for (size_t i = 0; i < uavs_.size(); i++) {
+
+    auto odom =  sh_odoms_[i].getMsg();
+    geometry_msgs::Pose pose;
+    pose = odom->pose.pose;
+    /* pose.position.x  = state.x[0]; */
+    /* pose.position.y  = state.x[1]; */
+    /* pose.position.z  = state.x[2]; */
+    /* pose.orientation = mrs_lib::AttitudeConverter(state.R); */
+
+    pose_array.poses.push_back(pose);
+  }
+
+  ph_poses_.publish(pose_array);
+}
+
+//}
+
 /* updateUnrealPoses() //{ */
 
 void UnrealSimulator::updateUnrealPoses(const bool teleport_without_collision) {
@@ -1446,39 +1521,51 @@ void UnrealSimulator::updateUnrealPoses(const bool teleport_without_collision) {
     std::scoped_lock lock(mutex_ueds_);
 
     for (size_t i = 0; i < uavs_.size(); i++) {
-      auto odom = sh_odoms_[i].getMsg();
-      auto imu = sh_imus_[i].getMsg();
-      
-      
-      mrs_multirotor_simulator::MultirotorModel::State state;
-      double roll, pitch, yaw; 
-      if(!_hil_){
-       state = uavs_[i]->getState();
-      auto [roll, pitch, yaw] = mrs_lib::AttitudeConverter(state.R).getExtrinsicRPY();
-      }else{
-       // x ... position
-       // R ... orientation
-       // v ... velocity
-       // omega ... angular velocity 
-       
-       // get the position from the sh_odoms_ 
-       state.x = Eigen::Vector3d(odom->pose.pose.position.x, odom->pose.pose.position.y, odom->pose.pose.position.z);
-       /* state.R = mrs_lib::AttitudeConverter(odom.pose.pose.orientation).; */
-       
-       // get the velocity from the  sh_imus_
-       state.v = Eigen::Vector3d(imu->linear_acceleration.x, imu->linear_acceleration.y, imu->linear_acceleration.z);
-       /* state.omega = */ 
-       state.omega = Eigen::Vector3d(imu->angular_velocity.x, imu->angular_velocity.y, imu->angular_velocity.z); 
-      
-      auto [roll, pitch, yaw] = mrs_lib::AttitudeConverter(odom->pose.pose.orientation).getExtrinsicRPY();
 
-      } 
+      mrs_multirotor_simulator::MultirotorModel::State state = uavs_[i]->getState();
+
+      auto [roll, pitch, yaw] = mrs_lib::AttitudeConverter(state.R).getExtrinsicRPY();
 
       ueds_connector::Coordinates pos;
 
       pos.x = ueds_world_origins_[i].x + state.x.x() * 100.0;
       pos.y = ueds_world_origins_[i].y - state.x.y() * 100.0;
       pos.z = ueds_world_origins_[i].z + state.x.z() * 100.0;
+
+      ueds_connector::Rotation rot;
+      rot.pitch = 180.0 * (-pitch / M_PI);
+      rot.roll  = 180.0 * (roll / M_PI);
+      rot.yaw   = 180.0 * (-yaw / M_PI);
+
+      ueds_connectors_[i]->SetLocationAndRotationAsync(pos, rot, !teleport_without_collision && _collisions_);
+    }
+  }
+}
+
+//}
+
+/* updateUnrealPosesHitl() //{ */
+
+void UnrealSimulator::updateUnrealPosesHitl(const bool teleport_without_collision) {
+
+  // | ------------ set each UAV's position in unreal ----------- |
+
+  {
+    std::scoped_lock lock(mutex_ueds_);
+
+    for (size_t i = 0; i < real_uav_names.size(); i++) {
+
+      auto odom =  sh_odoms_[i].getMsg();
+      /* is it needed here? */ 
+      /* auto imu =  sh_imus_[i].getMsg(); */
+    
+      auto [roll, pitch, yaw] = mrs_lib::AttitudeConverter(odom->pose.pose.orientation).getExtrinsicRPY();
+
+      ueds_connector::Coordinates pos;
+
+      pos.x = ueds_world_origins_[i].x + odom->pose.pose.position.x * 100.0;
+      pos.y = ueds_world_origins_[i].y - odom->pose.pose.position.y * 100.0;
+      pos.z = ueds_world_origins_[i].z + odom->pose.pose.position.z * 100.0;
 
       ueds_connector::Rotation rot;
       rot.pitch = 180.0 * (-pitch / M_PI);
@@ -1499,6 +1586,7 @@ void UnrealSimulator::checkForCrash(void) {
   // | ------------ set each UAV's position in unreal ----------- |
 
   {
+    /* TODO: what to do here when HITL is enabled? */
     std::scoped_lock lock(mutex_ueds_);
 
     for (size_t i = 0; i < uavs_.size(); i++) {

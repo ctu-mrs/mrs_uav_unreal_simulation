@@ -1,0 +1,56 @@
+<launch>
+
+  <arg name="UAV_NAME" default="$(optenv UAV_NAME uav1)"/>
+
+  <arg name="camera_pitch" default="0.0"/>
+
+  <arg name="mrs_vins_world_frame" default="$(arg UAV_NAME)/mrs_vins_world"/>
+  <arg name="vins_world_frame" default="global"/>
+  <arg name="fcu_frame" default="$(arg UAV_NAME)/fcu"/>
+  <arg name="vins_fcu_frame" default="imu"/>
+  <arg name="vins_fcu_front_frame" default="$(arg UAV_NAME)/vins_body_front"/>
+
+  <!-- will it run using GNU debugger? -->
+  <arg name="DEBUG" default="false" />
+  <arg unless="$(arg DEBUG)" name="launch_prefix_debug" value=""/>
+  <arg     if="$(arg DEBUG)" name="launch_prefix_debug" value="debug_roslaunch"/>
+
+  <!-- nodelet settings-->
+  <arg name="standalone" default="true" />
+  <arg name="manager" default="$(arg UAV_NAME)_vinsrepublisher_manager" />
+  <arg name="n_threads" default="8" />
+  <arg unless="$(arg standalone)" name="nodelet" value="load"/>
+  <arg     if="$(arg standalone)" name="nodelet" value="standalone"/>
+  <arg unless="$(arg standalone)" name="nodelet_manager" value="$(arg manager)"/>
+  <arg     if="$(arg standalone)" name="nodelet_manager" value=""/>
+
+  <group ns="$(arg UAV_NAME)">
+
+      <!-- ================= Static transformations ================= -->
+
+    <!-- TF between the FCU of the UAV and the VINS body (IMU) frame -->
+    <node pkg="tf2_ros" type="static_transform_publisher" name="tf_vins_fcu_to_mrs_fcu" args="0.0 0.0 0.0 0.0 0.0 0.0 $(arg fcu_frame) $(arg vins_fcu_front_frame)" />
+
+    <!-- TF for variable pitch of the camera -->
+    <node pkg="tf2_ros" type="static_transform_publisher" name="tf_vins_fcu_to_mrs_fcu2" args="0 0 0 0 0 $(arg camera_pitch) $(arg vins_fcu_front_frame) $(arg vins_fcu_frame)" />
+
+      <!-- ================= VinsRepublisher nodelet ================ -->
+    <node pkg="nodelet" type="nodelet" name="vins_republisher" args="$(arg nodelet) vins_republisher/VinsRepublisher $(arg nodelet_manager)" launch-prefix="$(arg launch_prefix_debug)" output="screen">
+
+      <rosparam file="$(find mrs_vins_republisher)/config/default.yaml" command="load" />
+
+      <param name="uav_name" value="$(arg UAV_NAME)"/>
+
+      <!-- set to true if velocity is defined in the IMU frame -->
+      <param name="velocity_in_body_frame" value="true"/>
+
+      <remap from="~vins_odom_in" to="ov_msckf/odomimu"/>
+      <remap from="~vins_odom_out" to="~odom"/>
+
+      <param name="fcu_frame" value="$(arg fcu_frame)"/>
+      <param name="mrs_vins_world_frame" value="$(arg mrs_vins_world_frame)"/>
+      <param name="vins_fcu_frame" value="$(arg vins_fcu_frame)"/>
+
+    </node>
+  </group>
+</launch>
