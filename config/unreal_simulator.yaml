@@ -29,7 +29,7 @@ ueds_world_level_name_enum: 2
 
 # Only Forest Procedural Generation settings
 # Choose cluttered difficulties from 1 [high] to 10 [low]
-ueds_forest_density: 7
+ueds_forest_density: 6
 
 sensors:
 

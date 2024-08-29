@@ -496,6 +496,7 @@ void UnrealSimulator::onInit() {
 
       ROS_INFO("[UnrealSimulator]: %s - Connection succeed: %d", uav_name.c_str(), connect_result);
 
+      std::this_thread::sleep_for(std::chrono::seconds(3));
       const auto [res, location] = ueds_connector->GetLocation();
 
       if (!res) {
