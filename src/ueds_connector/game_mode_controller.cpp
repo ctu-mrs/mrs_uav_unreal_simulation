@@ -55,7 +55,7 @@ bool GameModeController::RemoveDrone(const int port) {
 
 //}
 
-/* removeDrone() //{ */
+/* SetForestDensity() //{ */
 
 bool GameModeController::SetForestDensity(const int DensityLevel) {
 
@@ -63,6 +63,22 @@ bool GameModeController::SetForestDensity(const int DensityLevel) {
   request.Density_Level = DensityLevel;
 
   Serializable::GameMode::SetForestDensity::Response response{};
+  const auto                                    status  = Request(request, response);
+  const auto                                    success = status && response.status;
+
+  return success;
+}
+
+//}
+
+/* SetForestHillyLevel() //{ */
+
+bool GameModeController::SetForestHillyLevel(const int HillyLevel) {
+
+  Serializable::GameMode::SetForestHillyLevel::Request request{};
+  request.Hilly_Level = HillyLevel;
+
+  Serializable::GameMode::SetForestHillyLevel::Response response{};
   const auto                                    status  = Request(request, response);
   const auto                                    success = status && response.status;
 

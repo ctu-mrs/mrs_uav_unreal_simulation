@@ -40,6 +40,8 @@ public:
   bool SwitchWorldLevel(const Serializable::GameMode::WorldLevelEnum& worldLevelEnum);
 
   bool SetForestDensity(const int DensityLevel);
+
+  bool SetForestHillyLevel(const int HillyLevel);
 };
 
 }  // namespace ueds_connector

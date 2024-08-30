@@ -27,9 +27,15 @@ ueds_graphics_settings_enum: 0
 ueds_world_level_name_enum: 2
 
 
-# Only Forest Procedural Generation settings
+############ Only Forest Procedural Generation settings ############
+
 # Choose cluttered difficulties from 1 [high] to 10 [low]
 ueds_forest_density: 6
+
+# Choose Hilly Level from 1 [totally flat] to 5 [the most hilly]
+ueds_forest_hilly_level: 3
+
+####################################################################
 
 sensors:
 

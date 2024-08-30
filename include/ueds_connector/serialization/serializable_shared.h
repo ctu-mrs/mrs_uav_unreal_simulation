@@ -879,7 +879,8 @@ enum MessageType : unsigned short
   get_api_version         = 9,
   set_graphics_settings   = 10,
   switch_world_level      = 11,
-  set_forest_density      = 12
+  set_forest_density      = 12,
+  set_forest_hilly_level  = 13
 };
 
 namespace GetDrones
@@ -926,6 +927,25 @@ struct Response : public Common::NetworkResponse
   explicit Response(bool _status) : Common::NetworkResponse(MessageType::set_forest_density, _status){};
 };
 };  // namespace SetForestDensity
+
+namespace SetForestHillyLevel
+{
+struct Request : public Common::NetworkRequest
+{
+  Request() : Common::NetworkRequest(MessageType::set_forest_hilly_level){}
+  int Hilly_Level;
+
+  template <class Archive>
+  void serialize(Archive& archive) {
+    archive(cereal::base_class<Common::NetworkRequest>(this), Hilly_Level);
+  }
+};
+struct Response : public Common::NetworkResponse
+{
+  Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::set_forest_hilly_level)){};
+  explicit Response(bool _status) : Common::NetworkResponse(MessageType::set_forest_hilly_level, _status){};
+};
+};  // namespace SetForestHilly  
 
 
 namespace SpawnDrone
