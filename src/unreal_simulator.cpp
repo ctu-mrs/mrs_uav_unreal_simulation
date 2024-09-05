@@ -718,7 +718,7 @@ void UnrealSimulator::timerDynamics([[maybe_unused]] const ros::WallTimerEvent& 
       wall_time_offset_ += wall_time_offset_drift_slope_ * wall_dt;
     }
   }
-
+  
   for (size_t i = 0; i < uavs_.size(); i++) {
     if (!uavs_[i]->hasCrashed()) {
       uavs_[i]->makeStep(simulation_step_size);
@@ -770,11 +770,11 @@ void UnrealSimulator::timerHitlDynamics([[maybe_unused]] const ros::WallTimerEve
     }
   }
 
-  for (size_t i = 0; i < uavs_.size(); i++) {
-    if (!uavs_[i]->hasCrashed()) {
-      uavs_[i]->makeStep(simulation_step_size);
-    }
-  }
+  /* for (size_t i = 0; i < uavs_.size(); i++) { */
+  /*   if (!uavs_[i]->hasCrashed()) { */
+  /*     uavs_[i]->makeStep(simulation_step_size); */
+  /*   } */
+  /* } */
 
   publishHitlPoses();
 
@@ -860,8 +860,8 @@ void UnrealSimulator::timerStatus([[maybe_unused]] const ros::WallTimerEvent& ev
   const double desired_rtf = (drs_params.dynamic_rtf && ueds_rtf_ < drs_params.realtime_factor) ? ueds_rtf_ : drs_params.realtime_factor;
 
   timer_dynamics_.setPeriod(ros::WallDuration(1.0 / (_simulation_rate_ * desired_rtf)), false);
-
-  if (_collisions_) {
+  
+  if (_collisions_ && !hitl) {
     checkForCrash();
   }
 
@@ -1497,6 +1497,9 @@ void UnrealSimulator::publishHitlPoses(void) {
 
     auto odom =  sh_odoms_[i].getMsg();
     geometry_msgs::Pose pose;
+    if(!odom){
+    return;
+    }
     pose = odom->pose.pose;
     /* pose.position.x  = state.x[0]; */
     /* pose.position.y  = state.x[1]; */
@@ -1531,7 +1534,7 @@ void UnrealSimulator::updateUnrealPoses(const bool teleport_without_collision) {
       pos.x = ueds_world_origins_[i].x + state.x.x() * 100.0;
       pos.y = ueds_world_origins_[i].y - state.x.y() * 100.0;
       pos.z = ueds_world_origins_[i].z + state.x.z() * 100.0;
-
+      ROS_INFO("The current ueds position is: %f %f %f", pos.x, pos.y, pos.z);
       ueds_connector::Rotation rot;
       rot.pitch = 180.0 * (-pitch / M_PI);
       rot.roll  = 180.0 * (roll / M_PI);
@@ -1556,10 +1559,14 @@ void UnrealSimulator::updateUnrealPosesHitl(const bool teleport_without_collisio
     for (size_t i = 0; i < real_uav_names.size(); i++) {
 
       auto odom =  sh_odoms_[i].getMsg();
+      //check if the odom is not null
+      if(!odom){
+       return;
+      }
       /* is it needed here? */ 
       /* auto imu =  sh_imus_[i].getMsg(); */
-    
-      auto [roll, pitch, yaw] = mrs_lib::AttitudeConverter(odom->pose.pose.orientation).getExtrinsicRPY();
+      const geometry_msgs::Quaternion quaternion = odom->pose.pose.orientation;
+      auto [roll, pitch, yaw] = mrs_lib::AttitudeConverter(quaternion).getExtrinsicRPY();
 
       ueds_connector::Coordinates pos;
 
@@ -1596,12 +1603,14 @@ void UnrealSimulator::checkForCrash(void) {
       if (!res) {
         ROS_ERROR_THROTTLE(1.0, "[UnrealSimulator]: failed to obtain crash state for uav%lu", i + 1);
       }
-
+      if(!hitl){
       if (res && crashed && !uavs_[i]->hasCrashed()) {
 
         ROS_WARN_THROTTLE(1.0, "[UnrealSimulator]: uav%lu crashed", i + 1);
 
         uavs_[i]->crash();
+      }
+
       }
     }
   }

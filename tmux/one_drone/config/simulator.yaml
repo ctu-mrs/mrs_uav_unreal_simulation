@@ -2,6 +2,8 @@ uav_names: [
   "uav1",
 ]
 
+ueds_world_level_name_enum: 6
+
 uav1:
   type: "x500"
   spawn:

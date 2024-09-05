@@ -1,0 +1,38 @@
+uav_names: [
+  "uav1",
+]
+
+real_uav_names: [
+"uav34"
+]
+
+ueds_world_level_name_enum: 6
+uav1:
+  type: "x500"
+  spawn:
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    heading: 0.0
+hitl: true 
+sensors:
+  lidar:
+    enabled: true
+  rgb:
+    enabled: true
+
+    rate: 30.0 # [Hz]
+
+    width: 800 # [px]
+    height: 800 # [px]
+    fov: 120.0 # [deg]
+
+    offset_x: 0.14 # [m]
+    offset_y: 0.0 # [m]
+    offset_z: 0.0 # [m]
+
+    rotation_pitch: 30.0 # [deg]
+    rotation_yaw: 0.0 # [deg]
+    rotation_roll: 0.0 # [deg]
+  stereo:
+    enabled: false 

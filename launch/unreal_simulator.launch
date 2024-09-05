@@ -1,7 +1,7 @@
 <launch>
 
-  <arg name="debug" default="false" />
-  <arg name="standalone" default="false" />
+  <arg name="debug" default="true" />
+  <arg name="standalone" default="true" />
   <arg name="bond" default="$(optenv BOND true)" />
   <arg name="nodelet_manager_name" default="unreal_nodelet_manager" />
   <arg name="use_sim_time" default="true" />

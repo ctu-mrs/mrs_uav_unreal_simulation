@@ -1,0 +1,61 @@
+<launch>
+
+  <arg name="UAV_NAME" default="$(env UAV_NAME)" />
+  <arg name="REAL_UAV_NAME" default="$(env REAL_UAV_NAME)" />
+  <arg name="LOGGER_DEBUG" default="$(optenv LOGGER_DEBUG false)" />
+
+  <env name="ROSCONSOLE_CONFIG_FILE" if="$(eval arg('LOGGER_DEBUG'))" value="$(find mrs_octomap_planner)/config/debug_verbosity.yaml" />
+
+    <!-- other args -->
+  <arg name="debug" default="false" />
+  <arg name="standalone" default="true" />
+  <arg name="custom_config" default="" />
+
+  <arg     if="$(arg debug)" name="launch_prefix" value="debug_roslaunch" />
+  <arg unless="$(arg debug)" name="launch_prefix" value="" />
+
+  <arg name="nodelet_manager_name" default="" />
+  <arg     if="$(eval arg('standalone') or arg('debug'))" name="nodelet" value="standalone" />
+  <arg unless="$(eval arg('standalone') or arg('debug'))" name="nodelet" value="load" />
+  <arg     if="$(eval arg('standalone') or arg('debug'))" name="nodelet_manager" value="" />
+  <arg unless="$(eval arg('standalone') or arg('debug'))" name="nodelet_manager" value="$(arg nodelet_manager_name)" />
+
+  <group ns="$(arg UAV_NAME)">
+
+    <node pkg="nodelet" type="nodelet" name="octomap_planner" args="$(arg nodelet) mrs_octomap_planner/OctomapPlanner $(arg nodelet_manager)" output="screen" launch-prefix="$(arg launch_prefix)">
+
+      <rosparam file="$(find mrs_octomap_planner)/config/octomap_planner.yaml" command="load" />
+
+      <rosparam if="$(eval not arg('custom_config') == '')" file="$(arg custom_config)" />
+
+      <param name="uav_name" value="$(arg UAV_NAME)" />
+
+      <!-- topics in -->
+
+      <remap from="~tracker_cmd_in" to="control_manager/tracker_cmd" />
+      <remap from="~octomap_in" to="octomap_server/octomap_local_full" />
+      <remap from="~control_manager_diag_in" to="control_manager/diagnostics" />
+      <remap from="~constraints_in" to="control_manager/current_constraints" />
+
+      <!-- topics out -->
+
+      <remap from="~diagnostics_out" to="~diagnostics" />
+
+      <!-- services in -->
+
+      <remap from="~goto_in" to="~goto" />
+      <remap from="~stop_in" to="~stop" />
+      <remap from="~reference_in" to="~reference" />
+      <remap from="~planner_type_in" to="~set_planner" />
+
+      <!-- services out -->
+
+      <remap from="~trajectory_generation_out" to="trajectory_generation/get_path" />
+      <remap from="~trajectory_reference_out" to="$(arg REAL_UAV_NAME)/control_manager/trajectory_reference" />
+      <remap from="~hover_out" to="$(arg REAL_UAV_NAME)/control_manager/hover" />
+
+    </node>
+
+  </group>
+
+</launch>

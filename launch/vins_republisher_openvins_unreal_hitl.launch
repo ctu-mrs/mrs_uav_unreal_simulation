@@ -1,6 +1,8 @@
 <launch>
 
   <arg name="UAV_NAME" default="$(optenv UAV_NAME uav1)"/>
+  <arg name="REAL_UAV_NAME" default="$(optenv REAL_UAV_NAME uav1)"/>
+  
 
   <arg name="camera_pitch" default="0.0"/>
 

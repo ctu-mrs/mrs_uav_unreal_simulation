@@ -1,7 +1,7 @@
 <launch>
 
   <arg name="UAV_NAME" default="$(optenv UAV_NAME uav1)" />
-  <arg name="REAL_UAV_NAME" default="$(optenv REAL_UAV_NAME uav1)" />
+  <arg name="REAL_UAV_NAME" default="$(optenv REAL_UAV_NAME uav34)" />
 
   <!-- what config we are going to run (should match folder name) -->
   <arg name="config"      default="unreal_simulation" /> <!-- euroc_mav, tum_vi, rpng_aruco -->
