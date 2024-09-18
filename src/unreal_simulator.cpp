@@ -225,7 +225,11 @@ private:
 
   std::mutex mutex_ueds_;
 
+  ueds_connector::Coordinates ueds_world_origin_;
+
   std::vector<ueds_connector::Coordinates> ueds_world_origins_;
+
+  ueds_connector::Coordinates position2ue(const Eigen::Vector3d &pos, const ueds_connector::Coordinates &ueds_world_origin);
 
   void updateUnrealPoses(const bool teleport_without_collision);
 
@@ -393,7 +397,8 @@ void UnrealSimulator::onInit() {
       break;
     }
 
-    ros::Duration(1.0).sleep();
+    //ros::Duration(1.0).sleep();
+    std::this_thread::sleep_for(std::chrono::seconds(1));
   }
 
   // | ------------------ check the API version ----------------- |
@@ -432,12 +437,8 @@ void UnrealSimulator::onInit() {
     ROS_ERROR("[UnrealSimulator] ueds_game_controller_ was not Disconnected succesfully.");
   }
 
-  ROS_WARN("SLEEP START");
-  // ros::Duration(1.0).sleep();
   std::this_thread::sleep_for(std::chrono::seconds(1));
-  ROS_WARN("SLEEP STOP");
 
-  // ueds_game_controller_ = std::make_unique<ueds_connector::GameModeController>(LOCALHOST, 8000);
   while (true) {
     bool connect_result = ueds_game_controller_->Connect();
     if (connect_result != 1) {
@@ -478,12 +479,27 @@ void UnrealSimulator::onInit() {
 
   // | --------------------- Spawn the UAVs --------------------- |
 
+  const auto [result, world_origin] = ueds_game_controller_->GetWorldOrigin();
+
+  if (!result) {
+    ROS_ERROR("[UnrealSimulator]: GameError: getting world origin");
+    ros::shutdown();
+  } else {
+    ueds_world_origin_ = world_origin;
+  }
+
   for (size_t i = 0; i < uav_names.size(); i++) {
 
     const std::string uav_name = uav_names[i];
 
-    ROS_INFO("[UnrealSimulator]: %s spawning .......", uav_name.c_str());
-    const auto [resSpawn, port] = ueds_game_controller_->SpawnDrone();
+    mrs_multirotor_simulator::MultirotorModel::State uav_state = uavs_[i]->getState();
+
+    ueds_connector::Coordinates pos = position2ue(uav_state.x, ueds_world_origin_);
+    
+    ROS_INFO("[UnrealSimulator]: %s spawning at [%.2lf, %.2lf, %.2lf] ...", uav_name.c_str(), uav_state.x.x(), uav_state.x.y(), uav_state.x.z());
+    
+    auto [resSpawn, port] = ueds_game_controller_->SpawnDroneAtLocation(pos);
+    //auto [resSpawn, port] = ueds_game_controller_->SpawnDrone();
 
     if (!resSpawn) {
       ROS_ERROR("[UnrealSimulator]: failed to spawn %s", uav_names[i].c_str());
@@ -496,6 +512,7 @@ void UnrealSimulator::onInit() {
 
     ueds_connectors_.push_back(ueds_connector);
 
+
     auto connect_result = ueds_connector->Connect();
 
     if (connect_result != 1) {
@@ -503,19 +520,23 @@ void UnrealSimulator::onInit() {
       ROS_ERROR("[UnrealSimulator]: %s - Error connecting to drone controller, connect_result was %d", uav_name.c_str(), connect_result);
       ros::shutdown();
 
-    } else {
+    } 
+    else {
 
       ROS_INFO("[UnrealSimulator]: %s - Connection succeed: %d", uav_name.c_str(), connect_result);
+      
+      // ROS_INFO("[UnrealSimulator]: wait until UAV fall on the ground ... && uptade their world origin");
+      
+      // std::this_thread::sleep_for(std::chrono::seconds(3));
 
-      std::this_thread::sleep_for(std::chrono::seconds(3));
-      const auto [res, location] = ueds_connector->GetLocation();
+      // const auto [res, location] = ueds_connector->GetLocation();
 
-      if (!res) {
-        ROS_ERROR("[UnrealSimulator]: %s - DroneError: getting location", uav_name.c_str());
-        ros::shutdown();
-      } else {
-        ueds_world_origins_.push_back(location);
-      }
+      // if (!res) {
+      //   ROS_ERROR("[UnrealSimulator]: %s - DroneError: getting location", uav_name.c_str());
+      //   ros::shutdown();
+      // } else {
+      //   ueds_world_origins_.push_back(location);
+      // }
     }
 
     ph_lidars_.push_back(mrs_lib::PublisherHandler<sensor_msgs::PointCloud2>(nh_, "/" + uav_name + "/lidar/points", 10));
@@ -610,9 +631,9 @@ void UnrealSimulator::onInit() {
     }
   }
 
-  ROS_INFO("[UnrealSimulator]: teleporting the UAVs to their spawn positions");
+  // ROS_INFO("[UnrealSimulator]: teleporting the UAVs to their spawn positions");
 
-  updateUnrealPoses(true);
+  // updateUnrealPoses(true);
 
   ROS_INFO("[UnrealSimulator]: Unreal UAVs are initialized");
 
@@ -902,7 +923,7 @@ void UnrealSimulator::timerLidar([[maybe_unused]] const ros::TimerEvent& event) 
 
   for (size_t i = 0; i < uavs_.size(); i++) {
 
-    mrs_multirotor_simulator::MultirotorModel::State state = uavs_[i]->getState();
+    //mrs_multirotor_simulator::MultirotorModel::State state = uavs_[i]->getState();
 
     bool                                   res;
     std::vector<ueds_connector::LidarData> lidarData;
@@ -995,7 +1016,7 @@ void UnrealSimulator::timerSegLidar([[maybe_unused]] const ros::TimerEvent& even
 
   for (size_t i = 0; i < uavs_.size(); i++) {
 
-    mrs_multirotor_simulator::MultirotorModel::State state = uavs_[i]->getState();
+    //mrs_multirotor_simulator::MultirotorModel::State state = uavs_[i]->getState();
 
     bool                                      res;
     std::vector<ueds_connector::LidarSegData> lidarSegData;
@@ -1428,9 +1449,10 @@ void UnrealSimulator::updateUnrealPoses(const bool teleport_without_collision) {
 
       ueds_connector::Coordinates pos;
 
-      pos.x = ueds_world_origins_[i].x + state.x.x() * 100.0;
-      pos.y = ueds_world_origins_[i].y - state.x.y() * 100.0;
-      pos.z = ueds_world_origins_[i].z + state.x.z() * 100.0;
+      pos = position2ue(state.x, ueds_world_origin_);
+      // pos.x = ueds_world_origins_[i].x + state.x.x() * 100.0;
+      // pos.y = ueds_world_origins_[i].y - state.x.y() * 100.0;
+      // pos.z = ueds_world_origins_[i].z + state.x.z() * 100.0;
 
       ueds_connector::Rotation rot;
       rot.pitch = 180.0 * (-pitch / M_PI);
@@ -1440,6 +1462,16 @@ void UnrealSimulator::updateUnrealPoses(const bool teleport_without_collision) {
       ueds_connectors_[i]->SetLocationAndRotationAsync(pos, rot, !teleport_without_collision && _collisions_);
     }
   }
+}
+
+ueds_connector::Coordinates UnrealSimulator::position2ue(const Eigen::Vector3d &pos, const ueds_connector::Coordinates &ueds_world_origin){
+  ueds_connector::Coordinates pos_ue;
+  
+  pos_ue.x = ueds_world_origin.x + pos.x() * 100.0;
+  pos_ue.y = ueds_world_origin.y - pos.y() * 100.0;
+  pos_ue.z = ueds_world_origin.z + pos.z() * 100.0;
+
+  return pos_ue;
 }
 
 //}

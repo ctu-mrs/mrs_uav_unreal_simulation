@@ -7,6 +7,24 @@
 #include <ueds_connector/data_types.h>
 #include <ueds_connector/serialization/serializable_shared.h>
 
+namespace Serializable::GameMode::GetWorldOrigin
+{
+inline std::unique_ptr<ueds_connector::Coordinates> ResponseToCoordinates(std::unique_ptr<Response> response) {
+  return std::make_unique<ueds_connector::Coordinates>(response->x, response->y, response->z);
+}
+}
+
+namespace Serializable::GameMode::SpawnDroneAtLocation
+{
+inline std::unique_ptr<Request> CoordinateToRequest(const ueds_connector::Coordinates& coordinate) {
+  auto request = std::make_unique<Request>();
+  request->x   = coordinate.x;
+  request->y   = coordinate.y;
+  request->z   = coordinate.z;
+  return request;
+}
+} 
+
 namespace Serializable::Drone::GetLocation
 {
 inline std::unique_ptr<ueds_connector::Coordinates> ResponseToCoordinates(std::unique_ptr<Response> response) {

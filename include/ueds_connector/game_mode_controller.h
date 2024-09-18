@@ -23,6 +23,8 @@ public:
 
   std::pair<bool, int> SpawnDrone();
 
+  std::pair<bool, int> SpawnDroneAtLocation(ueds_connector::Coordinates &Location);
+
   bool RemoveDrone(const int port);
 
   std::pair<bool, CameraCaptureModeEnum> GetCameraCaptureMode();
@@ -42,6 +44,8 @@ public:
   bool SetForestDensity(const int DensityLevel);
 
   bool SetForestHillyLevel(const int HillyLevel);
+
+  std::pair<bool, ueds_connector::Coordinates> GetWorldOrigin();
 };
 
 }  // namespace ueds_connector

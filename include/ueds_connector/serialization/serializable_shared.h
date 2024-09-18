@@ -880,7 +880,9 @@ enum MessageType : unsigned short
   set_graphics_settings   = 10,
   switch_world_level      = 11,
   set_forest_density      = 12,
-  set_forest_hilly_level  = 13
+  set_forest_hilly_level  = 13,
+  get_world_origin        = 14,
+  spawn_drone_at_location = 15
 };
 
 namespace GetDrones
@@ -971,6 +973,35 @@ struct Response : public Common::NetworkResponse
   }
 };
 }  // namespace SpawnDrone
+
+namespace SpawnDroneAtLocation
+{
+  struct Request : public Common::NetworkRequest
+  {
+    Request() : Common::NetworkRequest(MessageType::spawn_drone_at_location){};
+
+    double x;
+    double y;
+    double z;
+    template <class Archive>
+    void serialize(Archive& archive) {
+      archive(cereal::base_class<Common::NetworkRequest>(this), x, y, z);
+    }
+  };
+  
+  struct Response : public Common::NetworkResponse
+  {
+    Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::spawn_drone_at_location)){};
+    explicit Response(bool _status) : Common::NetworkResponse(MessageType::spawn_drone, _status){};
+    
+    int port;
+
+    template <class Archive>
+    void serialize(Archive& archive) {
+      archive(cereal::base_class<Common::NetworkResponse>(this), port);
+    }
+  };
+};  // namespace SpawnDrone 
 
 namespace RemoveDrone
 {
@@ -1171,6 +1202,29 @@ struct Response : public Common::NetworkResponse
   }
 };
 }  // namespace GetTime
+
+namespace GetWorldOrigin
+{
+  struct Request : public Common::NetworkRequest
+  {
+    Request() : Common::NetworkRequest(MessageType::get_world_origin){};
+  };
+
+  struct Response : public Common::NetworkResponse
+  {
+    Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::get_world_origin)){};
+    explicit Response(bool _status) : Common::NetworkResponse(MessageType::get_world_origin, _status){};
+
+    double x;
+    double y;
+    double z;
+
+    template <class Archive>
+    void serialize(Archive& archive) {
+      archive(cereal::base_class<Common::NetworkResponse>(this), x, y, z);
+    }
+  };
+}  // namespace GetWorldOrigin
 
 }  // namespace GameMode
 

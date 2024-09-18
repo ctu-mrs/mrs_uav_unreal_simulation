@@ -24,6 +24,29 @@ std::pair<bool, std::vector<int>> GameModeController::GetDrones() {
 
 //}
 
+/* GetWorldOrigin() //{ */
+
+std::pair<bool, ueds_connector::Coordinates> GameModeController::GetWorldOrigin() {
+
+  Serializable::GameMode::GetWorldOrigin::Request request{};
+
+  Serializable::GameMode::GetWorldOrigin::Response response{};
+  const auto                                 status  = Request(request, response);
+  const auto                                 success = status && response.status;
+
+  ueds_connector::Coordinates coordinates{};
+
+  if (success) {
+    coordinates.x = response.x;
+    coordinates.y = response.y;
+    coordinates.z = response.z;
+  }
+
+  return std::make_pair(success, coordinates);
+}
+
+//}
+
 /* spawnDrone() //{ */
 
 std::pair<bool, int> GameModeController::SpawnDrone() {
@@ -31,6 +54,24 @@ std::pair<bool, int> GameModeController::SpawnDrone() {
   Serializable::GameMode::SpawnDrone::Request request{};
 
   Serializable::GameMode::SpawnDrone::Response response{};
+  const auto                                   status  = Request(request, response);
+  const auto                                   success = status && response.status;
+
+  return std::make_pair(success, success ? response.port : 0);
+}
+
+//}
+
+/* spawnDrone() //{ */
+
+std::pair<bool, int> GameModeController::SpawnDroneAtLocation(ueds_connector::Coordinates &Location) {
+
+  Serializable::GameMode::SpawnDroneAtLocation::Request request{};
+  request.x = Location.x;
+  request.y = Location.y;
+  request.z = Location.z;
+
+  Serializable::GameMode::SpawnDroneAtLocation::Response response{};
   const auto                                   status  = Request(request, response);
   const auto                                   success = status && response.status;
 
