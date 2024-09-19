@@ -39,6 +39,11 @@ ueds_forest_hilly_level: 3
 
 sensors:
 
+  rangefinder:
+
+    enabled: true
+    rate: 10.0 # [Hz]
+
   lidar:
 
     enabled: false

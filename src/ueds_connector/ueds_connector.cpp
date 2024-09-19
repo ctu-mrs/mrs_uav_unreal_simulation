@@ -292,7 +292,16 @@ std::tuple<bool, std::vector<LidarData>, Coordinates> UedsConnector::GetLidarDat
   return std::make_tuple(success, lidarData, start);
 }
 
-//}
+std::tuple<bool, double> ueds_connector::UedsConnector::GetRangefinderData()
+{
+  Serializable::Drone::GetRangefinderData::Request request{};
+
+  Serializable::Drone::GetRangefinderData::Response response{};
+  const auto                                        status  = Request(request, response);
+  const auto                                        success = status && response.status;
+
+  return std::make_pair(success, success ? response.range : -1);
+} //}
 
 /* getLidarSegData() //{ */
 

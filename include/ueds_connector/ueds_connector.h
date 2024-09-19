@@ -41,6 +41,8 @@ public:
 
   std::tuple<bool> SetLocationAndRotationAsync(const Coordinates& coordinate, const Rotation& rotation, const bool should_collide);
 
+  std::tuple<bool, double> GetRangefinderData();
+
   std::tuple<bool, std::vector<LidarData>, Coordinates> GetLidarData();
 
   std::tuple<bool, std::vector<LidarSegData>, Coordinates> GetLidarSegData();

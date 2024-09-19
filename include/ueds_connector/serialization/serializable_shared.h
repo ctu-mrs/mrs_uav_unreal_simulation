@@ -104,6 +104,7 @@ enum MessageType : unsigned short
   get_lidar_seg                   = 19,
   set_location_and_rotation_async = 20,
   get_crash_state                 = 21,
+  get_rangefinder_data            = 22
 };
 
 /* struct LidarConfig //{ */
@@ -540,6 +541,27 @@ struct Response : public Common::NetworkResponse
 }  // namespace SetLocationAndRotationAsync
 
 //}
+
+namespace GetRangefinderData
+{
+  struct Request : public Common::NetworkRequest
+  {
+    Request() : Common::NetworkRequest(static_cast<unsigned short>(MessageType::get_rangefinder_data)){};
+  };
+
+  struct Response : public Common::NetworkResponse
+  {
+    Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::get_rangefinder_data)){};
+    explicit Response(bool _status) : Common::NetworkResponse(MessageType::get_rangefinder_data, _status){};
+
+    double range;
+
+    template <class Archive>
+    void serialize(Archive& archive) {
+      archive(cereal::base_class<Common::NetworkResponse>(this), range);
+    }
+  };
+}  // namespace GetRangefinderData  
 
 /* GetLidarData //{ */
 

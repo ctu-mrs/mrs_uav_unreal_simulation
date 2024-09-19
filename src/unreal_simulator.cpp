@@ -97,6 +97,9 @@ private:
   ros::Timer timer_unreal_sync_;
   void       timerUnrealSync(const ros::TimerEvent& event);
 
+  ros::Timer timer_rangefinder_;
+  void       timerRangefinder(const ros::TimerEvent& event);
+
   ros::Timer timer_lidar_;
   void       timerLidar(const ros::TimerEvent& event);
 
@@ -181,6 +184,8 @@ private:
 
   mrs_lib::PublisherHandler<rosgraph_msgs::Clock>     ph_clock_;
   mrs_lib::PublisherHandler<geometry_msgs::PoseArray> ph_poses_;
+
+  std::vector<mrs_lib::PublisherHandler<sensor_msgs::Range>>       ph_rangefinders_;
 
   std::vector<mrs_lib::PublisherHandler<sensor_msgs::PointCloud2>> ph_lidars_;
   std::vector<mrs_lib::PublisherHandler<sensor_msgs::PointCloud2>> ph_seg_lidars_;
@@ -307,6 +312,9 @@ void UnrealSimulator::onInit() {
   param_loader.loadParam("frames/world/name", _world_frame_name_);
 
   param_loader.loadParam("collisions", _collisions_);
+
+  param_loader.loadParam("sensors/rangefinder/enabled", drs_params_.rangefinder_enabled);
+  param_loader.loadParam("sensors/rangefinder/rate", drs_params_.rangefinder_rate);
 
   param_loader.loadParam("sensors/lidar/enabled", drs_params_.lidar_enabled);
   param_loader.loadParam("sensors/lidar/rate", drs_params_.lidar_rate);
@@ -539,6 +547,8 @@ void UnrealSimulator::onInit() {
       // }
     }
 
+    ph_rangefinders_.push_back(mrs_lib::PublisherHandler<sensor_msgs::Range>(nh_, "/" + uav_name + "/rangefinder", 10));
+
     ph_lidars_.push_back(mrs_lib::PublisherHandler<sensor_msgs::PointCloud2>(nh_, "/" + uav_name + "/lidar/points", 10));
     ph_seg_lidars_.push_back(mrs_lib::PublisherHandler<sensor_msgs::PointCloud2>(nh_, "/" + uav_name + "/lidar_segmented/points", 10));
 
@@ -668,6 +678,8 @@ void UnrealSimulator::onInit() {
   timer_status_ = nh_.createWallTimer(ros::WallDuration(1.0), &UnrealSimulator::timerStatus, this);
 
   timer_time_sync_ = nh_.createWallTimer(ros::WallDuration(1.0), &UnrealSimulator::timerTimeSync, this);
+
+  timer_rangefinder_ = nh_.createTimer(ros::Duration(1.0 / drs_params_.rangefinder_rate), &UnrealSimulator::timerRangefinder, this);
 
   timer_lidar_ = nh_.createTimer(ros::Duration(1.0 / drs_params_.lidar_rate), &UnrealSimulator::timerLidar, this);
 
@@ -904,6 +916,43 @@ void UnrealSimulator::timerTimeSync([[maybe_unused]] const ros::WallTimerEvent& 
 }
 
 //}
+
+void UnrealSimulator::timerRangefinder([[maybe_unused]] const ros::TimerEvent& event){
+  if(!is_initialized_){
+    return;
+  }
+
+  auto drs_params = mrs_lib::get_mutexed(mutex_drs_params_, drs_params_);
+
+  if (!drs_params_.rangefinder_enabled) {
+    return;
+  }
+
+  for(size_t i = 0; i < uavs_.size(); i++){
+    bool res;
+    double range;
+    {
+      std::scoped_lock lock(mutex_ueds_);
+
+      std::tie(res, range) = ueds_connectors_[i]->GetRangefinderData();
+    }
+
+    if(!res){
+      ROS_ERROR_THROTTLE(1.0, "[UnrealSimulator]: [uav%d] - ERROR GetRangefinderData", int(i));
+      continue;
+    }
+
+    sensor_msgs::Range msg_range;
+    msg_range.header.stamp    = ros::Time::now();
+    msg_range.header.frame_id = "uav" + std::to_string(i + 1) + "/fcu";
+    msg_range.radiation_type  = 1;
+    msg_range.min_range       = 0.1;
+    msg_range.max_range       = 30;
+    msg_range.range           = range / 100;
+
+    ph_rangefinders_[i].publish(msg_range);
+  }
+}
 
 /* timerLidar() //{ */
 
