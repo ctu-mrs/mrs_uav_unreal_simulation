@@ -13,6 +13,26 @@ uav1:
 sensors:
   lidar:
     enabled: true
+    horizontal_rays: 128 # [-]
+    vertical_rays: 64 # [-]
+    lidar_intensity:
+      enabled: true
+      rate: 10.0 # [Hz]
+
+      values:
+        grass: 50
+        road: 7
+        tree: 90
+        building: 70
+        fence: 40
+        dirt_road: 30
+        other: 155
+
+      noise:
+        enabled: true
+        std_at_1m: 0.59 # [-]
+        std_slope: 0.81 # [-] # multiplies std_at_1m for each meter of measured distances
+
   rgb:
     enabled: true
   stereo:

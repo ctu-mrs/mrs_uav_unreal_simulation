@@ -104,7 +104,8 @@ enum MessageType : unsigned short
   get_lidar_seg                   = 19,
   set_location_and_rotation_async = 20,
   get_crash_state                 = 21,
-  get_rangefinder_data            = 22
+  get_lidar_int                   = 22,
+  get_rangefinder_data            = 23,
 };
 
 /* struct LidarConfig //{ */
@@ -561,7 +562,7 @@ namespace GetRangefinderData
       archive(cereal::base_class<Common::NetworkResponse>(this), range);
     }
   };
-}  // namespace GetRangefinderData  
+}  // namespace GetRangefinderData
 
 /* GetLidarData //{ */
 
@@ -654,6 +655,53 @@ struct Response : public Common::NetworkResponse
   }
 };
 }  // namespace GetLidarSegData
+
+//}
+
+/* GetLidarIntData //{ */
+
+namespace GetLidarIntData
+{
+struct LidarIntData
+{
+  LidarIntData() = default;
+
+  double distance;
+  double directionX;
+  double directionY;
+  double directionZ;
+  int    intensity;
+  template <class Archive>
+  void serialize(Archive& archive) {
+    archive(distance, directionX, directionY, directionZ, intensity);
+  }
+};
+
+struct Request : public Common::NetworkRequest
+{
+  Request() : Common::NetworkRequest(static_cast<unsigned short>(MessageType::get_lidar_int)) {
+  }
+};
+
+struct Response : public Common::NetworkResponse
+{
+  Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::get_lidar_int)) {
+  }
+  explicit Response(bool _status) : Common::NetworkResponse(MessageType::get_lidar_int, _status) {
+  }
+
+  double startX;
+  double startY;
+  double startZ;
+
+  std::vector<LidarIntData> lidarIntData;
+
+  template <class Archive>
+  void serialize(Archive& archive) {
+    archive(cereal::base_class<Common::NetworkResponse>(this), startX, startY, startZ, lidarIntData);
+  }
+};
+}  // namespace GetLidarIntData
 
 //}
 
@@ -969,7 +1017,7 @@ struct Response : public Common::NetworkResponse
   Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::set_forest_hilly_level)){};
   explicit Response(bool _status) : Common::NetworkResponse(MessageType::set_forest_hilly_level, _status){};
 };
-};  // namespace SetForestHilly  
+};  // namespace SetForestHilly
 
 
 namespace SpawnDrone
@@ -1010,12 +1058,12 @@ namespace SpawnDroneAtLocation
       archive(cereal::base_class<Common::NetworkRequest>(this), x, y, z);
     }
   };
-  
+
   struct Response : public Common::NetworkResponse
   {
     Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::spawn_drone_at_location)){};
     explicit Response(bool _status) : Common::NetworkResponse(MessageType::spawn_drone, _status){};
-    
+
     int port;
 
     template <class Archive>
@@ -1023,7 +1071,7 @@ namespace SpawnDroneAtLocation
       archive(cereal::base_class<Common::NetworkResponse>(this), port);
     }
   };
-};  // namespace SpawnDrone 
+};  // namespace SpawnDrone
 
 namespace RemoveDrone
 {
@@ -1107,7 +1155,7 @@ enum GraphicsSettingsEnum : unsigned short
   EPIC = 3,
   CINEMATIC = 4
 };
-  
+
 namespace SetGraphicsSettings
 {
   struct Request : public Common::NetworkRequest
@@ -1127,7 +1175,7 @@ namespace SetGraphicsSettings
     Response() : Common::NetworkResponse(static_cast<unsigned short>(MessageType::set_graphics_settings)){};
     explicit Response(bool _status) : Common::NetworkResponse(MessageType::set_graphics_settings, _status){};
   };
-  
+
 }// namespace SetGraphicsSettings
 
 enum WorldLevelEnum : unsigned short
