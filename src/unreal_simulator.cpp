@@ -534,7 +534,12 @@ void UnrealSimulator::onInit() {
 
     ROS_INFO("[UnrealSimulator]: %s spawning at [%.2lf, %.2lf, %.2lf] ...", uav_name.c_str(), uav_state.x.x(), uav_state.x.y(), uav_state.x.z());
 
-    auto [resSpawn, port] = ueds_game_controller_->SpawnDroneAtLocation(pos);
+    std::string uav_type = "x500";
+    // param_loader.loadParam(uav_names[i] + "/type", uav_type);
+
+    // ROS_WARN("type to spawn is %s", uav_type.c_str());
+
+    auto [resSpawn, port] = ueds_game_controller_->SpawnDroneAtLocation(pos, uav_type);
     //auto [resSpawn, port] = ueds_game_controller_->SpawnDrone();
 
     if (!resSpawn) {

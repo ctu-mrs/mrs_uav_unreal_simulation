@@ -14,16 +14,16 @@ inline std::unique_ptr<ueds_connector::Coordinates> ResponseToCoordinates(std::u
 }
 }
 
-namespace Serializable::GameMode::SpawnDroneAtLocation
-{
-inline std::unique_ptr<Request> CoordinateToRequest(const ueds_connector::Coordinates& coordinate) {
-  auto request = std::make_unique<Request>();
-  request->x   = coordinate.x;
-  request->y   = coordinate.y;
-  request->z   = coordinate.z;
-  return request;
-}
-} 
+// namespace Serializable::GameMode::SpawnDroneAtLocation
+// {
+// inline std::unique_ptr<Request> CoordinateToRequest(const ueds_connector::Coordinates& coordinate) {
+//   auto request = std::make_unique<Request>();
+//   request->x   = coordinate.x;
+//   request->y   = coordinate.y;
+//   request->z   = coordinate.z;
+//   return request;
+// }
+// } 
 
 namespace Serializable::Drone::GetLocation
 {

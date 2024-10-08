@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 
+#include <ueds_connector/data_types.h>
 #include <ueds_connector/socket_client.h>
 #include <ueds_connector/serialization/serializable_shared.h>
 
@@ -23,7 +24,7 @@ public:
 
   std::pair<bool, int> SpawnDrone();
 
-  std::pair<bool, int> SpawnDroneAtLocation(ueds_connector::Coordinates &Location);
+  std::pair<bool, int> SpawnDroneAtLocation(ueds_connector::Coordinates &Location, std::string &TypeUav);
 
   bool RemoveDrone(const int port);
 

@@ -1053,9 +1053,10 @@ namespace SpawnDroneAtLocation
     double x;
     double y;
     double z;
+    int idMesh;
     template <class Archive>
     void serialize(Archive& archive) {
-      archive(cereal::base_class<Common::NetworkRequest>(this), x, y, z);
+      archive(cereal::base_class<Common::NetworkRequest>(this), x, y, z, idMesh);
     }
   };
 

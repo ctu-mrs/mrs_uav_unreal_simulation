@@ -37,6 +37,7 @@
     <param name="config_uavs" value="$(find mrs_uav_unreal_simulation)/config/uavs.yaml" />
 
     <rosparam file="$(find mrs_multirotor_simulator)/config/uavs/x500.yaml" />
+    <rosparam file="$(find mrs_multirotor_simulator)/config/uavs/t650.yaml" />
 
     <rosparam file="$(find mrs_multirotor_simulator)/config/controllers/mixer.yaml" />
     <rosparam file="$(find mrs_multirotor_simulator)/config/controllers/rate_controller.yaml" />

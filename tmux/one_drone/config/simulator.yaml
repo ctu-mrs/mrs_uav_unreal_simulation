@@ -2,6 +2,9 @@ uav_names: [
   "uav1",
 ]
 
+ueds_world_level_name_enum: 3
+
+
 uav1:
   type: "x500"
   spawn:
@@ -15,8 +18,11 @@ sensors:
     enabled: true
     horizontal_rays: 128 # [-]
     vertical_rays: 64 # [-]
-    lidar_intensity:
+    lidar_segmented:
       enabled: true
+      rate: 10.0 # [Hz]
+    lidar_intensity:
+      enabled: trues
       rate: 10.0 # [Hz]
 
       values:
@@ -35,5 +41,9 @@ sensors:
 
   rgb:
     enabled: true
+    offset_x: 0.0
   stereo:
-    enabled: true
+    enabled: false
+  rgb_segmented:
+      enabled: false
+      rate: 5.0 # [Hz]

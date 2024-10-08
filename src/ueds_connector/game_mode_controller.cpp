@@ -64,12 +64,13 @@ std::pair<bool, int> GameModeController::SpawnDrone() {
 
 /* spawnDrone() //{ */
 
-std::pair<bool, int> GameModeController::SpawnDroneAtLocation(ueds_connector::Coordinates &Location) {
+std::pair<bool, int> GameModeController::SpawnDroneAtLocation(ueds_connector::Coordinates &Location, std::string &TypeUav) {
 
   Serializable::GameMode::SpawnDroneAtLocation::Request request{};
   request.x = Location.x;
   request.y = Location.y;
   request.z = Location.z;
+  request.idMesh = UavType::Type2IdMesh().at(TypeUav);
 
   Serializable::GameMode::SpawnDroneAtLocation::Response response{};
   const auto                                   status  = Request(request, response);

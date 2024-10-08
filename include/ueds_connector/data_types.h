@@ -4,9 +4,22 @@
 #pragma once
 
 #include <string>
+#include <map>
 
 namespace ueds_connector
 {
+  
+struct UavType
+{
+    static const std::map<std::string, int>& Type2IdMesh() {
+        static const std::map<std::string, int> map = {
+            {"x500", 0},
+            {"t650", 1}
+        };
+        return map;
+    }
+};
+
 struct Coordinates
 {
   Coordinates() = default;
