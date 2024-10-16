@@ -9,12 +9,14 @@
 namespace ueds_connector
 {
   
-struct UavType
+struct UavFrameType
 {
     static const std::map<std::string, int>& Type2IdMesh() {
         static const std::map<std::string, int> map = {
             {"x500", 0},
-            {"t650", 1}
+            {"t650", 1},
+            {"Agile", 2},
+            {"Robofly", 3}
         };
         return map;
     }

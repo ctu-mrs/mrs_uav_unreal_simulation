@@ -22,7 +22,7 @@ uav1:
 
 
 uav2:
-  type: "x500"
+  type: "Robofly"
   spawn:
     x: 6.0
     y: 0.0

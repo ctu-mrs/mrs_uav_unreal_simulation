@@ -70,7 +70,7 @@ std::pair<bool, int> GameModeController::SpawnDroneAtLocation(ueds_connector::Co
   request.x = Location.x;
   request.y = Location.y;
   request.z = Location.z;
-  request.idMesh = UavType::Type2IdMesh().at(TypeUav);
+  request.idMesh = UavFrameType::Type2IdMesh().at(TypeUav);
 
   Serializable::GameMode::SpawnDroneAtLocation::Response response{};
   const auto                                   status  = Request(request, response);
