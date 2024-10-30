@@ -38,8 +38,8 @@
 
     <rosparam file="$(find mrs_multirotor_simulator)/config/uavs/x500.yaml" />
     <rosparam file="$(find mrs_multirotor_simulator)/config/uavs/t650.yaml" />
-    <rosparam file="$(find mrs_multirotor_simulator)/config/uavs/Agile.yaml" />
-    <rosparam file="$(find mrs_multirotor_simulator)/config/uavs/Robofly.yaml" />
+    <rosparam file="$(find mrs_multirotor_simulator)/config/uavs/a300.yaml" />
+    <rosparam file="$(find mrs_multirotor_simulator)/config/uavs/robofly.yaml" />
 
     <rosparam file="$(find mrs_multirotor_simulator)/config/controllers/mixer.yaml" />
     <rosparam file="$(find mrs_multirotor_simulator)/config/controllers/rate_controller.yaml" />

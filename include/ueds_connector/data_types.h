@@ -15,8 +15,8 @@ struct UavFrameType
         static const std::map<std::string, int> map = {
             {"x500", 0},
             {"t650", 1},
-            {"Agile", 2},
-            {"Robofly", 3}
+            {"a300", 2},
+            {"robofly", 3}
         };
         return map;
     }
