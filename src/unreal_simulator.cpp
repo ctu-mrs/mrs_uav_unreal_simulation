@@ -1195,6 +1195,12 @@ void UnrealSimulator::timerSegLidar([[maybe_unused]] const ros::TimerEvent& even
           point.b = 255;
           break;
         }
+        case 8: {
+          point.r = 255;
+          point.g = 255;
+          point.b = 0;
+          break;
+        }
         default: {
           point.r = 0;
           point.g = 0;

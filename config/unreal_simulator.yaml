@@ -24,7 +24,7 @@ ueds_graphics_settings_enum: 0
 # 4 -  CAVE
 # 5 -  ERDING_AIRBASE
 # 6 -  TEMESVAR :D
-ueds_world_level_name_enum: 1
+ueds_world_level_name_enum: 3
 
 
 ############ Only Forest Procedural Generation settings ############
@@ -81,7 +81,7 @@ sensors:
       rate: 10.0 # [Hz]
 
     lidar_intensity:
-      enabled: false
+      enabled: true
       rate: 10.0 # [Hz]
 
       values:
