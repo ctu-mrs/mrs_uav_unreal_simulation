@@ -37,12 +37,12 @@ windows:
   - control:
       layout: tiled
       panes:
-        - export UAV_NAME=uav1; waitForHw; roslaunch mrs_uav_core core.launch
+        - export UAV_NAME=uav1; waitForHw; sleep 3; roslaunch mrs_uav_core core.launch
           platform_config:=`rospack find mrs_multirotor_simulator`/config/mrs_uav_system/$UAV_TYPE.yaml
           custom_config:=./config/custom_config.yaml
           world_config:=./config/world_config.yaml
           network_config:=./config/network_config.yaml
-        - export UAV_NAME=uav2; waitForHw; roslaunch mrs_uav_core core.launch
+        - export UAV_NAME=uav2; waitForHw; sleep 3; roslaunch mrs_uav_core core.launch
           platform_config:=`rospack find mrs_multirotor_simulator`/config/mrs_uav_system/$UAV_TYPE.yaml
           custom_config:=./config/custom_config.yaml
           world_config:=./config/world_config.yaml

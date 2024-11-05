@@ -53,9 +53,9 @@ include_directories(
 ## | --------------------- UEDS connector --------------------- |
 
 add_library(MrsUavUnrealSimulation_UedsConnector
-  src/ueds_connector/socket_client.cpp
-  src/ueds_connector/ueds_connector.cpp
-  src/ueds_connector/game_mode_controller.cpp
+  src/flight_forge_connector/socket_client.cpp
+  src/flight_forge_connector/flight_forge_connector.cpp
+  src/flight_forge_connector/game_mode_controller.cpp
   )
 
 ## | ------------------------ Simulator ----------------------- |

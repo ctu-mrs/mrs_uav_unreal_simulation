@@ -32,8 +32,8 @@
 #include <cv_bridge/cv_bridge.h>
 #include <opencv2/opencv.hpp>
 
-#include <ueds_connector/ueds_connector.h>
-#include <ueds_connector/game_mode_controller.h>
+#include <flight_forge_connector/flight_forge_connector.h>
+#include <flight_forge_connector/game_mode_controller.h>
 
 #include <pcl_ros/transforms.h>
 #include <pcl/point_types.h>
