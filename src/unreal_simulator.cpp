@@ -534,12 +534,14 @@ void UnrealSimulator::onInit() {
 
     ROS_INFO("[UnrealSimulator]: %s spawning at [%.2lf, %.2lf, %.2lf] ...", uav_name.c_str(), uav_state.x.x(), uav_state.x.y(), uav_state.x.z());
 
-    std::string uav_type; // = "x500";
-    param_loader.loadParam(uav_names[i] + "/type", uav_type);
+    std::string uav_frame; // = "x500";
+    param_loader.loadParam(uav_names[i] + "/frame", uav_frame);
 
-    ROS_INFO("[UnrealSimulator]: Frame type to spawn is %s", uav_type.c_str());
+    ROS_INFO("[UnrealSimulator]: Frame type to spawn is %s", uav_frame.c_str());
 
-    auto [resSpawn, port] = ueds_game_controller_->SpawnDroneAtLocation(pos, uav_type);
+    int uav_frame_id = ueds_connector::UavFrameType::Type2IdMesh().at(uav_frame);
+
+    auto [resSpawn, port] = ueds_game_controller_->SpawnDroneAtLocation(pos, uav_frame_id);
 
     if (!resSpawn) {
       ROS_ERROR("[UnrealSimulator]: failed to spawn %s", uav_names[i].c_str());

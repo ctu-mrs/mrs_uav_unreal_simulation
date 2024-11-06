@@ -2,9 +2,11 @@ uav_names: [
   "uav1",
 ]
 
+ueds_graphics_settings_enum: 2
 ueds_world_level_name_enum: 3
 
 uav1:
+  frame: "robofly"
   type: "x500"
   spawn:
     x: 0.0
