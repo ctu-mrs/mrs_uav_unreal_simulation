@@ -4,9 +4,10 @@ uav_names: [
 
 ueds_graphics_settings_enum: 2
 ueds_world_level_name_enum: 3
+ueds_forest_hilly_level: 4
 
 uav1:
-  frame: "robofly"
+  frame: "x500"
   type: "x500"
   spawn:
     x: 0.0

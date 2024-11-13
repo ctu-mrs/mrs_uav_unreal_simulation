@@ -121,6 +121,10 @@ sensors:
     rotation_yaw: 0.0 # [deg]
     rotation_roll: 0.0 # [deg]
 
+    enable_motion_blur: true
+    motion_blur_amount: 0.5 # [0.0 - 1.0]
+    motion_blur_distortion: 50.0 # [0-100]
+
     rgb_segmented:
       enabled: false
       rate: 5.0 # [Hz]

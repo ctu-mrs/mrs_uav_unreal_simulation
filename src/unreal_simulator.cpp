@@ -169,6 +169,9 @@ private:
   bool   rgb_enable_hdr_;
   bool   rgb_enable_temporal_aa_;
   bool   rgb_enable_raytracing_;
+  bool   rgb_enable_motion_blur_;
+  double rgb_motion_blur_amount_;
+  double rgb_motion_blur_distortion_;
 
   double stereo_baseline_;
   int    stereo_width_;
@@ -372,6 +375,9 @@ void UnrealSimulator::onInit() {
   param_loader.loadParam("sensors/rgb/enable_hdr", rgb_enable_hdr_);
   param_loader.loadParam("sensors/rgb/enable_temporal_aa", rgb_enable_temporal_aa_);
   param_loader.loadParam("sensors/rgb/enable_raytracing", rgb_enable_raytracing_);
+  param_loader.loadParam("sensors/rgb/enable_motion_blur", rgb_enable_motion_blur_);
+  param_loader.loadParam("sensors/rgb/motion_blur_amount", rgb_motion_blur_amount_);
+  param_loader.loadParam("sensors/rgb/motion_blur_distortion", rgb_motion_blur_distortion_);
 
   param_loader.loadParam("sensors/stereo/enabled", drs_params_.stereo_enabled);
   param_loader.loadParam("sensors/stereo/rate", drs_params_.stereo_rate);
@@ -611,6 +617,9 @@ void UnrealSimulator::onInit() {
       cameraConfig.enable_raytracing_  = rgb_enable_raytracing_;
       cameraConfig.enable_hdr_         = rgb_enable_hdr_;
       cameraConfig.enable_temporal_aa_ = rgb_enable_temporal_aa_;
+      cameraConfig.enable_motion_blur_ = rgb_enable_motion_blur_;
+      cameraConfig.motion_blur_amount_ = rgb_motion_blur_amount_;
+      cameraConfig.motion_blur_distortion_ = rgb_motion_blur_distortion_;
 
       const auto res = ueds_connectors_[i]->SetRgbCameraConfig(cameraConfig);
 
