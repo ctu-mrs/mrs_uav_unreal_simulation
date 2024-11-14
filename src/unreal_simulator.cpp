@@ -263,16 +263,17 @@ private:
   void publishStaticTfs(void);
 
   // how much to add to unreal time to get to our wall time
-  double        wall_time_offset_             = 0;
-  double        wall_time_offset_drift_slope_ = 0;
-  ros::WallTime last_sync_time_;
-  std::mutex    mutex_wall_time_offset_;
+  double         wall_time_offset_             = 0;
+  double         wall_time_offset_drift_slope_ = 0;
+  ros::WallTime  last_sync_time_;
+  std::mutex     mutex_wall_time_offset_;
 
-  double ueds_fps_                    = 0;
-  int    ueds_world_level_name_enum_  = 2;
-  int    ueds_graphics_settings_enum_ = 0;
-  int    ueds_forest_density_         = 5;
-  int    ueds_forest_hilly_level_     = 3;
+  double         ueds_fps_                    = 0;
+  int            ueds_world_level_name_enum_  = 2;
+  int            ueds_graphics_settings_enum_ = 0;
+  int            ueds_forest_density_         = 5;
+  int            ueds_forest_hilly_level_     = 3;
+  std::string    weather_type_;
 
   std::vector<double> last_rgb_ue_stamp_;
   std::vector<double> last_rgb_seg_ue_stamp_;
@@ -323,6 +324,7 @@ void UnrealSimulator::onInit() {
   param_loader.loadParam("ueds_world_level_name_enum", ueds_world_level_name_enum_);
   param_loader.loadParam("ueds_forest_density", ueds_forest_density_);
   param_loader.loadParam("ueds_forest_hilly_level", ueds_forest_hilly_level_);
+  param_loader.loadParam("weather_type", weather_type_);
 
   param_loader.loadParam("simulation_rate", _simulation_rate_);
   param_loader.loadParam("realtime_factor", drs_params_.realtime_factor);
@@ -501,6 +503,7 @@ void UnrealSimulator::onInit() {
     ROS_ERROR("[UnrealSimulator]: Graphical Settings was not set succesfully to '%d'", graphicsSettings);
   }
 
+
   // | --------------------- These graphical settings influence only Forest Game World --------------------- |
 
   res = ueds_game_controller_->SetForestDensity(ueds_forest_density_);
@@ -516,6 +519,13 @@ void UnrealSimulator::onInit() {
   } else {
     ROS_ERROR("[UnrealSimulator]: Forest Hilly Level wasn't set succesfully to '%d'", ueds_forest_hilly_level_);
   }
+
+  res = ueds_game_controller_->SetWeather(ueds_connector::WeatherType::Type2Id().at(weather_type_));
+  if (res) {
+     ROS_INFO("[UnrealSimulator]: SetWeather successful.");
+  } else {
+     ROS_INFO("[UnrealSimulator]: SetWeather error !!!");
+  }  
 
   std::this_thread::sleep_for(std::chrono::seconds(1));
 

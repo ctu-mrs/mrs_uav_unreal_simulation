@@ -26,6 +26,17 @@ ueds_graphics_settings_enum: 0
 # 6 -  TEMESVAR :D
 ueds_world_level_name_enum: 3
 
+#  {"sunny", 0},
+#  {"cloudy", 1},
+#  {"foggy", 2},
+#  {"rain", 3},
+#  {"rain_light", 4},
+#  {"rain_thunderstorm", 5},
+#  {"sand_dust_calm", 6},
+#  {"sand_dust_storm", 7},
+#  {"snow", 8},
+#  {"snow_blizzards", 9}
+weather_type: "snow_blizzards"
 
 ############ Only Forest Procedural Generation settings ############
 
