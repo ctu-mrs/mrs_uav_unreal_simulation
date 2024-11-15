@@ -15,7 +15,7 @@ collisions: true
 #  2 - HIGH
 #  4 - EPIC
 #  5 - CINEMATIC
-ueds_graphics_settings_enum: 0
+graphics_settings: "medium"
 
 # 0 -  VALLEY
 # 1 -  FOREST
@@ -24,7 +24,7 @@ ueds_graphics_settings_enum: 0
 # 4 -  CAVE
 # 5 -  ERDING_AIRBASE
 # 6 -  TEMESVAR :D
-ueds_world_level_name_enum: 3
+world_name: "infinite_forest"
 
 #  {"sunny", 0},
 #  {"cloudy", 1},
@@ -36,7 +36,7 @@ ueds_world_level_name_enum: 3
 #  {"sand_dust_storm", 7},
 #  {"snow", 8},
 #  {"snow_blizzards", 9}
-weather_type: "rain"
+weather_type: "foggy"
 
 daytime:
   hour: 7

@@ -2,9 +2,16 @@ uav_names: [
   "uav1",
 ]
 
-ueds_graphics_settings_enum: 2
-ueds_world_level_name_enum: 2
-ueds_forest_hilly_level: 2
+
+graphics_settings: "low"
+
+world_name: "infinite_forest"
+
+weather_type: "rain"
+
+daytime:
+  hour: 7
+  minute: 30
 
 uav1:
   frame: "x500"

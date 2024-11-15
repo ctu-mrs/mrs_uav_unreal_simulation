@@ -269,8 +269,8 @@ private:
   std::mutex     mutex_wall_time_offset_;
 
   double         ueds_fps_                    = 0;
-  int            ueds_world_level_name_enum_  = 2;
-  int            ueds_graphics_settings_enum_ = 0;
+  std::string    ueds_world_level_name_enum_;
+  std::string    ueds_graphics_settings_enum_;
   int            ueds_forest_density_         = 5;
   int            ueds_forest_hilly_level_     = 3;
   std::string    weather_type_;
@@ -321,8 +321,8 @@ void UnrealSimulator::onInit() {
   param_loader.addYamlFileFromParam("config");
   param_loader.addYamlFileFromParam("config_uavs");
 
-  param_loader.loadParam("ueds_graphics_settings_enum", ueds_graphics_settings_enum_);
-  param_loader.loadParam("ueds_world_level_name_enum", ueds_world_level_name_enum_);
+  param_loader.loadParam("graphics_settings", ueds_graphics_settings_enum_);
+  param_loader.loadParam("world_name", ueds_world_level_name_enum_);
   param_loader.loadParam("ueds_forest_density", ueds_forest_density_);
   param_loader.loadParam("ueds_forest_hilly_level", ueds_forest_hilly_level_);
   param_loader.loadParam("weather_type", weather_type_);
@@ -469,8 +469,7 @@ void UnrealSimulator::onInit() {
 
   // | --------------------- Set graphical settings and choose World Level --------------------- |
 
-  Serializable::GameMode::WorldLevelEnum worldLevelEnum = Serializable::GameMode::WorldLevelEnum(ueds_world_level_name_enum_);
-  res                                                   = ueds_game_controller_->SwitchWorldLevel(worldLevelEnum);
+  res = ueds_game_controller_->SwitchWorldLevel(ueds_connector::WorldName::Name2Id().at(ueds_world_level_name_enum_));
   if (res) {
     ROS_INFO("[UnrealSimulator] World was switched succesfully.");
   } else {
@@ -497,13 +496,12 @@ void UnrealSimulator::onInit() {
     std::this_thread::sleep_for(std::chrono::seconds(1));
   }
 
-  Serializable::GameMode::GraphicsSettingsEnum graphicsSettings = Serializable::GameMode::GraphicsSettingsEnum(ueds_graphics_settings_enum_);
-  res                                                           = ueds_game_controller_->SetGraphicsSettings(graphicsSettings);
+  res = ueds_game_controller_->SetGraphicsSettings(ueds_connector::GraphicsSettings::Name2Id().at(ueds_graphics_settings_enum_));
 
   if (res) {
-    ROS_INFO("[UnrealSimulator]: Graphical Settings was set succesfully to '%d'", graphicsSettings);
+    ROS_INFO("[UnrealSimulator]: Graphical Settings was set succesfully to '%s'", ueds_graphics_settings_enum_.c_str());
   } else {
-    ROS_ERROR("[UnrealSimulator]: Graphical Settings was not set succesfully to '%d'", graphicsSettings);
+    ROS_ERROR("[UnrealSimulator]: Graphical Settings was not set succesfully to '%s'", ueds_graphics_settings_enum_.c_str());
   }
 
   res = ueds_game_controller_->SetWeather(ueds_connector::WeatherType::Type2Id().at(weather_type_));
