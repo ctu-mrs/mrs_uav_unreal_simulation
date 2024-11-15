@@ -274,6 +274,7 @@ private:
   int            ueds_forest_density_         = 5;
   int            ueds_forest_hilly_level_     = 3;
   std::string    weather_type_;
+  ueds_connector::Daytime daytime_;
 
   std::vector<double> last_rgb_ue_stamp_;
   std::vector<double> last_rgb_seg_ue_stamp_;
@@ -325,6 +326,8 @@ void UnrealSimulator::onInit() {
   param_loader.loadParam("ueds_forest_density", ueds_forest_density_);
   param_loader.loadParam("ueds_forest_hilly_level", ueds_forest_hilly_level_);
   param_loader.loadParam("weather_type", weather_type_);
+  param_loader.loadParam("daytime/hour", daytime_.hour);
+  param_loader.loadParam("daytime/minute", daytime_.minute);
 
   param_loader.loadParam("simulation_rate", _simulation_rate_);
   param_loader.loadParam("realtime_factor", drs_params_.realtime_factor);
@@ -503,6 +506,20 @@ void UnrealSimulator::onInit() {
     ROS_ERROR("[UnrealSimulator]: Graphical Settings was not set succesfully to '%d'", graphicsSettings);
   }
 
+  res = ueds_game_controller_->SetWeather(ueds_connector::WeatherType::Type2Id().at(weather_type_));
+  if (res) {
+     ROS_INFO("[UnrealSimulator]: SetWeather successful.");
+  } else {
+     ROS_ERROR("[UnrealSimulator]: SetWeather error");
+  }  
+
+  res = ueds_game_controller_->SetDatetime(daytime_.hour, daytime_.minute);
+  if (res) {
+     ROS_INFO("[UnrealSimulator]: SetDatetime successful.");
+  } else {
+     ROS_ERROR("[UnrealSimulator]: SetDatetime error");
+  }  
+
 
   // | --------------------- These graphical settings influence only Forest Game World --------------------- |
 
@@ -519,13 +536,6 @@ void UnrealSimulator::onInit() {
   } else {
     ROS_ERROR("[UnrealSimulator]: Forest Hilly Level wasn't set succesfully to '%d'", ueds_forest_hilly_level_);
   }
-
-  res = ueds_game_controller_->SetWeather(ueds_connector::WeatherType::Type2Id().at(weather_type_));
-  if (res) {
-     ROS_INFO("[UnrealSimulator]: SetWeather successful.");
-  } else {
-     ROS_INFO("[UnrealSimulator]: SetWeather error !!!");
-  }  
 
   std::this_thread::sleep_for(std::chrono::seconds(1));
 

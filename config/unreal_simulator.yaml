@@ -36,7 +36,11 @@ ueds_world_level_name_enum: 3
 #  {"sand_dust_storm", 7},
 #  {"snow", 8},
 #  {"snow_blizzards", 9}
-weather_type: "snow_blizzards"
+weather_type: "rain"
+
+daytime:
+  hour: 7
+  minute: 30
 
 ############ Only Forest Procedural Generation settings ############
 
