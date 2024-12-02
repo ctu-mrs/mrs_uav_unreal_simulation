@@ -1,9 +1,10 @@
 location: .gitman
 sources:
-  - repo: git@mrs.fel.cvut.cz:uav/mrs_flight_forge_connector.git
+  - repo: git@github.com:ctu-mrs/mrs_flight_forge_connector.git
     name: mrs_flight_forge_connertor
     rev: master
     type: git
+    params:
     sparse_paths:
       - src/
       - include/
@@ -12,10 +13,11 @@ sources:
     scripts:
       -
 sources_locked:
-  - repo: git@mrs.fel.cvut.cz:uav/mrs_flight_forge_connector.git
+  - repo: git@github.com:ctu-mrs/mrs_flight_forge_connector.git
     name: mrs_flight_forge_connertor
-    rev: 7d3d3e1cf4100fbc2b2c7601b0123171fc4869e7
+    rev: 42a09e94130e67976656dde5312e695571b92ca4
     type: git
+    params:
     sparse_paths:
       - src/
       - include/
