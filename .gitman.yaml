@@ -1,8 +1,28 @@
-
-location: .gitman 
+location: .gitman
 sources:
   - repo: git@mrs.fel.cvut.cz:uav/mrs_flight_forge_connector.git
-    name: mrs_flight_forge_connertor 
+    name: mrs_flight_forge_connertor
     rev: master
     type: git
-    sparse_paths:  ["src/", "include/"]
+    sparse_paths:
+      - src/
+      - include/
+    links:
+      -
+    scripts:
+      -
+sources_locked:
+  - repo: git@mrs.fel.cvut.cz:uav/mrs_flight_forge_connector.git
+    name: mrs_flight_forge_connertor
+    rev: 7d3d3e1cf4100fbc2b2c7601b0123171fc4869e7
+    type: git
+    sparse_paths:
+      - src/
+      - include/
+    links:
+      -
+    scripts:
+      -
+default_group: ''
+groups:
+  -
