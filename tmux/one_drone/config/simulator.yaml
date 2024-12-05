@@ -3,11 +3,11 @@ uav_names: [
 ]
 
 
-graphics_settings: "low"
+graphics_settings: "high"
 
-world_name: "infinite_forest"
+world_name: "eletric_towers"
 
-weather_type: "rain"
+weather_type: "sunny"
 
 daytime:
   hour: 7
