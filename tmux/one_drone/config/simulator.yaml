@@ -3,9 +3,9 @@ uav_names: [
 ]
 
 
-graphics_settings: "high"
+graphics_settings: "low"
 
-world_name: "eletric_towers"
+world_name: "VALLEY"
 
 weather_type: "sunny"
 
