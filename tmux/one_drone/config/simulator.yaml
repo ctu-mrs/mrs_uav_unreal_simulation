@@ -5,7 +5,7 @@ uav_names: [
 
 graphics_settings: "low"
 
-world_name: "VALLEY"
+world_name: "valley"
 
 weather_type: "sunny"
 
