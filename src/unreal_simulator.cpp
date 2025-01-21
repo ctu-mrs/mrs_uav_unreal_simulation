@@ -48,7 +48,7 @@
 
 /* defines //{ */
 
-#define API_VERSION 8
+#define API_VERSION 9
 
 //}
 
@@ -692,7 +692,7 @@ void UnrealSimulator::onInit() {
 
   // | ----------- initialize the Unreal Sim connector ---------- |
 
-  ueds_game_controller_ = std::make_unique<ueds_connector::GameModeController>(LOCALHOST, 8000);
+  ueds_game_controller_ = std::make_unique<ueds_connector::GameModeController>(LOCALHOST, 8551);
 
   while (true) {
 
@@ -743,7 +743,7 @@ void UnrealSimulator::onInit() {
     ROS_ERROR("[UnrealSimulator] ueds_game_controller_ was not Disconnected succesfully.");
   }
 
-  std::this_thread::sleep_for(std::chrono::seconds(1));
+  std::this_thread::sleep_for(std::chrono::seconds(5));
 
   while (true) {
     bool connect_result = ueds_game_controller_->Connect();
