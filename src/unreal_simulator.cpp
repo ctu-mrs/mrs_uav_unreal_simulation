@@ -144,8 +144,10 @@ private:
 
   // | ------------------------- sensors ------------------------ |
 
-  double lidar_horizontal_fov_;
-  double lidar_vertical_fov_;
+  double lidar_horizontal_fov_left_;
+  double lidar_horizontal_fov_right_;
+  double lidar_vertical_fov_up_;
+  double lidar_vertical_fov_down_;
   int    lidar_horizontal_rays_;
   int    lidar_vertical_rays_;
   double lidar_offset_x_;
@@ -608,9 +610,10 @@ void UnrealSimulator::onInit() {
   param_loader.loadParam("sensors/lidar/noise/enabled", drs_params_.lidar_noise_enabled);
   param_loader.loadParam("sensors/lidar/noise/std_at_1m", drs_params_.lidar_std_at_1m);
   param_loader.loadParam("sensors/lidar/noise/std_slope", drs_params_.lidar_std_slope);
-
-  param_loader.loadParam("sensors/lidar/horizontal_fov", lidar_horizontal_fov_);
-  param_loader.loadParam("sensors/lidar/vertical_fov", lidar_vertical_fov_);
+  param_loader.loadParam("sensors/lidar/horizontal_fov_left", lidar_horizontal_fov_left_);
+  param_loader.loadParam("sensors/lidar/horizontal_fov_right", lidar_horizontal_fov_right_);
+  param_loader.loadParam("sensors/lidar/vertical_fov_up", lidar_vertical_fov_up_);
+  param_loader.loadParam("sensors/lidar/vertical_fov_down", lidar_vertical_fov_down_);
   param_loader.loadParam("sensors/lidar/horizontal_rays", lidar_horizontal_rays_);
   param_loader.loadParam("sensors/lidar/vertical_rays", lidar_vertical_rays_);
   param_loader.loadParam("sensors/lidar/offset_x", lidar_offset_x_);
@@ -944,8 +947,10 @@ void UnrealSimulator::onInit() {
 
       lidarConfig.BeamHorRays  = lidar_horizontal_rays_;
       lidarConfig.BeamVertRays = lidar_vertical_rays_;
-      lidarConfig.FOVVert      = lidar_vertical_fov_;
-      lidarConfig.FOVHor       = lidar_horizontal_fov_;
+      lidarConfig.FOVHorLeft = lidar_horizontal_fov_left_;
+      lidarConfig.FOVHorRight = lidar_horizontal_fov_right_;
+      lidarConfig.FOVVertUp = lidar_vertical_fov_up_;
+      lidarConfig.FOVVertDown = lidar_vertical_fov_down_;
       lidarConfig.beamLength   = lidar_beam_length_ * 100.0;
       lidarConfig.offset       = ueds_connector::Coordinates(lidar_offset_x_ * 100.0, lidar_offset_y_ * 100.0, lidar_offset_z_ * 100.0);
       lidarConfig.orientation  = ueds_connector::Rotation(-lidar_rotation_pitch_, lidar_rotation_yaw_, lidar_rotation_roll_);
@@ -1245,6 +1250,7 @@ void UnrealSimulator::timerTimeSync([[maybe_unused]] const ros::WallTimerEvent& 
 
 //}
 
+/*timerRangefinder()//{*/
 void UnrealSimulator::timerRangefinder([[maybe_unused]] const ros::TimerEvent& event){
   if(!is_initialized_){
     return;
@@ -1281,6 +1287,7 @@ void UnrealSimulator::timerRangefinder([[maybe_unused]] const ros::TimerEvent& e
     ph_rangefinders_[i].publish(msg_range);
   }
 }
+/*//}*/
 
 /* timerLidar() //{ */
 
