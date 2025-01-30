@@ -5,7 +5,9 @@ uav_names: [
 
 graphics_settings: "low"
 
-world_name: "valley"
+# world_name: "dead_spruce_forest"
+world_name: "forest"
+# world_name: "cave"
 
 weather_type: "sunny"
 
@@ -24,28 +26,24 @@ uav1:
 
 sensors:
   lidar:
-    enabled: true
+    enabled: false 
+    # horizontal_rays: 256 # [-]
+    # vertical_rays: 128 # [-]
     horizontal_rays: 128 # [-]
-    vertical_rays: 64 # [-]
-    lidar_intensity:
-      enabled: true
+    vertical_rays: 32 # [-]
+    offset_x: 0.2 # [m]
+    offset_y: 0.0 # [m]
+    offset_z: -0.1 # [m]
+    rotation_pitch: -30.0 # [deg]
+    rotation_roll: 0.0 # [deg]
+    rotation_yaw: 0.0 # [deg]
+    lidar_segmented:
+      enabled: false 
       rate: 10.0 # [Hz]
-
-      values:
-        grass: 50
-        road: 7
-        tree: 90
-        building: 70
-        fence: 40
-        dirt_road: 30
-        other: 155
-
-      noise:
-        enabled: true
-        std_at_1m: 0.59 # [-]
-        std_slope: 0.81 # [-] # multiplies std_at_1m for each meter of measured distances
-
   rgb:
-    enabled: true
+    enabled: false 
+    rgb_segmented:
+      enabled: false 
+      rate: 10.0 # [Hz]
   stereo:
     enabled: false
