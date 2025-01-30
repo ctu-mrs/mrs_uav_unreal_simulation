@@ -1245,6 +1245,7 @@ void UnrealSimulator::timerTimeSync([[maybe_unused]] const ros::WallTimerEvent& 
 
 //}
 
+/*timerRangefinder()//{*/
 void UnrealSimulator::timerRangefinder([[maybe_unused]] const ros::TimerEvent& event){
   if(!is_initialized_){
     return;
@@ -1281,6 +1282,7 @@ void UnrealSimulator::timerRangefinder([[maybe_unused]] const ros::TimerEvent& e
     ph_rangefinders_[i].publish(msg_range);
   }
 }
+/*//}*/
 
 /* timerLidar() //{ */
 
@@ -1925,6 +1927,21 @@ void UnrealSimulator::checkForCrash(void) {
     for (size_t i = 0; i < uavs_.size(); i++) {
 
       auto [res, crashed] = ueds_connectors_[i]->GetCrashState();
+
+      /* if the uav has crashed check the rangefinder data to determine if its not just a landing */
+      if (crashed) {
+        bool res_range;
+        double range;
+        {
+          std::scoped_lock lock(mutex_ueds_);
+
+          std::tie(res_range, range) = ueds_connectors_[i]->GetRangefinderData();
+        }
+
+        if (res_range && range < 0.2) {
+          crashed = false;
+        }
+      }
 
       if (!res) {
         ROS_ERROR_THROTTLE(1.0, "[UnrealSimulator]: failed to obtain crash state for uav%lu", i + 1);
