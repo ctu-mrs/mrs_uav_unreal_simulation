@@ -8,12 +8,14 @@
 #include <rosgraph_msgs/Clock.h>
 
 #include <geometry_msgs/PoseArray.h>
+#include <geometry_msgs/QuaternionStamped.h>
 
 #include <mrs_lib/param_loader.h>
 #include <mrs_lib/publisher_handler.h>
 #include <mrs_lib/scope_timer.h>
 #include <mrs_lib/transform_broadcaster.h>
 #include <tf2_ros/static_transform_broadcaster.h>
+#include <tf2_ros/transform_broadcaster.h>
 
 #include <dynamic_reconfigure/server.h>
 #include <mrs_uav_unreal_simulation/unreal_simulatorConfig.h>
@@ -43,7 +45,7 @@
 #include <pcl/common/transforms.h>
 
 #include <random>
-
+#include <mrs_uav_unreal_simulation/SetOrientation.h>
 //}
 
 /* defines //{ */
@@ -126,10 +128,14 @@ private:
   bool callbackSetRealtimeFactor(mrs_msgs::Float64Srv::Request& req, mrs_msgs::Float64Srv::Response& res);
 
   std::vector<ros::ServiceClient> set_ground_z_clients_;
+  
+  std::vector<ros::ServiceServer> service_gimbal_control_servers_;
+  bool                            callbackSetGimbalOrientation(mrs_uav_unreal_simulation::SetOrientation::Request& req, mrs_uav_unreal_simulation::SetOrientation::Response& res, int uav_index);
 
   // | --------------------------- tfs -------------------------- |
 
   tf2_ros::StaticTransformBroadcaster static_broadcaster_;
+  tf2_ros::TransformBroadcaster        dynamic_broadcaster_;
 
   // | ----------------------- camera info ---------------------- |
 
@@ -138,6 +144,9 @@ private:
 
   geometry_msgs::TransformStamped rgb_camera_tf_;
   geometry_msgs::TransformStamped stereo_camera_tf_;
+  
+  // | --------- store current camera orientation -------- |
+  std::vector<Eigen::Quaterniond> rgb_camera_orientations_;
 
   // | --------------------------- rtf -------------------------- |
 
@@ -202,7 +211,7 @@ private:
 
   // segmentation decode array
   // clang-format off
-  
+  /*seg_rgb//{*/
   uint8_t seg_rgb_[256][3] = {
       255, 255, 255,
       153, 108, 6 ,
@@ -461,7 +470,7 @@ private:
       162, 203, 118 ,
       0, 0, 0 
   };
-
+/*//}*/
   // clang-format on
 
   // | ----------------------- publishers ----------------------- |
@@ -529,6 +538,7 @@ private:
 
   void publishStaticTfs(void);
 
+  void publishCameraTf(const int& uav_index);
   // how much to add to unreal time to get to our wall time
   double        wall_time_offset_             = 0;
   double        wall_time_offset_drift_slope_ = 0;
@@ -1027,10 +1037,20 @@ void UnrealSimulator::onInit() {
   timer_rgb_segmented_ = nh_.createTimer(ros::Duration(1.0 / drs_params_.rgb_segmented_rate), &UnrealSimulator::timerRgbSegmented, this);
 
 
+  rgb_camera_orientations_.resize(uavs_.size());
   set_ground_z_clients_.resize(uav_names.size());
   for (size_t i = 0; i < uav_names.size(); i++) {
     std::string service_name = "/" + uav_names[i] + "/set_ground_z";
     set_ground_z_clients_[i] = nh_.serviceClient<mrs_msgs::Float64Srv>(service_name);
+    
+
+    std::string gimbal_service_name = "/" + uav_names[i] + "/set_gimbal_orientation";  // Example service name
+        // Use a lambda instead of boost::bind
+    service_gimbal_control_servers_.push_back(
+        nh_.advertiseService<mrs_uav_unreal_simulation::SetOrientation::Request, mrs_uav_unreal_simulation::SetOrientation::Response>(
+            gimbal_service_name, [this, i](mrs_uav_unreal_simulation::SetOrientation::Request& req, mrs_uav_unreal_simulation::SetOrientation::Response& res) {
+              return callbackSetGimbalOrientation(req, res, i);
+            }));
   }
 
 
@@ -2280,6 +2300,114 @@ bool UnrealSimulator::callbackSetRealtimeFactor(mrs_msgs::Float64Srv::Request& r
   res.success = true;
 
   return true;
+}
+
+//}
+
+/* callbackSetGimbalOrientation() //{ */
+
+bool UnrealSimulator::callbackSetGimbalOrientation(mrs_uav_unreal_simulation::SetOrientation::Request& req, mrs_uav_unreal_simulation::SetOrientation::Response& res, int uav_index) {
+
+    if (!is_initialized_) {
+        res.success = false;
+        res.message = "UnrealSimulator not initialized.";
+        return false;
+    }
+
+    if (uav_index < 0 || uav_index >= uavs_.size()) {
+        res.success = false;
+        res.message = "Invalid UAV index.";
+        return false;
+    }
+
+    // 1. Get quaternion and validate.
+    geometry_msgs::Quaternion q_msg = req.quaternion.quaternion; // Access the quaternion within the stamped message
+    Eigen::Quaterniond        q(q_msg.w, q_msg.x, q_msg.y, q_msg.z);
+
+    if (std::abs(q.norm() - 1.0) > 1e-6) {
+        res.success = false;
+        res.message = "Invalid quaternion (not normalized).";
+        ROS_WARN("[UnrealSimulator]: Invalid quaternion received for uav%d gimbal control.", uav_index + 1);
+        return false;
+    }
+
+    // 2. Convert quaternion to Euler angles (degrees).
+    auto [roll, pitch, yaw] = mrs_lib::AttitudeConverter(q).getExtrinsicRPY();
+    ueds_connector::Rotation unreal_rotation;
+    unreal_rotation.pitch = -pitch * 180.0 / M_PI;
+    unreal_rotation.roll  = roll * 180.0 / M_PI;
+    unreal_rotation.yaw   = -yaw * 180.0 / M_PI;
+
+    // 3. Modify and update the camera config.
+    bool result;
+    {
+        std::scoped_lock lock(mutex_ueds_);
+
+        // Get the *current* config.
+        auto [current_config_result, current_config] = ueds_connectors_[uav_index]->GetRgbCameraConfig();
+        if (!current_config_result) {
+            res.success = false;
+            res.message = "Failed to get current RGB camera config for UAV " + std::to_string(uav_index + 1);
+            ROS_WARN("[UnrealSimulator]: %s", res.message.c_str());
+            return false;
+        }
+
+        // Modify the orientation.
+        current_config.orientation_ = unreal_rotation;
+
+        // Set the *modified* config.
+        result = ueds_connectors_[uav_index]->SetRgbCameraConfig(current_config);
+    }
+
+    // 4. Set response.
+    if (result) {
+        res.success = true;
+        res.message = "Gimbal orientation set successfully for UAV " + std::to_string(uav_index + 1);
+        ROS_INFO_THROTTLE(1.0, "[UnrealSimulator]: Gimbal orientation set for UAV %d", uav_index + 1);
+        // 5. Update TF
+        {
+            std::scoped_lock lock(mutex_ueds_);
+            rgb_camera_orientations_[uav_index] = q;
+        }
+        publishCameraTf(uav_index);
+    } else {
+        res.success = false;
+        res.message = "Failed to set gimbal orientation for UAV " + std::to_string(uav_index + 1);
+        ROS_WARN("[UnrealSimulator]: Failed to set gimbal orientation for UAV %d", uav_index + 1);
+    }
+
+    return res.success;
+}
+//}
+
+/* publishCameraTf() //{ */
+
+void UnrealSimulator::publishCameraTf(const int& uav_index) {
+  geometry_msgs::TransformStamped tf;
+  // | ------------------------- rgb tf ------------------------- |
+
+  {
+    tf.header.stamp = ros::Time::now();
+
+    tf.header.frame_id = "uav" + std::to_string(uav_index + 1) + "/fcu";
+    tf.child_frame_id  = "uav" + std::to_string(uav_index + 1) + "/rgb";
+
+    tf.transform.translation.x = rgb_offset_x_;
+    tf.transform.translation.y = rgb_offset_y_;
+    tf.transform.translation.z = rgb_offset_z_;
+
+    Eigen::Matrix3d initial_tf   = mrs_lib::AttitudeConverter(Eigen::Quaterniond(-0.5, 0.5, -0.5, 0.5));
+    Eigen::Matrix3d dynamic_tf   = mrs_lib::AttitudeConverter(rgb_camera_orientations_[uav_index]);
+    Eigen::Matrix3d final_tf     = dynamic_tf * initial_tf;
+    tf.transform.rotation = mrs_lib::AttitudeConverter(final_tf);
+
+    try {
+      dynamic_broadcaster_.sendTransform(tf);
+    }
+    catch (...) {
+      ROS_ERROR("[UnrealSimulator]: could not publish rgb tf");
+    }
+  }
 }
 
 //}
