@@ -27,8 +27,6 @@
   <depend>std_srvs</depend>
   <depend>mrs_multirotor_simulator</depend>
   <depend>stereo_image_proc</depend>
-  <depend>message_generation</depend>
-  <depend>message_runtime</depend>
 
   <export>
     <nodelet plugin="${prefix}/nodelets.xml" />

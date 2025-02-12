@@ -22,25 +22,11 @@ set(CATKIN_DEPENDENCIES
   std_msgs
   std_srvs
   mrs_multirotor_simulator
-  message_generation
-  message_runtime
   )
-
 
 find_package(catkin REQUIRED COMPONENTS
   ${CATKIN_DEPENDENCIES}
   )
-
-add_service_files(DIRECTORY srv/ FILES
-  FILES
-  SetOrientation.srv
-)
-
-generate_messages(
-  DEPENDENCIES
-  geometry_msgs
-  std_msgs
-)
 
 generate_dynamic_reconfigure_options(
   cfg/unreal_simulator.cfg
@@ -63,7 +49,6 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
   ${dynamic_reconfigure_PACKAGE_PATH}/cmake/cfgbuild.cmake
   )
-
 
 ## | --------------------- UEDS connector --------------------- |
 

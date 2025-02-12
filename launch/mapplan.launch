@@ -28,22 +28,6 @@
 
   <!-- //} -->
 
-  <!-- LidarFilter //{ -->
-
-  <include file="$(find mrs_pcl_tools)/launch/pcl_filter.launch">
-
-    <!-- <arg name="standalone" value="true" /> -->
-    <arg name="standalone" value="$(arg standalone)" />
-    <arg name="nodelet_manager_name" value="$(arg nodelet_manager_name)" />
-    <arg name="custom_config" value="$(arg config_pcl_filter_ouster)" />
-    <arg name="debug" value="false" />
-    <arg name="name_suffix" value="ouster" />
-    <arg name="topic_3d_lidar_in" value="lidar/points" />
-
-  </include>
-
-  <!-- //} -->
-
   <!-- OctomapServer //{ -->
 
   <include file="$(find mrs_octomap_server)/launch/octomap.launch">
@@ -52,7 +36,7 @@
     <arg name="nodelet_manager_name" value="$(arg nodelet_manager_name)" />
     <arg name="custom_config" value="$(arg config_octomap_server)" />
     <arg name="debug" value="false" />
-    <arg name="lidar_3d_topic_0_in" value="pcl_filter_ouster/points_processed" />
+    <arg name="lidar_3d_topic_0_in" value="lidar/points" />
     <arg name="lidar_3d_topic_0_over_max_range_in" value="pcl_filter_ouster/points_over_max_range" />
     <arg name="depth_camera_topic_0_in" value="pcl_filter_rs_front/points_processed" />
     <arg name="depth_camera_topic_0_over_max_range_in" default="pcl_filter_rs_front/points_over_max_range" />
