@@ -26,7 +26,7 @@ uav1:
 
 sensors:
   lidar:
-    enabled: false 
+    enabled: true 
     # horizontal_rays: 256 # [-]
     # vertical_rays: 128 # [-]
     horizontal_rays: 128 # [-]
@@ -41,7 +41,7 @@ sensors:
       enabled: false 
       rate: 10.0 # [Hz]
   rgb:
-    enabled: false 
+    enabled: true 
     rgb_segmented:
       enabled: false 
       rate: 10.0 # [Hz]
