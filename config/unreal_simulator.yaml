@@ -64,21 +64,9 @@ sensors:
     enabled: false
 
     rate: 10.0 # [Hz]
-  # param_loader.loadParam("sensors/lidar/horizontal_fov_left", lidar_horizontal_fov_left_);
-  # param_loader.loadParam("sensors/lidar/horizontal_fov_right", lidar_horizontal_fov_right_);
-  # param_loader.loadParam("sensors/lidar/vertical_fov_up", lidar_vertical_fov_up_);
-  # param_loader.loadParam("sensors/lidar/vertical_fov_down", lidar_vertical_fov_down_);
 
-    # horizontal_fov: 360.0 # [deg]
-    # TODO WIP to asymmetric FOV lidar
-    horizontal_fov_left: 180.0 # [deg]
-    horizontal_fov_right: 180.0 # [deg]
-    
-    # vertical_fov: 90.0 # [deg]
-    # TODO WIP to asymmetric FOV lidar
-    vertical_fov_up: 52.0 # [deg]
-    vertical_fov_down: 7.0 # [deg]
-
+    horizontal_fov: 360.0 # [deg]
+    vertical_fov: 90.0 # [deg]
 
     horizontal_rays: 128 # [-]
     vertical_rays: 64 # [-]
