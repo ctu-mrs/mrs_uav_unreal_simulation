@@ -1,0 +1,4 @@
+geometry_msgs/QuaternionStamped quaternion
+---
+bool success
+string message
