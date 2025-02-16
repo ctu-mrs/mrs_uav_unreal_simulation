@@ -25,7 +25,6 @@ uav1:
 sensors:
   lidar:
     enabled: true
-
     horizontal_rays: 128 # [-]
     vertical_rays: 64 # [-]
     lidar_intensity:
@@ -47,9 +46,6 @@ sensors:
         std_slope: 0.81 # [-] # multiplies std_at_1m for each meter of measured distances
 
   rgb:
-    rgb_segmented:
-      enabled: false 
-      rate: 10.0 # [Hz]
     enabled: true
   stereo:
     enabled: false

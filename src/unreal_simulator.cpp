@@ -1904,11 +1904,9 @@ void UnrealSimulator::updateUnrealPoses(const bool teleport_without_collision) {
 ueds_connector::Coordinates UnrealSimulator::position2ue(const Eigen::Vector3d &pos, const ueds_connector::Coordinates &ueds_world_origin){
   ueds_connector::Coordinates pos_ue;
 
-  float PlayerStartOffset = 92.12;
-
   pos_ue.x = ueds_world_origin.x + pos.x() * 100.0;
   pos_ue.y = ueds_world_origin.y - pos.y() * 100.0;
-  pos_ue.z = ueds_world_origin.z + pos.z() * 100.0 - PlayerStartOffset;
+  pos_ue.z = ueds_world_origin.z + pos.z() * 100.0;
 
   return pos_ue;
 }
