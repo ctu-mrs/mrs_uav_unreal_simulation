@@ -50,7 +50,7 @@
 
 /* defines //{ */
 
-#define API_VERSION 9
+#define API_VERSION 10
 
 //}
 
