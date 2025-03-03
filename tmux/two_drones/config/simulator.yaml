@@ -1,4 +1,7 @@
-ueds_world_level_name_enum: 0
+world_name: "valley"
+
+weather_type: "sunny"
+
 frames:
   world:
     name: "simulator_origin"
@@ -13,6 +16,7 @@ uav_names: [
 ]
 
 uav1:
+  frame: "x500"
   type: "x500"
   spawn:
     x: 0.0
@@ -22,7 +26,8 @@ uav1:
 
 
 uav2:
-  type: "t650"
+  frame: "a300"
+  type: "x500"
   spawn:
     x: 6.0
     y: 0.0
@@ -31,8 +36,8 @@ uav2:
 
 sensors:
   lidar:
-    enabled: false
+    enabled: true
   rgb:
-    enabled: false
+    enabled: true
   stereo:
     enabled: false
