@@ -50,8 +50,6 @@
 
 /* defines //{ */
 
-#define API_VERSION 10
-
 //}
 
 using PCLPoint               = pcl::PointXYZ;
@@ -728,11 +726,12 @@ void UnrealSimulator::onInit() {
 
   // | ------------------ check the API version ----------------- |
 
-  auto [res, ueds_api_version] = ueds_game_controller_->GetApiVersion();
+  auto [res, api_version] = ueds_game_controller_->GetApiVersion();
+  auto [api_version_major, api_version_minor] = api_version;
 
-  if (!res || ueds_api_version != API_VERSION) {
+  if (!res || api_version_major != API_VERSION_MAJOR || api_version_minor != API_VERSION_MINOR) {
 
-    ROS_ERROR("[UnrealSimulator]: the API versions don't match! (ROS side '%d' != Unreal side '%d')", API_VERSION, ueds_api_version);
+    ROS_ERROR("[UnrealSimulator]: the API versions don't match! (ROS side '%d.%d' != Unreal side '%d.%d')", API_VERSION_MAJOR, API_VERSION_MINOR, api_version_major, api_version_minor);
     ROS_ERROR("[UnrealSimulator]:");
     ROS_ERROR("[UnrealSimulator]: Solution:");
     ROS_ERROR("[UnrealSimulator]:           1. make sure the mrs_uav_unreal_simulation package is up to date");
