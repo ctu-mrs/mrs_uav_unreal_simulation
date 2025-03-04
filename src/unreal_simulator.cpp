@@ -209,8 +209,6 @@ private:
   bool   lidar_int_noise;
 
   // segmentation decode array
-  // clang-format off
-  /*seg_rgb//{*/
   uint8_t seg_rgb_[256][3] = {
       255, 255, 255,
       153, 108, 6 ,
@@ -551,6 +549,7 @@ private:
   int                     ueds_forest_hilly_level_ = 3;
   std::string             weather_type_;
   ueds_connector::Daytime daytime_;
+  bool                    uavs_mutual_visibility_ = true;
 
   std::vector<double> last_rgb_ue_stamp_;
   std::vector<double> last_rgb_seg_ue_stamp_;
@@ -604,6 +603,7 @@ void UnrealSimulator::onInit() {
   param_loader.loadParam("weather_type", weather_type_);
   param_loader.loadParam("daytime/hour", daytime_.hour);
   param_loader.loadParam("daytime/minute", daytime_.minute);
+  param_loader.loadParam("uavs_mutual_visibility", uavs_mutual_visibility_);
 
   param_loader.loadParam("simulation_rate", _simulation_rate_);
   param_loader.loadParam("realtime_factor", drs_params_.realtime_factor);
@@ -780,6 +780,13 @@ void UnrealSimulator::onInit() {
     ROS_INFO("[UnrealSimulator]: Graphical Settings was set succesfully to '%s'", ueds_graphics_settings_enum_.c_str());
   } else {
     ROS_ERROR("[UnrealSimulator]: Graphical Settings was not set succesfully to '%s'", ueds_graphics_settings_enum_.c_str());
+  }
+
+  res = ueds_game_controller_->SetMutualDroneVisibility(uavs_mutual_visibility_); 
+  if (res) {
+    ROS_INFO("[UnrealSimulator]: Mutual Drone Visibility was succesfully set to %i.", uavs_mutual_visibility_);
+  } else {
+    ROS_ERROR("[UnrealSimulator]: Set Mutual Drone Visibility was NOT succesfull.");
   }
 
   res = ueds_game_controller_->SetWeather(ueds_connector::WeatherType::Type2Id().at(weather_type_));
