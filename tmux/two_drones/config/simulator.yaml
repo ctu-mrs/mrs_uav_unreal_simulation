@@ -1,4 +1,4 @@
-uavs_mutual_visibility: false
+uavs_mutual_visibility: true
 
 world_name: "valley"
 
@@ -37,8 +37,23 @@ uav2:
     heading: 3.14
 
 sensors:
-  lidar:
+
+  rangefinder:
+
     enabled: true
+    rate: 10.0 # [Hz]
+
+  lidar:
+
+    enabled: true
+
+    rate: 10.0 # [Hz]
+
+    horizontal_fov_left: 180.0 # [deg]
+    horizontal_fov_right: 180.0 # [deg]
+    
+    vertical_fov_up: 52.0 # [deg]
+    vertical_fov_down: 7.0 # [deg]
   rgb:
     enabled: true
   stereo:
