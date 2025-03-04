@@ -10,6 +10,9 @@ dynamic_rtf: true
 # TODO describe
 collisions: true
 
+# Set mutual visibilitiy and collision of UAVs
+uavs_mutual_visibility: true
+
 #  0 - LOW
 #  1 - MEDIUM
 #  2 - HIGH

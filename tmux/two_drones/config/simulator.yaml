@@ -1,3 +1,5 @@
+uavs_mutual_visibility: false
+
 world_name: "valley"
 
 weather_type: "sunny"
