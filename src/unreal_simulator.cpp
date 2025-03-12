@@ -168,6 +168,7 @@ private:
   double lidar_rotation_yaw_;
   double lidar_beam_length_;
   bool   lidar_show_beams_;
+  bool   lidar_livox_;
 
   int    rgb_width_;
   int    rgb_height_;
@@ -638,6 +639,7 @@ void UnrealSimulator::onInit() {
   param_loader.loadParam("sensors/lidar/rotation_yaw", lidar_rotation_yaw_);
   param_loader.loadParam("sensors/lidar/beam_length", lidar_beam_length_);
   param_loader.loadParam("sensors/lidar/show_beams", lidar_show_beams_);
+  param_loader.loadParam("sensors/lidar/livox", lidar_livox_);
 
   param_loader.loadParam("sensors/rgb/enabled", drs_params_.rgb_enabled);
   param_loader.loadParam("sensors/rgb/rate", drs_params_.rgb_rate);
@@ -976,8 +978,7 @@ void UnrealSimulator::onInit() {
       lidarConfig.offset       = ueds_connector::Coordinates(lidar_offset_x_ * 100.0, lidar_offset_y_ * 100.0, lidar_offset_z_ * 100.0);
       lidarConfig.orientation  = ueds_connector::Rotation(-lidar_rotation_pitch_, lidar_rotation_yaw_, lidar_rotation_roll_);
       lidarConfig.showBeams    = lidar_show_beams_;
-
-      /* LidarConfig. */
+      lidarConfig.Livox       = lidar_livox_;
 
       const auto res = ueds_connectors_[i]->SetLidarConfig(lidarConfig);
 
@@ -2326,39 +2327,6 @@ void UnrealSimulator::publishStaticTfs(void) {
         ROS_ERROR("[UnrealSimulator]: could not publish lidar tf");
       }
     }
-    /* { */
-    /*   tf.header.stamp = ros::Time::now(); */
-
-    /*   tf.header.frame_id = "uav" + std::to_string(i + 1) + "/fcu"; */
-    /*   tf.child_frame_id  = "uav" + std::to_string(i + 1) + "/lidar"; */
-
-    /*   tf.transform.translation.x = lidar_offset_x_; */
-    /*   tf.transform.translation.y = lidar_offset_y_; */
-    /*   tf.transform.translation.z = lidar_offset_z_; */
-
-    /*   /1* Eigen::Quaterniond initial_quat(0.5, -0.5, 0.5, -0.5); *1/ */
-    /*   Eigen::Quaterniond initial_quat = Eigen::Quaterniond::Identity(); */
-
-    /*   Eigen::Quaterniond dynamic_quat = Eigen::AngleAxisd(lidar_rotation_roll_ * M_PI / 180.0, Eigen::Vector3d::UnitX()) * */
-    /*                                     Eigen::AngleAxisd(lidar_rotation_pitch_ * M_PI / 180.0, Eigen::Vector3d::UnitY()) * */
-    /*                                     Eigen::AngleAxisd(lidar_rotation_yaw_ * M_PI / 180.0, Eigen::Vector3d::UnitZ()); */
-
-    /*   Eigen::Quaterniond final_quat = dynamic_quat * initial_quat; */
-
-    /*   final_quat.normalize(); */
-
-    /*   tf.transform.rotation.x = final_quat.x(); */
-    /*   tf.transform.rotation.y = final_quat.y(); */
-    /*   tf.transform.rotation.z = final_quat.z(); */
-    /*   tf.transform.rotation.w = final_quat.w(); */
-
-    /*   try { */
-    /*     static_broadcaster_.sendTransform(tf); */
-    /*   } */
-    /*   catch (...) { */
-    /*     ROS_ERROR("[UnrealSimulator]: could not publish lidar tf"); */
-    /*   } */
-    /* } */
   }
 }
 
