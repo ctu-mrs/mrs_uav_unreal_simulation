@@ -6,8 +6,8 @@ uav_names: [
 graphics_settings: "low"
 
 # world_name: "dead_spruce_forest"
-world_name: "forest"
-# world_name: "cave"
+# world_name: "infinite_forest"
+world_name: "cave"
 
 weather_type: "sunny"
 
@@ -16,7 +16,7 @@ daytime:
   minute: 30
 
 uav1:
-  frame: "x500"
+  frame: "a300"
   type: "x500"
   spawn:
     x: 0.0
