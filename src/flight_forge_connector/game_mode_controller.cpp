@@ -1,1 +1,1 @@
-../../.gitman/mrs_flight_forge_connertor/src/game_mode_controller.cpp
+../../.gitman/mrs_flight_forge_connector/src/game_mode_controller.cpp
