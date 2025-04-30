@@ -2,12 +2,15 @@ uav_names: [
   "uav1",
 ]
 
-
 graphics_settings: "low"
 
-# world_name: "dead_spruce_forest"
-# world_name: "infinite_forest"
-world_name: "cave"
+world_name: "warehouse" # works
+# world_name: "valley" # works
+
+# TODO
+# world_name: "dead_spruce_forest" # does not work
+# world_name: "infinite_forest" # does not work
+# world_name: "forest" # does not work
 
 weather_type: "sunny"
 
@@ -16,7 +19,7 @@ daytime:
   minute: 30
 
 uav1:
-  frame: "a300"
+  frame: "x500"
   type: "x500"
   spawn:
     x: 0.0
@@ -25,25 +28,29 @@ uav1:
     heading: 0.0
 
 sensors:
+
   lidar:
     enabled: true 
     # horizontal_rays: 256 # [-]
     # vertical_rays: 128 # [-]
     horizontal_rays: 128 # [-]
     vertical_rays: 32 # [-]
-    offset_x: 0.2 # [m]
+    offset_x: 0.0 # [m]
     offset_y: 0.0 # [m]
-    offset_z: -0.1 # [m]
-    rotation_pitch: -30.0 # [deg]
+    offset_z: 0.1 # [m]
+    rotation_pitch: 0.0 # [deg]
     rotation_roll: 0.0 # [deg]
     rotation_yaw: 0.0 # [deg]
+
     lidar_segmented:
       enabled: false 
       rate: 10.0 # [Hz]
+
   rgb:
     enabled: true 
     rgb_segmented:
       enabled: false 
       rate: 10.0 # [Hz]
+
   stereo:
-    enabled: false
+    enabled: true
