@@ -4,10 +4,11 @@ uav_names: [
 
 graphics_settings: "low"
 
-world_name: "warehouse" # works
+# world_name: "warehouse" # works
 # world_name: "valley" # works
 
 # TODO
+# world_name: "cave" # does not work
 # world_name: "dead_spruce_forest" # does not work
 # world_name: "infinite_forest" # does not work
 # world_name: "forest" # does not work
