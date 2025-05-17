@@ -24,13 +24,13 @@
 ### Linux
 
 1. Install the [MRS UAV System](https://github.com/ctu-mrs/mrs_uav_system)
-2. Install the MRS UAV System UE5 endpoint
+2. Install the MRS UAV System FlightForge endpoint
 ```bash
 sudo apt install ros-noetic-mrs-uav-unreal-simulation
 ```
-3. Download the and unpack [Unreal Engine Drone Simulator](https://nasmrs.felk.cvut.cz/index.php/s/MnGARsSwnpeVy5z)
-4. Launch the UE5 Simulator by `./flight_forge.sh`. Alternatively, start it in a headless mode via `./flight_forge.sh -renderOffScreen`.
-6. Start the MRS UAV System UE5 endpoint
+3. Download the and unpack [MRS FlightForge simulator](https://nasmrs.felk.cvut.cz/index.php/s/MnGARsSwnpeVy5z)
+4. Launch the FlightForge Simulator by `./mrs_flight_forge.sh`. Alternatively, start it in a headless mode via `./mrs_flight_forge.sh -RenderOffscreen`.
+6. Start the MRS UAV System FlightForge endpoint
 ```bash
 roscd mrs_uav_unreal_simulation
 ./tmux/one_drone/start.sh
@@ -55,24 +55,34 @@ debugConsole=false
 hostAddressLoopback=true
 ```
 5. Restart the WSL by issuing `wsl --shutdown` into a comand line.
-6. Install the MRS UAV System UE5 endpoint
+6. Install the MRS UAV System FlightForge endpoint
 ```bash
 sudo apt install ros-noetic-mrs-uav-unreal-simulation
 ```
-7. Download and unpack the [Unreal Engine Drone Simulator](https://nasmrs.felk.cvut.cz/index.php/s/MnGARsSwnpeVy5z)
-8. Start the Unreal Engine Drone Simulator
-9. Start the MRS UAV System UE5 endpoint
+7. Download and unpack the [FlightForge Simulator](https://nasmrs.felk.cvut.cz/index.php/s/MnGARsSwnpeVy5z)
+8. Start the FlightForge Simulator
+9. Start the MRS UAV System FlightForge endpoint
 ```bash
 roscd mrs_uav_unreal_simulation
 ./tmux/one_drone/start.sh
 ```
 10. The first start might require hitting "CTRL+C" in the `roscore` tab of the tmux session. The roscore is always stuck for the first time after rebooting the computer.
 
-## TODO
+## Citing this work
 
-* UAVs don't see eachother in their cameras / LiDARS
+If you use this simulator in your research, please cite the following paper:
+
+```@article{čapek2025flightforge,
+  title   = {FlightForge: Advancing UAV Research with Procedural Generation of High-Fidelity Simulation and Integrated Autonomy},
+  author  = {David Čapek and Jan Hrnčíř and Tomáš Báča and Jakub Jirkal and Vojtěch Vonásek and Robert Pěnička and Martin Saska},
+  year    = {2025},
+  journal = {arXiv preprint arXiv: 2502.05038},
+  url     = {https://arxiv.org/abs/2502.05038v1},
+  pdf     = {https://arxiv.org/pdf/2502.05038.pdf}
+}
+```
+
+## Planned features
+
+* Adding back a grayscale normalized depth image
 * possible coloring of the depth pointcloud using the segmented RGB image
-* ability to switch worlds in C++ from the ROS side
-* ability to switch graphics scaling in C++ from the ROS side
-* finer settings of the graphics scaling than (low, middle, etc).
-* adding weather effects controllable form the ROS side
