@@ -116,6 +116,9 @@ private:
   ros::Timer timer_rgb_segmented_;
   void       timerRgbSegmented(const ros::TimerEvent& event);
 
+  ros::Timer timer_depth_;
+  void       timerDepth(const ros::TimerEvent& event);
+
   ros::Timer timer_stereo_;
   void       timerStereo(const ros::TimerEvent& event);
 
@@ -486,6 +489,7 @@ private:
   std::vector<image_transport::Publisher> imp_stereo_left_;
   std::vector<image_transport::Publisher> imp_stereo_right_;
   std::vector<image_transport::Publisher> imp_rgbd_segmented_;
+  std::vector<image_transport::Publisher> imp_depth_;
 
   std::vector<mrs_lib::PublisherHandler<sensor_msgs::CameraInfo>> ph_rgb_camera_info_;
   std::vector<mrs_lib::PublisherHandler<sensor_msgs::CameraInfo>> ph_rgb_seg_camera_info_;
@@ -646,6 +650,9 @@ void UnrealSimulator::onInit() {
 
   param_loader.loadParam("sensors/rgb/rgb_segmented/enabled", drs_params_.rgb_segmented_enabled);
   param_loader.loadParam("sensors/rgb/rgb_segmented/rate", drs_params_.rgb_segmented_rate);
+  
+  param_loader.loadParam("sensors/rgb/depth/enabled", drs_params_.rgb_depth_enabled);
+  param_loader.loadParam("sensors/rgb/depth/rate", drs_params_.rgb_depth_rate);
 
   param_loader.loadParam("sensors/rgb/width", rgb_width_);
   param_loader.loadParam("sensors/rgb/height", rgb_height_);
@@ -662,6 +669,7 @@ void UnrealSimulator::onInit() {
   param_loader.loadParam("sensors/rgb/enable_motion_blur", rgb_enable_motion_blur_);
   param_loader.loadParam("sensors/rgb/motion_blur_amount", rgb_motion_blur_amount_);
   param_loader.loadParam("sensors/rgb/motion_blur_distortion", rgb_motion_blur_distortion_);
+
 
   param_loader.loadParam("sensors/stereo/enabled", drs_params_.stereo_enabled);
   param_loader.loadParam("sensors/stereo/rate", drs_params_.stereo_rate);
@@ -901,6 +909,7 @@ void UnrealSimulator::onInit() {
     imp_stereo_left_.push_back(it_->advertise("/" + uav_name + "/stereo/left/image_raw", 10));
     imp_stereo_right_.push_back(it_->advertise("/" + uav_name + "/stereo/right/image_raw", 10));
     imp_rgbd_segmented_.push_back(it_->advertise("/" + uav_name + "/rgb_segmented/image_raw", 10));
+    imp_depth_.push_back(it_->advertise("/" + uav_name + "/depth/image_raw", 10));
 
     ph_rgb_camera_info_.push_back(mrs_lib::PublisherHandler<sensor_msgs::CameraInfo>(nh_, "/" + uav_name + "/rgb/camera_info", 10));
     ph_rgb_seg_camera_info_.push_back(mrs_lib::PublisherHandler<sensor_msgs::CameraInfo>(nh_, "/" + uav_name + "/rgb_segmented/camera_info", 10));
@@ -1043,6 +1052,8 @@ void UnrealSimulator::onInit() {
   timer_stereo_ = nh_.createTimer(ros::Duration(1.0 / drs_params_.stereo_rate), &UnrealSimulator::timerStereo, this);
 
   timer_rgb_segmented_ = nh_.createTimer(ros::Duration(1.0 / drs_params_.rgb_segmented_rate), &UnrealSimulator::timerRgbSegmented, this);
+
+  timer_depth_ = nh_.createTimer(ros::Duration(1.0 / drs_params_.rgb_depth_rate), &UnrealSimulator::timerDepth, this);
 
 
   rgb_camera_orientations_.resize(uavs_.size());
@@ -1839,6 +1850,109 @@ void UnrealSimulator::timerRgbSegmented([[maybe_unused]] const ros::TimerEvent& 
 }
 
 //}
+
+void UnrealSimulator::timerDepth([[maybe_unused]] const ros::TimerEvent& event) {
+
+  if (!is_initialized_) {
+    return;
+  }
+
+  /* mrs_lib::ScopeTimer timer = mrs_lib::ScopeTimer("timerRgb()"); */
+
+  auto drs_params = mrs_lib::get_mutexed(mutex_drs_params_, drs_params_);
+
+  if (!drs_params_.rgb_depth_rate) {
+    ROS_INFO_THROTTLE(1.0, "[UnrealSimulator]: Depth sensor is disabled");
+    return;
+  }
+
+  for (size_t i = 0; i < uavs_.size(); i++) {
+
+    bool                       res;
+    std::vector<uint16_t>      cameraData;
+    uint32_t                   size;
+    double                     stamp;
+
+    /* timer.checkpoint("before_getting_data"); */
+
+    {
+      std::scoped_lock lock(mutex_ueds_);
+
+      std::tie(res, cameraData, stamp, size) = ueds_connectors_[i]->GetDepthCameraData();
+    }
+
+    /* timer.checkpoint("after_getting_data"); */
+
+    if (!res) {
+      ROS_WARN("[UnrealSimulator]: failed to obtain depth camera data from uav%lu", i + 1);
+      continue;
+    }
+
+    if (cameraData.empty()) {
+      ROS_WARN("[UnrealSimulator]: depth camera data from uav%lu is empty!", i + 1);
+      continue;
+    }
+
+    if (cameraData.size() != rgb_width_ * rgb_height_) {
+      ROS_WARN("[UnrealSimulator]: depth camera data size mismatch for uav%lu (got %zu, expected %d)", i + 1, cameraData.size(), rgb_width_ * rgb_height_);
+      continue;
+    }
+
+    cv::Mat image = cv::Mat(rgb_height_, rgb_width_, CV_16UC1, cameraData.data());
+
+    //     // Convert float16 (encoded as uint16_t) to float32 for the center pixel
+    //     uint16_t half_val = image.at<uint16_t>(rgb_height_ / 2, rgb_width_ / 2);
+    //     // Use OpenCV's built-in conversion if available, otherwise use a custom function
+    //     float middle_value;
+    // #if CV_VERSION_MAJOR >= 4 && CV_VERSION_MINOR >= 5
+    //     cv::Mat half_mat(1, 1, CV_16UC1, &half_val);
+    //     cv::Mat float_mat;
+    //     half_mat.convertTo(float_mat, CV_32F); // OpenCV 4.5+ supports float16 to float32
+    //     middle_value = float_mat.at<float>(0, 0);
+    // #else
+    //     // Manual conversion for older OpenCV versions
+    //     uint16_t h = half_val;
+    //     uint32_t sign = (h & 0x8000) << 16;
+    //     uint32_t exp = (h & 0x7C00) >> 10;
+    //     uint32_t mant = (h & 0x03FF);
+    //     uint32_t f;
+    //     if (exp == 0) {
+    //       if (mant == 0) {
+    //         f = sign;
+    //       } else {
+    //         exp = 1;
+    //         while ((mant & 0x0400) == 0) {
+    //           mant <<= 1;
+    //           exp--;
+    //         }
+    //         mant &= 0x03FF;
+    //         exp = exp + (127 - 15);
+    //         f = sign | (exp << 23) | (mant << 13);
+    //       }
+    //     } else if (exp == 0x1F) {
+    //       f = sign | 0x7F800000 | (mant << 13);
+    //     } else {
+    //       exp = exp + (127 - 15);
+    //       f = sign | (exp << 23) | (mant << 13);
+    //     }
+    //     middle_value = *reinterpret_cast<float*>(&f);
+    // #endif
+    //     ROS_INFO_STREAM("[UnrealSimulator]: Depth value at image center: " << middle_value << " meters");
+
+    sensor_msgs::ImagePtr msg = cv_bridge::CvImage(std_msgs::Header(), "mono16", image).toImageMsg();
+
+    msg->header.frame_id = "uav" + std::to_string(i + 1) + "/rgb";
+    msg->header.stamp    = ros::Time::now();
+
+    imp_depth_[i].publish(msg);
+
+    // auto camera_info = mrs_lib::get_mutexed(mutex_camera_info_, camera_info_);
+
+    // camera_info.header = msg->header;
+
+    // ph_depth_info_[i].publish(camera_info);
+  }
+}
 
 // | ------------------------ callbacks ----------------------- |
 

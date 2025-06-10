@@ -4,8 +4,8 @@ uav_names: [
 
 graphics_settings: "low"
 
-# world_name: "warehouse" # works
-world_name: "valley" # works
+world_name: "warehouse" # works
+# world_name: "forest" # works
 
 # TODO
 # world_name: "cave" # does not work
@@ -52,6 +52,8 @@ sensors:
     rgb_segmented:
       enabled: false 
       rate: 10.0 # [Hz]
+    depth:
+      enabled: true 
 
   stereo:
     enabled: true
