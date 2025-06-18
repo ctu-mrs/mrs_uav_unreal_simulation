@@ -48,7 +48,7 @@ set(DEPENDENCIES
 
 
 set(LIBRARIES
-  MrsUavFlightforgeSimulation_Simulator
+  MrsUavFlightforgeSimulation_FlightforgeSimulator
   MrsUavFlightforgeSimulation_HwApiPlugin
   MrsUavFlightforgeSimulation_FlightforgeConnector
   )
@@ -73,25 +73,24 @@ add_library(MrsUavFlightforgeSimulation_FlightforgeConnector
   src/flight_forge_connector/game_mode_controller.cpp
   )
 
-## | ------------------------ Simulator ----------------------- |
+## | ------------------------ FlightForge Simulator ----------------------- |
 
-add_library(MrsUavFlightforgeSimulation_Simulator
+add_library(MrsUavFlightforgeSimulation_FlightforgeSimulator
   src/flightforge_simulator.cpp
   )
 
-# add_dependencies(MrsUavFlightforgeSimulation_Simulator
+# add_dependencies(MrsUavFlightforgeSimulation_flightforgeSimulator
 #   ${${PROJECT_NAME}_EXPORTED_TARGETS}
 #   ${catkin_EXPORTED_TARGETS}
 #   )
 
-target_link_libraries(MrsUavFlightforgeSimulation_Simulator
+target_link_libraries(MrsUavFlightforgeSimulation_FlightforgeSimulator
   MrsUavFlightforgeSimulation_FlightforgeConnector
-  ${LIB_UEDS_CONNECTOR}
-  ${catkin_LIBRARIES}
+  ${LIB_FLIGHTFORGE_CONNECTOR}
   ${Eigen_LIBRARIES}
   )
 
-ament_target_dependencies(MrsMultirotorSimulator_Simulator
+ament_target_dependencies(MrsFlightforgeSimulation_Simulator
   rclcpp
   rclcpp_components
   mrs_lib
@@ -103,19 +102,22 @@ ament_target_dependencies(MrsMultirotorSimulator_Simulator
 )
 ## | ---------------------- HW Api Plugin --------------------- |
 
-add_library(MrsUavUnrealSimulation_HwApiPlugin
+add_library(MrsUavFlightforgeSimulation_HwApiPlugin
   src/hw_api_plugin.cpp
   )
 
-add_dependencies(MrsUavUnrealSimulation_HwApiPlugin
-  ${${PROJECT_NAME}_EXPORTED_TARGETS}
-  ${catkin_EXPORTED_TARGETS}
-  )
+ament_target_dependencies(MrsMultirotorSimulator_HwApiPlugin
+  ${DEPENDENCIES}
+)
 
-target_link_libraries(MrsUavUnrealSimulation_HwApiPlugin
-  ${catkin_LIBRARIES}
-  ${Eigen_LIBRARIES}
-  )
+target_compile_definitions(MrsMultirotorSimulator_HwApiPlugin PRIVATE USE_ROS_TIMER=${USE_ROS_TIMER})
+
+## --------------------------------------------------------------
+## |                       Export plugins                       |
+## --------------------------------------------------------------
+
+# <package of the base class>, <relative path to the xml>
+pluginlib_export_plugin_description_file(mrs_uav_flightforge_simulation plugins.xml)
 
 add_service_files(DIRECTORY srv/ FILES
   FILES
@@ -145,31 +147,49 @@ catkin_package(
 ## |                           Install                          |
 ## --------------------------------------------------------------
 
-install(TARGETS ${LIBRARIES}
-  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION}
-  )
+ament_export_libraries(
+  ${LIBRARIES}
+)
 
-install(DIRECTORY launch config
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-  )
+install(
+  TARGETS ${LIBRARIES}
+  EXPORT export_${PROJECT_NAME}
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
+)
 
-install(DIRECTORY tmux/
+install(
+  DIRECTORY include
+  DESTINATION .
+)
+
+install(
+  DIRECTORY launch
+  DESTINATION share/${PROJECT_NAME}
+)
+
+install(
+  DIRECTORY config
+  DESTINATION share/${PROJECT_NAME}
+)
+
+install(
+  DIRECTORY tmux
   USE_SOURCE_PERMISSIONS
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/tmux
-  )
+  DESTINATION share/${PROJECT_NAME}
+)
 
-install(DIRECTORY scripts/
-  USE_SOURCE_PERMISSIONS
-  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-  )
+ament_export_include_directories(
+  include
+)
 
-install(DIRECTORY scripts
-  USE_SOURCE_PERMISSIONS
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-  )
+ament_export_targets(
+  export_${PROJECT_NAME} HAS_LIBRARY_TARGET
+)
 
-install(FILES nodelets.xml plugins.xml
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-  )
+ament_export_dependencies(
+  ${DEPENDENCIES}
+)
+
+ament_package()
