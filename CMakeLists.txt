@@ -42,8 +42,6 @@ set(DEPENDENCIES
   std_msgs
   std_srvs
   mrs_multirotor_simulator
-  message_generation
-  message_runtime
   )
 
 
@@ -90,7 +88,7 @@ target_link_libraries(MrsUavFlightforgeSimulation_FlightforgeSimulator
   ${Eigen_LIBRARIES}
   )
 
-ament_target_dependencies(MrsFlightforgeSimulation_Simulator
+ament_target_dependencies(MrsUavFlightforgeSimulation_FlightforgeSimulator
   rclcpp
   rclcpp_components
   mrs_lib
