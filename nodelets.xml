@@ -1,5 +1,0 @@
-<library path="lib/libMrsUavUnrealSimulation_Simulator">
-  <class name="mrs_uav_unreal_simulation/UnrealSimulator" type="mrs_uav_unreal_simulation::UnrealSimulator" base_class_type="nodelet::Nodelet">
-    <description>UnrealSimulator nodelet</description>
-  </class>
-</library>

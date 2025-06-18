@@ -21,7 +21,6 @@
   <depend>pluginlib</depend>
   <depend>builtin_interfaces</depend>
 
-  <depend>dynamic_reconfigure</depend>
   <depend>geometry_msgs</depend>
   <depend>mrs_lib</depend>
   <depend>mrs_msgs</depend>
@@ -33,8 +32,6 @@
   <depend>std_srvs</depend>
   <depend>mrs_multirotor_simulator</depend>
   <depend>stereo_image_proc</depend>
-  <depend>message_generation</depend>
-  <depend>message_runtime</depend>
   <depend>image_transport</depend>
   <depend>pcl_ros</depend>
   <depend>pcl_conversions</depend>

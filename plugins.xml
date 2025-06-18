@@ -1,5 +1,5 @@
-<library path="lib/libMrsUavUnrealSimulation_HwApiPlugin">
-  <class name="mrs_uav_unreal_simulation/Api" type="mrs_uav_unreal_simulation::Api" base_class_type="mrs_uav_hw_api::MrsUavHwApi">
-    <description>MRS UAV Unreal simulator API plugin for the MRS UAV System</description>
+<library path="MrsUavFlightforgeSimulation_HwApiPlugin">
+  <class type="mrs_uav_flightforge_hw_api_plugin::Api" base_class_type="mrs_uav_hw_api::MrsUavHwApi">
+    <description>MRS FlightForge Simulation HW Api</description>
   </class>
 </library>
