@@ -152,6 +152,10 @@ sensors:
       enabled: false
       rate: 5.0 # [Hz]
 
+    depth:
+      enabled: false
+      rate: 10.0 # [Hz]    
+
   stereo:
 
     enabled: false

@@ -8,12 +8,6 @@
 
     </node>
 
-    <node name="disparity_to_depth" pkg="nodelet" type="nodelet" args="standalone rtabmap_util/disparity_to_depth" output="screen">
-
-      <remap from="disparity" to="disparity"/>
-
-    </node>
-
   </group>
 
 </launch>
