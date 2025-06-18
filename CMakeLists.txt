@@ -42,6 +42,10 @@ set(DEPENDENCIES
   std_msgs
   std_srvs
   mrs_multirotor_simulator
+  image_transport
+  cv_bridge
+  pcl_ros
+  pcl_conversions
   )
 
 
@@ -97,6 +101,10 @@ ament_target_dependencies(MrsUavFlightforgeSimulation_FlightforgeSimulator
   mrs_msgs
   geometry_msgs
   nav_msgs
+  image_transport
+  cv_bridge
+  pcl_ros
+  pcl_conversions
 )
 ## | ---------------------- HW Api Plugin --------------------- |
 
