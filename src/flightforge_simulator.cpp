@@ -1,11 +1,10 @@
 /* includes //{ */
 
-#include <ros/ros.h>
-#include <nodelet/nodelet.h>
+#include <rclcpp/rclcpp.hpp>
 
 #include <mrs_multirotor_simulator/uav_system_ros.h>
 
-#include <rosgraph_msgs/Clock.h>
+#include <rosgraph_msgs/msg/Clock.hpp>
 
 #include <geometry_msgs/PoseArray.h>
 #include <geometry_msgs/QuaternionStamped.h>
@@ -17,7 +16,6 @@
 #include <tf2_ros/static_transform_broadcaster.h>
 #include <tf2_ros/transform_broadcaster.h>
 
-#include <dynamic_reconfigure/server.h>
 #include <mrs_uav_unreal_simulation/unreal_simulatorConfig.h>
 
 #include <Eigen/Dense>
