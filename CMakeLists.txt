@@ -1,22 +1,42 @@
 cmake_minimum_required(VERSION 3.5)
-project(mrs_uav_unreal_simulation)
+project(mrs_uav_flightforge_simulation)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-add_definitions(-Wall)
-add_definitions(-Wextra)
+# set the compile options to show code warnings
+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  add_compile_options(-Wall -Wextra)
+endif()
 
-set(CATKIN_DEPENDENCIES
-  cmake_modules
-  dynamic_reconfigure
+set(USE_ROS_TIMER 0)
+
+if(${USE_ROS_TIMER})
+  MESSAGE(WARNING "[mrs_uav_managers]: Compiling with ROS Timers. This can cause high CPU load in runtime.")
+endif()
+
+if(ENABLE_COVERAGE)
+  message(WARNING "building for coverage, the performance might be limited")
+
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --coverage -fprofile-arcs")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage -fprofile-arcs")
+
+  add_definitions("-O1")
+  add_definitions("-g")
+endif()
+
+set(DEPENDENCIES
+  rclcpp
+  rclcpp_components
+  mrs_msgs
+  mrs_lib
+  pluginlib
   geometry_msgs
   mrs_lib
   mrs_msgs
   mrs_uav_hw_api
   nav_msgs
-  nodelet
-  roscpp
   rosgraph_msgs
   sensor_msgs
   std_msgs
@@ -27,8 +47,74 @@ set(CATKIN_DEPENDENCIES
   )
 
 
-find_package(catkin REQUIRED COMPONENTS
-  ${CATKIN_DEPENDENCIES}
+set(LIBRARIES
+  MrsUavFlightforgeSimulation_Simulator
+  MrsUavFlightforgeSimulation_HwApiPlugin
+  MrsUavFlightforgeSimulation_FlightforgeConnector
+  )
+
+foreach(DEP IN LISTS DEPENDENCIES)
+  find_package(${DEP} REQUIRED)
+endforeach()
+
+include_directories(
+  include
+  ${rclpp_INCLUDE_DIRS}
+  ${mrs_lib_INCLUDE_DIRS}
+  ${mrs_uav_hw_api_INCLUDE_DIRS}
+  )
+
+
+## | --------------------- FlightForge connector --------------------- |
+
+add_library(MrsUavFlightforgeSimulation_FlightforgeConnector
+  src/flight_forge_connector/socket_client.cpp
+  src/flight_forge_connector/flight_forge_connector.cpp
+  src/flight_forge_connector/game_mode_controller.cpp
+  )
+
+## | ------------------------ Simulator ----------------------- |
+
+add_library(MrsUavFlightforgeSimulation_Simulator
+  src/flightforge_simulator.cpp
+  )
+
+# add_dependencies(MrsUavFlightforgeSimulation_Simulator
+#   ${${PROJECT_NAME}_EXPORTED_TARGETS}
+#   ${catkin_EXPORTED_TARGETS}
+#   )
+
+target_link_libraries(MrsUavFlightforgeSimulation_Simulator
+  MrsUavFlightforgeSimulation_FlightforgeConnector
+  ${LIB_UEDS_CONNECTOR}
+  ${catkin_LIBRARIES}
+  ${Eigen_LIBRARIES}
+  )
+
+ament_target_dependencies(MrsMultirotorSimulator_Simulator
+  rclcpp
+  rclcpp_components
+  mrs_lib
+  sensor_msgs
+  std_msgs
+  mrs_msgs
+  geometry_msgs
+  nav_msgs
+)
+## | ---------------------- HW Api Plugin --------------------- |
+
+add_library(MrsUavUnrealSimulation_HwApiPlugin
+  src/hw_api_plugin.cpp
+  )
+
+add_dependencies(MrsUavUnrealSimulation_HwApiPlugin
+  ${${PROJECT_NAME}_EXPORTED_TARGETS}
+  ${catkin_EXPORTED_TARGETS}
+  )
+
+target_link_libraries(MrsUavUnrealSimulation_HwApiPlugin
+  ${catkin_LIBRARIES}
+  ${Eigen_LIBRARIES}
   )
 
 add_service_files(DIRECTORY srv/ FILES
@@ -46,66 +132,14 @@ generate_dynamic_reconfigure_options(
   cfg/unreal_simulator.cfg
   )
 
-set(LIBRARIES
-  MrsUavUnrealSimulation_Simulator
-  MrsUavUnrealSimulation_HwApiPlugin
-  MrsUavUnrealSimulation_UedsConnector
-  )
-
 catkin_package(
   LIBRARIES ${LIBRARIES}
   INCLUDE_DIRS include
   CATKIN_DEPENDS ${CATKIN_DEPENDENCIES}
   )
 
-include_directories(
-  include
-  ${catkin_INCLUDE_DIRS}
-  ${dynamic_reconfigure_PACKAGE_PATH}/cmake/cfgbuild.cmake
-  )
 
 
-## | --------------------- UEDS connector --------------------- |
-
-add_library(MrsUavUnrealSimulation_UedsConnector
-  src/flight_forge_connector/socket_client.cpp
-  src/flight_forge_connector/flight_forge_connector.cpp
-  src/flight_forge_connector/game_mode_controller.cpp
-  )
-
-## | ------------------------ Simulator ----------------------- |
-
-add_library(MrsUavUnrealSimulation_Simulator
-  src/unreal_simulator.cpp
-  )
-
-add_dependencies(MrsUavUnrealSimulation_Simulator
-  ${${PROJECT_NAME}_EXPORTED_TARGETS}
-  ${catkin_EXPORTED_TARGETS}
-  )
-
-target_link_libraries(MrsUavUnrealSimulation_Simulator
-  MrsUavUnrealSimulation_UedsConnector
-  ${LIB_UEDS_CONNECTOR}
-  ${catkin_LIBRARIES}
-  ${Eigen_LIBRARIES}
-  )
-
-## | ---------------------- HW Api Plugin --------------------- |
-
-add_library(MrsUavUnrealSimulation_HwApiPlugin
-  src/hw_api_plugin.cpp
-  )
-
-add_dependencies(MrsUavUnrealSimulation_HwApiPlugin
-  ${${PROJECT_NAME}_EXPORTED_TARGETS}
-  ${catkin_EXPORTED_TARGETS}
-  )
-
-target_link_libraries(MrsUavUnrealSimulation_HwApiPlugin
-  ${catkin_LIBRARIES}
-  ${Eigen_LIBRARIES}
-  )
 
 ## --------------------------------------------------------------
 ## |                           Install                          |
