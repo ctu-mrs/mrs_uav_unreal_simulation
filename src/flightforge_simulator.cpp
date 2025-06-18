@@ -4,10 +4,10 @@
 
 #include <mrs_multirotor_simulator/uav_system_ros.h>
 
-#include <rosgraph_msgs/msg/Clock.hpp>
+#include <rosgraph_msgs/msg/clock.hpp>
 
-#include <geometry_msgs/PoseArray.h>
-#include <geometry_msgs/QuaternionStamped.h>
+#include <geometry_msgs/msg/pose_array.hpp>
+#include <geometry_msgs/msg/quaternion_stamped.hpp>
 
 #include <mrs_lib/param_loader.h>
 #include <mrs_lib/publisher_handler.h>
@@ -16,26 +16,24 @@
 #include <tf2_ros/static_transform_broadcaster.h>
 #include <tf2_ros/transform_broadcaster.h>
 
-#include <mrs_uav_unreal_simulation/unreal_simulatorConfig.h>
-
 #include <Eigen/Dense>
 
-#include <sensor_msgs/PointCloud2.h>
-#include <sensor_msgs/PointField.h>
-#include <sensor_msgs/point_cloud2_iterator.h>
-#include <sensor_msgs/Image.h>
-#include <sensor_msgs/CompressedImage.h>
-#include <sensor_msgs/CameraInfo.h>
+#include <sensor_msgs/msg/point_cloud2.hpp>
+#include <sensor_msgs/msg/point_field.hpp>
+#include <sensor_msgs/impl/point_cloud2_iterator.hpp>
+#include <sensor_msgs/msg/image.hpp>
+#include <sensor_msgs/msg/compressed_image.hpp>
+#include <sensor_msgs/msg/camera_info.hpp>
 
-#include <image_transport/image_transport.h>
+#include <image_transport/image_transport.hpp>
 #include <opencv2/highgui/highgui.hpp>
-#include <cv_bridge/cv_bridge.h>
+#include <cv_bridge/cv_bridge.hpp>
 #include <opencv2/opencv.hpp>
 
 #include <flight_forge_connector/flight_forge_connector.h>
 #include <flight_forge_connector/game_mode_controller.h>
 
-#include <pcl_ros/transforms.h>
+#include <pcl_ros/transforms.hpp>
 #include <pcl/point_types.h>
 #include <pcl/conversions.h>
 #include <pcl/io/pcd_io.h>
@@ -43,7 +41,8 @@
 #include <pcl/common/transforms.h>
 
 #include <random>
-#include <mrs_uav_unreal_simulation/SetOrientation.h>
+/* TODO: Add the services */
+/* #include <mrs_uav_unreal_simulation/SetOrientation.h> */
 //}
 
 /* defines //{ */
@@ -2579,5 +2578,5 @@ void UnrealSimulator::publishCameraTf(const int& uav_index) {
 
 }  // namespace mrs_uav_unreal_simulation
 
-#include <pluginlib/class_list_macros.h>
-PLUGINLIB_EXPORT_CLASS(mrs_uav_unreal_simulation::UnrealSimulator, nodelet::Nodelet)
+#include <rclcpp_components/register_node_macro.hpp>
+RCLCPP_COMPONENTS_REGISTER_NODE(mrs_uav_flightforge::FlightforgeSimulator)
