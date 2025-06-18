@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.5)
 project(mrs_uav_flightforge_simulation)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_C_STANDARD 99)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # set the compile options to show code warnings
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
@@ -46,6 +46,7 @@ set(DEPENDENCIES
   cv_bridge
   pcl_ros
   pcl_conversions
+  Eigen3
   )
 
 
@@ -113,6 +114,18 @@ add_library(MrsUavFlightforgeSimulation_HwApiPlugin
   )
 
 ament_target_dependencies(MrsUavFlightforgeSimulation_HwApiPlugin
+  rclcpp
+  rclcpp_components
+  mrs_lib
+  sensor_msgs
+  std_msgs
+  mrs_msgs
+  geometry_msgs
+  nav_msgs
+  image_transport
+  cv_bridge
+  pcl_ros
+  pcl_conversions
   ${DEPENDENCIES}
 )
 
@@ -123,7 +136,7 @@ target_compile_definitions(MrsUavFlightforgeSimulation_HwApiPlugin PRIVATE USE_R
 ## --------------------------------------------------------------
 
 # <package of the base class>, <relative path to the xml>
-pluginlib_export_plugin_description_file(mrs_uav_flightforge_simulation plugins.xml)
+pluginlib_export_plugin_description_file(mrs_uav_hw_api plugins.xml)
 
 # add_service_files(DIRECTORY srv/ FILES
 #   FILES
@@ -146,7 +159,10 @@ pluginlib_export_plugin_description_file(mrs_uav_flightforge_simulation plugins.
 #   CATKIN_DEPENDS ${CATKIN_DEPENDENCIES}
 #   )
 
-
+# find_package(rosidl_default_generators REQUIRED)
+# rosidl_generate_interfaces(${PROJECT_NAME}
+#   "srv/SetOrientation.srv"
+# )
 
 
 ## --------------------------------------------------------------
