@@ -104,11 +104,11 @@ add_library(MrsUavFlightforgeSimulation_HwApiPlugin
   src/hw_api_plugin.cpp
   )
 
-ament_target_dependencies(MrsMultirotorSimulator_HwApiPlugin
+ament_target_dependencies(MrsUavFlightforgeSimulation_HwApiPlugin
   ${DEPENDENCIES}
 )
 
-target_compile_definitions(MrsMultirotorSimulator_HwApiPlugin PRIVATE USE_ROS_TIMER=${USE_ROS_TIMER})
+target_compile_definitions(MrsUavFlightforgeSimulation_HwApiPlugin PRIVATE USE_ROS_TIMER=${USE_ROS_TIMER})
 
 ## --------------------------------------------------------------
 ## |                       Export plugins                       |
@@ -117,26 +117,26 @@ target_compile_definitions(MrsMultirotorSimulator_HwApiPlugin PRIVATE USE_ROS_TI
 # <package of the base class>, <relative path to the xml>
 pluginlib_export_plugin_description_file(mrs_uav_flightforge_simulation plugins.xml)
 
-add_service_files(DIRECTORY srv/ FILES
-  FILES
-  SetOrientation.srv
-)
+# add_service_files(DIRECTORY srv/ FILES
+#   FILES
+#   SetOrientation.srv
+# )
 
-generate_messages(
-  DEPENDENCIES
-  geometry_msgs
-  std_msgs
-)
+# generate_messages(
+#   DEPENDENCIES
+#   geometry_msgs
+#   std_msgs
+# )
 
-generate_dynamic_reconfigure_options(
-  cfg/unreal_simulator.cfg
-  )
+# generate_dynamic_reconfigure_options(
+#   cfg/unreal_simulator.cfg
+#   )
 
-catkin_package(
-  LIBRARIES ${LIBRARIES}
-  INCLUDE_DIRS include
-  CATKIN_DEPENDS ${CATKIN_DEPENDENCIES}
-  )
+# catkin_package(
+#   LIBRARIES ${LIBRARIES}
+#   INCLUDE_DIRS include
+#   CATKIN_DEPENDS ${CATKIN_DEPENDENCIES}
+#   )
 
 
 
