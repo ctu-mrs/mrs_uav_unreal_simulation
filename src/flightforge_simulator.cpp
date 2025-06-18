@@ -20,7 +20,7 @@
 
 #include <sensor_msgs/msg/point_cloud2.hpp>
 #include <sensor_msgs/msg/point_field.hpp>
-#include <sensor_msgs/impl/point_cloud2_iterator.hpp>
+#include <sensor_msgs/point_cloud2_iterator.hpp>
 #include <sensor_msgs/msg/image.hpp>
 #include <sensor_msgs/msg/compressed_image.hpp>
 #include <sensor_msgs/msg/camera_info.hpp>
@@ -47,20 +47,23 @@
 
 /* defines //{ */
 
-//}
-
 using PCLPoint               = pcl::PointXYZ;
 using PCLPointCloud          = pcl::PointCloud<PCLPoint>;
 using PCLPointCloudColor     = pcl::PointCloud<pcl::PointXYZRGB>;
 using PCLPointCloudIntensity = pcl::PointCloud<pcl::PointXYZI>;
+
+//}
+
 namespace mrs_uav_unreal_simulation
 {
 
-/* class UnrealSimulator //{ */
+/* class FlightforgeSimulator //{ */
 
-class UnrealSimulator : public nodelet::Nodelet {
+class FlightforgeSimulator : public rclcpp::Node {
 
 public:
+    
+  FlightforgeSimulator(rclcpp::NodeOptions options);
   virtual void onInit();
 
 private:
@@ -209,7 +212,7 @@ private:
   double lidar_int_other;
   bool   lidar_int_noise;
 
-  // segmentation decode array
+  // segmentation decode array//{
   uint8_t seg_rgb_[256][3] = {
       255, 255, 255,
       153, 108, 6 ,
@@ -469,6 +472,7 @@ private:
       0, 0, 0 
   };
 /*//}*/
+
   // clang-format on
 
   // | ----------------------- publishers ----------------------- |
@@ -1848,6 +1852,8 @@ void UnrealSimulator::timerRgbSegmented([[maybe_unused]] const ros::TimerEvent& 
 
 //}
 
+/* timerDepth() //{ */
+
 void UnrealSimulator::timerDepth([[maybe_unused]] const ros::TimerEvent& event) {
 
   if (!is_initialized_) {
@@ -1950,6 +1956,8 @@ void UnrealSimulator::timerDepth([[maybe_unused]] const ros::TimerEvent& event) 
     // ph_depth_info_[i].publish(camera_info);
   }
 }
+
+//}
 
 // | ------------------------ callbacks ----------------------- |
 
