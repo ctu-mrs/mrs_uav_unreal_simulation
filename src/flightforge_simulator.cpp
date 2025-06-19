@@ -11,6 +11,7 @@
 
 #include <mrs_lib/param_loader.h>
 #include <mrs_lib/publisher_handler.h>
+#include <mrs_lib/timer_handler.h>
 #include <mrs_lib/scope_timer.h>
 #include <mrs_lib/transform_broadcaster.h>
 #include <tf2_ros/static_transform_broadcaster.h>
@@ -42,7 +43,9 @@
 
 #include <random>
 /* TODO: Add the services */
-/* #include <mrs_uav_unreal_simulation/SetOrientation.h> */
+/* #include "mrs_uav_flightforge_simulation/srv/set_orientation.hpp" */
+/* #include <mrs_uav_flightforge_simulation/srv/set_orientation.hpp> */
+#include <tutorial_interfaces/srv/set_orientation.hpp>
 //}
 
 /* defines //{ */
@@ -64,11 +67,19 @@ class FlightforgeSimulator : public rclcpp::Node {
 public:
     
   FlightforgeSimulator(rclcpp::NodeOptions options);
-  virtual void onInit();
 
 private:
-  ros::NodeHandle   nh_;
-  std::atomic<bool> is_initialized_;
+  rclcpp::CallbackGroup::SharedPtr cbgrp_main_;
+  rclcpp::CallbackGroup::SharedPtr cbgrp_status_;
+
+  rclcpp::TimerBase::SharedPtr timer_init_;
+  void                         timerInit();
+
+  rclcpp::Node::SharedPtr  node_;
+  rclcpp::Clock::SharedPtr clock_;
+  std::atomic<bool>        is_initialized_ = false;
+  
+  std::shared_ptr<mrs_lib::ScopeTimerLogger> scope_timer_logger_;
 
   std::shared_ptr<image_transport::ImageTransport> it_;
 
@@ -77,7 +88,7 @@ private:
   double _simulation_rate_;
   bool   _collisions_;
 
-  ros::Time  sim_time_;
+  rclcpp::Time sim_time_;
   std::mutex mutex_sim_time_;
 
   double _clock_min_dt_;
@@ -86,52 +97,52 @@ private:
 
   // | ------------------------- timers ------------------------- |
 
-  ros::WallTimer timer_dynamics_;
-  void           timerDynamics(const ros::WallTimerEvent& event);
+  rclcpp::TimerBase::SharedPtr timer_dynamics_;
+  void           timerDynamics();
 
-  ros::WallTimer timer_status_;
-  void           timerStatus(const ros::WallTimerEvent& event);
+  rclcpp::TimerBase::SharedPtr timer_status_;
+  void           timerStatus();
 
-  ros::WallTimer timer_time_sync_;
-  void           timerTimeSync(const ros::WallTimerEvent& event);
+  rclcpp::TimerBase::SharedPtr timer_time_sync_;
+  void           timerTimeSync();
 
-  ros::Timer timer_unreal_sync_;
-  void       timerUnrealSync(const ros::TimerEvent& event);
+  rclcpp::TimerBase::SharedPtr timer_unreal_sync_;
+  void       timerUnrealSync();
 
-  ros::Timer timer_rangefinder_;
-  void       timerRangefinder(const ros::TimerEvent& event);
+  rclcpp::TimerBase::SharedPtr timer_rangefinder_;
+  void       timerRangefinder();
 
-  ros::Timer timer_lidar_;
-  void       timerLidar(const ros::TimerEvent& event);
+  rclcpp::TimerBase::SharedPtr timer_lidar_;
+  void       timerLidar();
 
-  ros::Timer timer_seg_lidar_;
-  void       timerSegLidar(const ros::TimerEvent& event);
+  rclcpp::TimerBase::SharedPtr timer_seg_lidar_;
+  void       timerSegLidar();
 
-  ros::Timer timer_int_lidar_;
-  void       timerIntLidar(const ros::TimerEvent& event);
+  rclcpp::TimerBase::SharedPtr timer_int_lidar_;
+  void       timerIntLidar();
 
-  ros::Timer timer_rgb_;
-  void       timerRgb(const ros::TimerEvent& event);
+  rclcpp::TimerBase::SharedPtr timer_rgb_;
+  void       timerRgb();
 
-  ros::Timer timer_rgb_segmented_;
-  void       timerRgbSegmented(const ros::TimerEvent& event);
+  rclcpp::TimerBase::SharedPtr timer_rgb_segmented_;
+  void       timerRgbSegmented();
 
-  ros::Timer timer_depth_;
-  void       timerDepth(const ros::TimerEvent& event);
+  rclcpp::TimerBase::SharedPtr timer_depth_;
+  void       timerDepth();
 
-  ros::Timer timer_stereo_;
-  void       timerStereo(const ros::TimerEvent& event);
+  rclcpp::TimerBase::SharedPtr timer_stereo_;
+  void       timerStereo();
 
   // | --------------------- service servers -------------------- |
 
-  ros::ServiceServer service_server_realtime_factor_;
+  rclcpp::Service<mrs_msgs::srv::Float64Srv>::SharedPtr service_server_realtime_factor_;
 
-  bool callbackSetRealtimeFactor(mrs_msgs::Float64Srv::Request& req, mrs_msgs::Float64Srv::Response& res);
+  bool callbackSetRealtimeFactor(const std::shared_ptr<mrs_msgs::srv::Float64Srv::Request> request, const std::shared_ptr<mrs_msgs::srv::Float64Srv::Response> response);
 
-  std::vector<ros::ServiceClient> set_ground_z_clients_;
+  std::vector<rclcpp::Service<mrs_msgs::srv::Float64Srv>::SharedPtr> set_ground_z_clients_;
 
-  std::vector<ros::ServiceServer> service_gimbal_control_servers_;
-  bool callbackSetGimbalOrientation(mrs_uav_unreal_simulation::SetOrientation::Request& req, mrs_uav_unreal_simulation::SetOrientation::Response& res,
+  std::vector<rclcpp::Service<mrs_uav_unreal_simulation::SetOrientation>::SharedPtr> service_gimbal_control_servers_;
+  bool callbackSetGimbalOrientation(const std::shared_ptr<tutorial_interfaces::srv::SetOrientation::Request> request, const std::shared_ptr<tutorial_interfaces::srv::SetOrientation::Response> response,
                                     int uav_index);
 
   // | --------------------------- tfs -------------------------- |
@@ -141,11 +152,11 @@ private:
 
   // | ----------------------- camera info ---------------------- |
 
-  sensor_msgs::CameraInfo rgb_camera_info_;
-  sensor_msgs::CameraInfo stereo_camera_info_;
+  sensor_msgs::msg::CameraInfo rgb_camera_info_;
+  sensor_msgs::msg::CameraInfo stereo_camera_info_;
 
-  geometry_msgs::TransformStamped rgb_camera_tf_;
-  geometry_msgs::TransformStamped stereo_camera_tf_;
+  geometry_msgs::msg::TransformStamped rgb_camera_tf_;
+  geometry_msgs::msg::TransformStamped stereo_camera_tf_;
 
   // | --------- store current camera orientation -------- |
   std::vector<Eigen::Quaterniond> rgb_camera_orientations_;
@@ -153,7 +164,7 @@ private:
   // | --------------------------- rtf -------------------------- |
 
   double    actual_rtf_ = 1.0;
-  ros::Time last_sim_time_status_;
+  rclcpp::Time last_sim_time_status_;
 
   // | ------------------------- sensors ------------------------ |
 
@@ -477,14 +488,14 @@ private:
 
   // | ----------------------- publishers ----------------------- |
 
-  mrs_lib::PublisherHandler<rosgraph_msgs::Clock>     ph_clock_;
-  mrs_lib::PublisherHandler<geometry_msgs::PoseArray> ph_poses_;
+  mrs_lib::PublisherHandler<rosgraph_msgs::msg::Clock>     ph_clock_;
+  mrs_lib::PublisherHandler<geometry_msgs::msg::PoseArray> ph_poses_;
 
-  std::vector<mrs_lib::PublisherHandler<sensor_msgs::Range>> ph_rangefinders_;
+  std::vector<mrs_lib::PublisherHandler<sensor_msgs::msg::Range>> ph_rangefinders_;
 
-  std::vector<mrs_lib::PublisherHandler<sensor_msgs::PointCloud2>> ph_lidars_;
-  std::vector<mrs_lib::PublisherHandler<sensor_msgs::PointCloud2>> ph_seg_lidars_;
-  std::vector<mrs_lib::PublisherHandler<sensor_msgs::PointCloud2>> ph_int_lidars_;
+  std::vector<mrs_lib::PublisherHandler<sensor_msgs::msg::PointCloud2>> ph_lidars_;
+  std::vector<mrs_lib::PublisherHandler<sensor_msgs::msg::PointCloud2>> ph_seg_lidars_;
+  std::vector<mrs_lib::PublisherHandler<sensor_msgs::msg::PointCloud2>> ph_int_lidars_;
 
   std::vector<image_transport::Publisher> imp_rgb_;
   std::vector<image_transport::Publisher> imp_stereo_left_;
@@ -492,10 +503,10 @@ private:
   std::vector<image_transport::Publisher> imp_rgbd_segmented_;
   std::vector<image_transport::Publisher> imp_depth_;
 
-  std::vector<mrs_lib::PublisherHandler<sensor_msgs::CameraInfo>> ph_rgb_camera_info_;
-  std::vector<mrs_lib::PublisherHandler<sensor_msgs::CameraInfo>> ph_rgb_seg_camera_info_;
-  std::vector<mrs_lib::PublisherHandler<sensor_msgs::CameraInfo>> ph_stereo_left_camera_info_;
-  std::vector<mrs_lib::PublisherHandler<sensor_msgs::CameraInfo>> ph_stereo_right_camera_info_;
+  std::vector<mrs_lib::PublisherHandler<sensor_msgs::msg::CameraInfo>> ph_rgb_camera_info_;
+  std::vector<mrs_lib::PublisherHandler<sensor_msgs::msg::CameraInfo>> ph_rgb_seg_camera_info_;
+  std::vector<mrs_lib::PublisherHandler<sensor_msgs::msg::CameraInfo>> ph_stereo_left_camera_info_;
+  std::vector<mrs_lib::PublisherHandler<sensor_msgs::msg::CameraInfo>> ph_stereo_right_camera_info_;
 
   // | ------------------------- system ------------------------- |
 
@@ -503,7 +514,7 @@ private:
 
   // | -------------------------- time -------------------------- |
 
-  ros::Time last_published_time_;
+  rclcpp::Time   last_published_time_;
 
   // | ------------------------- methods ------------------------ |
 
@@ -511,13 +522,13 @@ private:
 
   // | --------------- dynamic reconfigure server --------------- |
 
-  boost::recursive_mutex                                    mutex_drs_;
-  typedef mrs_uav_unreal_simulation::unreal_simulatorConfig DrsConfig_t;
-  typedef dynamic_reconfigure::Server<DrsConfig_t>          Drs_t;
-  boost::shared_ptr<Drs_t>                                  drs_;
-  void                                                      callbackDrs(mrs_uav_unreal_simulation::unreal_simulatorConfig& config, uint32_t level);
-  DrsConfig_t                                               drs_params_;
-  std::mutex                                                mutex_drs_params_;
+  /* boost::recursive_mutex                                    mutex_drs_; */
+  /* typedef mrs_uav_unreal_simulation::unreal_simulatorConfig DrsConfig_t; */
+  /* typedef dynamic_reconfigure::Server<DrsConfig_t>          Drs_t; */
+  /* boost::shared_ptr<Drs_t>                                  drs_; */
+  /* void                                                      callbackDrs(mrs_uav_unreal_simulation::unreal_simulatorConfig& config, uint32_t level); */
+  /* DrsConfig_t                                               drs_params_; */
+  /* std::mutex                                                mutex_drs_params_; */
 
   // | ------------------------- Unreal ------------------------- |
 
@@ -545,7 +556,7 @@ private:
   // how much to add to unreal time to get to our wall time
   double        wall_time_offset_             = 0;
   double        wall_time_offset_drift_slope_ = 0;
-  ros::WallTime last_sync_time_;
+  rclcpp::Time last_sync_time_;
   std::mutex    mutex_wall_time_offset_;
 
   double                  ueds_fps_ = 0;
@@ -568,6 +579,14 @@ private:
 
 //}
 
+/* FlightforgeSimulator::FlightforgeSimulator() //{*/
+FlightforgeSimulator::FlightforgeSimulator(rclcpp::NodeOptions options) : Node("mrs_uav_flightforge_simulation", options){
+
+
+  timer_init_ = create_wall_timer(std::chrono::duration<double>(0.1s), std::bind(&FlightforgeSimulator::timerInit, this));
+}
+/*//}*/
+
 /* onInit() //{ */
 
 void UnrealSimulator::onInit() {
@@ -582,7 +601,7 @@ void UnrealSimulator::onInit() {
 
   srand(time(NULL));
 
-  sim_time_ = ros::Time(ros::WallTime::now().toSec());
+  sim_time_ = ros::Time(rclcpp::Time::now().toSec());
 
   last_published_time_  = sim_time_;
   last_sim_time_status_ = sim_time_;
@@ -1091,9 +1110,554 @@ void UnrealSimulator::onInit() {
 
 // | ------------------------- timers ------------------------- |
 
+  if (!(nh_.hasParam("/use_sim_time"))) {
+    nh_.setParam("/use_sim_time", true);
+  }
+
+  srand(time(NULL));
+
+  sim_time_ = ros::Time(rclcpp::Time::now().toSec());
+
+  last_published_time_  = sim_time_;
+  last_sim_time_status_ = sim_time_;
+
+  it_ = std::make_shared<image_transport::ImageTransport>(nh_);
+
+  mrs_lib::ParamLoader param_loader(nh_, "UnrealSimulator");
+
+  std::string custom_config_path;
+
+  param_loader.loadParam("custom_config", custom_config_path);
+
+  if (custom_config_path != "") {
+    param_loader.addYamlFile(custom_config_path);
+  }
+
+  param_loader.addYamlFileFromParam("config");
+  param_loader.addYamlFileFromParam("config_uavs");
+
+  param_loader.loadParam("graphics_settings", ueds_graphics_settings_enum_);
+
+  double clock_rate;
+  param_loader.loadParam("clock_rate", clock_rate);
+
+  drs_params_.paused = false;
+
+  std::vector<std::string> uav_names;
+
+  param_loader.loadParam("uav_names", uav_names);
+
+  for (size_t i = 0; i < uav_names.size(); i++) {
+
+    std::string uav_name = uav_names[i];
+
+    ROS_INFO("[UnrealSimulator]: initializing '%s'", uav_name.c_str());
+
+    uavs_.push_back(std::make_unique<mrs_multirotor_simulator::UavSystemRos>(nh_, uav_name));
+  }
+
+  // | ----------- initialize the Unreal Sim connector ---------- |
+
+  ueds_game_controller_ = std::make_unique<ueds_connector::GameModeController>(LOCALHOST, 8551);
+
+  while (true) {
+
+    bool connect_result = ueds_game_controller_->Connect();
+
+    if (connect_result != 1) {
+      ROS_ERROR("[UnrealSimulator]: Error connecting to Unreal's game mode controller, connect_result was %d", connect_result);
+    } else {
+      break;
+    }
+
+    // ros::Duration(1.0).sleep();
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+  }
+
+  // | ------------------ check the API version ----------------- |
+
+  auto [res, api_version] = ueds_game_controller_->GetApiVersion();
+  auto [api_version_major, api_version_minor] = api_version;
+
+  if (!res || api_version_major != API_VERSION_MAJOR || api_version_minor != API_VERSION_MINOR) {
+
+    ROS_ERROR("[UnrealSimulator]: the API versions don't match! (ROS side '%d.%d' != Unreal side '%d.%d')", API_VERSION_MAJOR, API_VERSION_MINOR, api_version_major, api_version_minor);
+    ROS_ERROR("[UnrealSimulator]:");
+    ROS_ERROR("[UnrealSimulator]: Solution:");
+    ROS_ERROR("[UnrealSimulator]:           1. make sure the mrs_uav_unreal_simulation package is up to date");
+    ROS_ERROR("[UnrealSimulator]:              sudo apt update && sudo apt upgrade");
+    ROS_ERROR("[UnrealSimulator]:");
+    ROS_ERROR("[UnrealSimulator]:           2. make sure you have the right version of the Unreal Simulator 'game'");
+    ROS_ERROR("[UnrealSimulator]:              download at: https://github.com/ctu-mrs/mrs_uav_unreal_simulation");
+    ROS_ERROR("[UnrealSimulator]:");
+
+    ros::shutdown();
+  }
+
+  // | --------------------- Set graphical settings and choose World Level --------------------- |
+
+  res = ueds_game_controller_->SwitchWorldLevel(ueds_connector::WorldName::Name2Id().at(ueds_world_level_name_enum_));
+  if (res) {
+    ROS_INFO("[UnrealSimulator] World was switched succesfully.");
+  } else {
+    ROS_ERROR("[UnrealSimulator] World was not switched succesfully.");
+  }
+
+  res = ueds_game_controller_->Disconnect();
+  if (res) {
+    ROS_INFO("[UnrealSimulator] ueds_game_controller_ was Disconnected succesfully.");
+  } else {
+    ROS_ERROR("[UnrealSimulator] ueds_game_controller_ was not Disconnected succesfully.");
+  }
+
+  std::this_thread::sleep_for(std::chrono::seconds(5));
+
+  while (true) {
+    bool connect_result = ueds_game_controller_->Connect();
+    if (connect_result != 1) {
+      ROS_ERROR("[UnrealSimulator]: Error connecting to Unreal's game mode controller, connect_result was %d", connect_result);
+    } else {
+      break;
+    }
+    // ros::Duration(1.0).sleep();
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+  }
+
+  res = ueds_game_controller_->SetGraphicsSettings(ueds_connector::GraphicsSettings::Name2Id().at(ueds_graphics_settings_enum_));
+
+  if (res) {
+    ROS_INFO("[UnrealSimulator]: Graphical Settings was set succesfully to '%s'", ueds_graphics_settings_enum_.c_str());
+  } else {
+    ROS_ERROR("[UnrealSimulator]: Graphical Settings was not set succesfully to '%s'", ueds_graphics_settings_enum_.c_str());
+  }
+
+  res = ueds_game_controller_->SetMutualDroneVisibility(uavs_mutual_visibility_); 
+  if (res) {
+    ROS_INFO("[UnrealSimulator]: Mutual Drone Visibility was succesfully set to %i.", uavs_mutual_visibility_);
+  } else {
+    ROS_ERROR("[UnrealSimulator]: Set Mutual Drone Visibility was NOT succesfull.");
+  }
+
+  res = ueds_game_controller_->SetWeather(ueds_connector::WeatherType::Type2Id().at(weather_type_));
+  if (res) {
+    ROS_INFO("[UnrealSimulator]: SetWeather successful.");
+  } else {
+    ROS_ERROR("[UnrealSimulator]: SetWeather error");
+  }
+
+  res = ueds_game_controller_->SetDatetime(daytime_.hour, daytime_.minute);
+  if (res) {
+    ROS_INFO("[UnrealSimulator]: SetDatetime successful.");
+  } else {
+    ROS_ERROR("[UnrealSimulator]: SetDatetime error");
+  }
+
+
+  // | --------------------- These graphical settings influence only Forest Game World --------------------- |
+
+  res = ueds_game_controller_->SetForestDensity(ueds_forest_density_);
+  if (res) {
+    ROS_INFO("[UnrealSimulator]: Forest Density was set succesfully to '%d'", ueds_forest_density_);
+  } else {
+    ROS_ERROR("[UnrealSimulator]: Forest Density wasn't set succesfully to '%d'", ueds_forest_density_);
+  }
+
+  res = ueds_game_controller_->SetForestHillyLevel(ueds_forest_hilly_level_);
+  if (res) {
+    ROS_INFO("[UnrealSimulator]: Forest Hilly Level was set succesfully to '%d'", ueds_forest_hilly_level_);
+  } else {
+    ROS_ERROR("[UnrealSimulator]: Forest Hilly Level wasn't set succesfully to '%d'", ueds_forest_hilly_level_);
+  }
+
+  std::this_thread::sleep_for(std::chrono::seconds(1));
+
+  // | --------------------- Spawn the UAVs --------------------- |
+
+  const auto [result, world_origin] = ueds_game_controller_->GetWorldOrigin();
+
+  if (!result) {
+    ROS_ERROR("[UnrealSimulator]: GameError: getting world origin");
+    ros::shutdown();
+  } else {
+    ueds_world_origin_ = world_origin;
+  }
+
+  for (size_t i = 0; i < uav_names.size(); i++) {
+
+    const std::string uav_name = uav_names[i];
+
+    mrs_multirotor_simulator::MultirotorModel::State uav_state = uavs_[i]->getState();
+
+    ueds_connector::Coordinates pos = position2ue(uav_state.x, ueds_world_origin_);
+
+    ROS_INFO("[UnrealSimulator]: %s spawning at [%.2lf, %.2lf, %.2lf] ...", uav_name.c_str(), uav_state.x.x(), uav_state.x.y(), uav_state.x.z());
+
+    std::string uav_frame;  // = "x500";
+    param_loader.loadParam(uav_names[i] + "/frame", uav_frame);
+
+    ROS_INFO("[UnrealSimulator]: Frame type to spawn is %s", uav_frame.c_str());
+
+    int uav_frame_id = ueds_connector::UavFrameType::Type2IdMesh().at(uav_frame);
+
+    auto [resSpawn, port] = ueds_game_controller_->SpawnDroneAtLocation(pos, uav_frame_id);
+
+    if (!resSpawn) {
+      ROS_ERROR("[UnrealSimulator]: failed to spawn %s", uav_names[i].c_str());
+      ros::shutdown();
+    }
+
+    ROS_INFO("[UnrealSimulator]: %s spawned", uav_name.c_str());
+
+    std::shared_ptr<ueds_connector::UedsConnector> ueds_connector = std::make_shared<ueds_connector::UedsConnector>(LOCALHOST, port);
+
+    ueds_connectors_.push_back(ueds_connector);
+
+
+    auto connect_result = ueds_connector->Connect();
+
+    if (connect_result != 1) {
+
+      ROS_ERROR("[UnrealSimulator]: %s - Error connecting to drone controller, connect_result was %d", uav_name.c_str(), connect_result);
+      ros::shutdown();
+
+    } else {
+
+      ROS_INFO("[UnrealSimulator]: %s - Connection succeed: %d", uav_name.c_str(), connect_result);
+
+      // ROS_INFO("[UnrealSimulator]: wait until UAV fall on the ground ... && uptade their world origin");
+
+      // std::this_thread::sleep_for(std::chrono::seconds(3));
+
+      // const auto [res, location] = ueds_connector->GetLocation();
+
+      // if (!res) {
+      //   ROS_ERROR("[UnrealSimulator]: %s - DroneError: getting location", uav_name.c_str());
+      //   ros::shutdown();
+      // } else {
+      //   ueds_world_origins_.push_back(location);
+      // }
+    }
+
+    ph_rangefinders_.push_back(mrs_lib::PublisherHandler<sensor_msgs::Range>(nh_, "/" + uav_name + "/rangefinder", 10));
+
+    ph_lidars_.push_back(mrs_lib::PublisherHandler<sensor_msgs::PointCloud2>(nh_, "/" + uav_name + "/lidar/points", 10));
+    ph_seg_lidars_.push_back(mrs_lib::PublisherHandler<sensor_msgs::PointCloud2>(nh_, "/" + uav_name + "/lidar_segmented/points", 10));
+    ph_int_lidars_.push_back(mrs_lib::PublisherHandler<sensor_msgs::PointCloud2>(nh_, "/" + uav_name + "/lidar_intensity/points", 10));
+
+    imp_rgb_.push_back(it_->advertise("/" + uav_name + "/rgb/image_raw", 10));
+    imp_stereo_left_.push_back(it_->advertise("/" + uav_name + "/stereo/left/image_raw", 10));
+    imp_stereo_right_.push_back(it_->advertise("/" + uav_name + "/stereo/right/image_raw", 10));
+    imp_rgbd_segmented_.push_back(it_->advertise("/" + uav_name + "/rgb_segmented/image_raw", 10));
+    imp_depth_.push_back(it_->advertise("/" + uav_name + "/depth/image_raw", 10));
+
+    ph_rgb_camera_info_.push_back(mrs_lib::PublisherHandler<sensor_msgs::CameraInfo>(nh_, "/" + uav_name + "/rgb/camera_info", 10));
+    ph_rgb_seg_camera_info_.push_back(mrs_lib::PublisherHandler<sensor_msgs::CameraInfo>(nh_, "/" + uav_name + "/rgb_segmented/camera_info", 10));
+
+    ph_stereo_left_camera_info_.push_back(mrs_lib::PublisherHandler<sensor_msgs::CameraInfo>(nh_, "/" + uav_name + "/stereo/left/camera_info", 10));
+    ph_stereo_right_camera_info_.push_back(mrs_lib::PublisherHandler<sensor_msgs::CameraInfo>(nh_, "/" + uav_name + "/stereo/right/camera_info", 10));
+
+    // | ------------------ set RGB camera config ----------------- |
+
+    {
+      ueds_connector::RgbCameraConfig cameraConfig{};
+
+      cameraConfig.width_                  = rgb_width_;
+      cameraConfig.height_                 = rgb_height_;
+      cameraConfig.fov_                    = rgb_fov_;
+      cameraConfig.offset_                 = ueds_connector::Coordinates(rgb_offset_x_ * 100.0, rgb_offset_y_ * 100.0, rgb_offset_z_ * 100.0);
+      cameraConfig.orientation_            = ueds_connector::Rotation(-rgb_rotation_pitch_, rgb_rotation_yaw_, rgb_rotation_roll_);
+      cameraConfig.enable_raytracing_      = rgb_enable_raytracing_;
+      cameraConfig.enable_hdr_             = rgb_enable_hdr_;
+      cameraConfig.enable_temporal_aa_     = rgb_enable_temporal_aa_;
+      cameraConfig.enable_motion_blur_     = rgb_enable_motion_blur_;
+      cameraConfig.motion_blur_amount_     = rgb_motion_blur_amount_;
+      cameraConfig.motion_blur_distortion_ = rgb_motion_blur_distortion_;
+
+      const auto res = ueds_connectors_[i]->SetRgbCameraConfig(cameraConfig);
+
+      last_rgb_ue_stamp_.push_back(0.0);
+      last_rgb_seg_ue_stamp_.push_back(0.0);
+
+      if (!res) {
+        ROS_ERROR("[UnrealSimulator]: failed to set camera config for uav %lu", i + 1);
+      } else {
+        ROS_INFO("[UnrealSimulator]: camera config set for uav%lu", i + 1);
+      }
+    }
+
+    // | ---------------- set Stereo camera config ---------------- |
+
+    {
+      ueds_connector::StereoCameraConfig cameraConfig{};
+
+      cameraConfig.width_              = stereo_width_;
+      cameraConfig.height_             = stereo_height_;
+      cameraConfig.fov_                = stereo_fov_;
+      cameraConfig.baseline_           = stereo_baseline_;
+      cameraConfig.offset_             = ueds_connector::Coordinates(stereo_offset_x_ * 100.0, stereo_offset_y_ * 100.0, stereo_offset_z_ * 100.0);
+      cameraConfig.orientation_        = ueds_connector::Rotation(-stereo_rotation_pitch_, stereo_rotation_yaw_, stereo_rotation_roll_);
+      cameraConfig.enable_raytracing_  = stereo_enable_raytracing_;
+      cameraConfig.enable_hdr_         = stereo_enable_hdr_;
+      cameraConfig.enable_temporal_aa_ = stereo_enable_temporal_aa_;
+
+      const auto res = ueds_connectors_[i]->SetStereoCameraConfig(cameraConfig);
+
+      last_stereo_ue_stamp_.push_back(0.0);
+
+      if (!res) {
+        ROS_ERROR("[UnrealSimulator]: failed to set camera config for uav %lu", i + 1);
+      } else {
+        ROS_INFO("[UnrealSimulator]: camera config set for uav%lu", i + 1);
+      }
+    }
+
+    // | -------------------- set LiDAR config -------------------- |
+
+    {
+      ueds_connector::LidarConfig lidarConfig{};
+
+      lidarConfig.BeamHorRays  = lidar_horizontal_rays_;
+      lidarConfig.BeamVertRays = lidar_vertical_rays_;
+      lidarConfig.FOVHorLeft   = lidar_horizontal_fov_left_;
+      lidarConfig.FOVHorRight  = lidar_horizontal_fov_right_;
+      lidarConfig.FOVVertUp    = lidar_vertical_fov_up_;
+      lidarConfig.FOVVertDown  = lidar_vertical_fov_down_;
+      lidarConfig.beamLength   = lidar_beam_length_ * 100.0;
+      lidarConfig.offset       = ueds_connector::Coordinates(lidar_offset_x_ * 100.0, lidar_offset_y_ * 100.0, lidar_offset_z_ * 100.0);
+      lidarConfig.orientation  = ueds_connector::Rotation(-lidar_rotation_pitch_, lidar_rotation_yaw_, lidar_rotation_roll_);
+      lidarConfig.showBeams    = lidar_show_beams_;
+      lidarConfig.Livox       = lidar_livox_;
+
+      const auto res = ueds_connectors_[i]->SetLidarConfig(lidarConfig);
+
+      if (!res) {
+        ROS_ERROR("[UnrealSimulator]: failed to set lidar config for uav %lu", i + 1);
+      } else {
+        ROS_INFO("[UnrealSimulator]: lidar config set for uav%lu", i + 1);
+      }
+    }
+  }
+
+  // ROS_INFO("[UnrealSimulator]: teleporting the UAVs to their spawn positions");
+
+  // updateUnrealPoses(true);
+
+  ROS_INFO("[UnrealSimulator]: Unreal UAVs are initialized");
+
+  // | --------------- dynamic reconfigure server --------------- |
+
+  drs_.reset(new Drs_t(mutex_drs_, nh_));
+  drs_->updateConfig(drs_params_);
+  Drs_t::CallbackType f = boost::bind(&UnrealSimulator::callbackDrs, this, _1, _2);
+  drs_->setCallback(f);
+
+  if (!param_loader.loadedSuccessfully()) {
+    ROS_ERROR("[UnrealSimulator]: could not load all parameters!");
+    ros::shutdown();
+  }
+
+  _clock_min_dt_ = 1.0 / clock_rate;
+
+  // | ----------------------- publishers ----------------------- |
+
+  ph_clock_ = mrs_lib::PublisherHandler<rosgraph_msgs::Clock>(nh_, "clock_out", 10, false);
+
+  ph_poses_ = mrs_lib::PublisherHandler<geometry_msgs::PoseArray>(nh_, "uav_poses_out", 10, false);
+
+  // | --------------------- service servers -------------------- |
+
+  service_server_realtime_factor_ = nh_.advertiseService("set_realtime_factor_in", &UnrealSimulator::callbackSetRealtimeFactor, this);
+
+  // | ------------------------- timers ------------------------- |
+
+  timer_dynamics_ = nh_.createWallTimer(ros::WallDuration(1.0 / (_simulation_rate_ * drs_params_.realtime_factor)), &UnrealSimulator::timerDynamics, this);
+
+  timer_status_ = nh_.createWallTimer(ros::WallDuration(1.0), &UnrealSimulator::timerStatus, this);
+
+  timer_time_sync_ = nh_.createWallTimer(ros::WallDuration(1.0), &UnrealSimulator::timerTimeSync, this);
+
+  timer_rangefinder_ = nh_.createTimer(ros::Duration(1.0 / drs_params_.rangefinder_rate), &UnrealSimulator::timerRangefinder, this);
+
+  timer_lidar_ = nh_.createTimer(ros::Duration(1.0 / drs_params_.lidar_rate), &UnrealSimulator::timerLidar, this);
+
+  timer_unreal_sync_ = nh_.createTimer(ros::Duration(1.0 / _simulation_rate_), &UnrealSimulator::timerUnrealSync, this);
+
+  timer_seg_lidar_ = nh_.createTimer(ros::Duration(1.0 / drs_params_.lidar_rate), &UnrealSimulator::timerSegLidar, this);
+
+  timer_int_lidar_ = nh_.createTimer(ros::Duration(1.0 / drs_params_.lidar_rate), &UnrealSimulator::timerIntLidar, this);
+
+  timer_rgb_ = nh_.createTimer(ros::Duration(1.0 / drs_params_.rgb_rate), &UnrealSimulator::timerRgb, this);
+
+  timer_stereo_ = nh_.createTimer(ros::Duration(1.0 / drs_params_.stereo_rate), &UnrealSimulator::timerStereo, this);
+
+  timer_rgb_segmented_ = nh_.createTimer(ros::Duration(1.0 / drs_params_.rgb_segmented_rate), &UnrealSimulator::timerRgbSegmented, this);
+
+  timer_depth_ = nh_.createTimer(ros::Duration(1.0 / drs_params_.rgb_depth_rate), &UnrealSimulator::timerDepth, this);
+
+
+  rgb_camera_orientations_.resize(uavs_.size());
+  set_ground_z_clients_.resize(uav_names.size());
+  for (size_t i = 0; i < uav_names.size(); i++) {
+    std::string service_name = "/" + uav_names[i] + "/set_ground_z";
+    set_ground_z_clients_[i] = nh_.serviceClient<mrs_msgs::Float64Srv>(service_name);
+
+
+    std::string gimbal_service_name = "/" + uav_names[i] + "/set_gimbal_orientation";  // Example service name
+                                                                                       // Use a lambda instead of boost::bind
+    service_gimbal_control_servers_.push_back(
+        nh_.advertiseService<mrs_uav_unreal_simulation::SetOrientation::Request, mrs_uav_unreal_simulation::SetOrientation::Response>(
+            gimbal_service_name, [this, i](mrs_uav_unreal_simulation::SetOrientation::Request& req, mrs_uav_unreal_simulation::SetOrientation::Response& res) {
+              return callbackSetGimbalOrientation(req, res, i);
+            }));
+  }
+
+
+
+/* timerInit() //{ */
+
+void FlightforgeSimulator::timerInit() {
+
+  node_  = this->shared_from_this();
+  clock_ = node_->get_clock();
+
+  srand(time(NULL));
+
+  RCLCPP_INFO(node_->get_logger(), "initializing");
+
+  cbgrp_main_   = create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
+  cbgrp_status_ = create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
+
+  mrs_lib::ParamLoader param_loader(node_, this->get_name());
+
+  // load custom config
+
+  std::string custom_config_path;
+  param_loader.loadParam("custom_config", custom_config_path);
+
+  if (custom_config_path != "") {
+    RCLCPP_INFO(node_->get_logger(), "loading custom config '%s", custom_config_path.c_str());
+    param_loader.addYamlFile(custom_config_path);
+  }
+
+  // load other configs
+
+  std::vector<std::string> config_files;
+  param_loader.loadParam("simulator_configs", config_files);
+
+  for (auto config_file : config_files) {
+    RCLCPP_INFO(node_->get_logger(), "loading config file '%s'", config_file.c_str());
+    param_loader.addYamlFile(config_file);
+  }
+
+  param_loader.loadParam("simulation_rate", _simulation_rate_);
+  param_loader.loadParam("clock_rate", _clock_rate_);
+
+  if (_clock_rate_ < _simulation_rate_) {
+    RCLCPP_ERROR(get_logger(), "clock_rate (%.2f Hz) should be higher than simulation rate (%.2f Hz)!", _clock_rate_, _simulation_rate_);
+    rclcpp::shutdown();
+    exit(1);
+  }
+
+  param_loader.loadParam("realtime_factor", drs_params_.realtime_factor);
+  this->set_parameter(rclcpp::Parameter("dynamic/realtime_factor", drs_params_.realtime_factor));
+
+  param_loader.loadParam("collisions/enabled", drs_params_.collisions_enabled);
+  this->set_parameter(rclcpp::Parameter("dynamic/collisions_enabled", drs_params_.collisions_enabled));
+
+  param_loader.loadParam("collisions/crash", drs_params_.collisions_crash);
+  this->set_parameter(rclcpp::Parameter("dynamic/collisions_crash", drs_params_.collisions_crash));
+
+  param_loader.loadParam("collisions/rebounce", drs_params_.collisions_rebounce);
+  this->set_parameter(rclcpp::Parameter("dynamic/collisions_rebounce", drs_params_.collisions_rebounce));
+
+  param_loader.loadParam("frames/world/name", _world_frame_name_);
+
+  bool sim_time_from_wall_time;
+  param_loader.loadParam("sim_time_from_wall_time", sim_time_from_wall_time);
+
+  if (sim_time_from_wall_time) {
+    sim_time_       = clock_->now();
+    last_step_time_ = clock_->now();
+  } else {
+    sim_time_       = rclcpp::Time(0, 0, RCL_ROS_TIME);
+    last_step_time_ = rclcpp::Time(0, 0, RCL_ROS_TIME);
+  }
+
+  last_sim_time_status_ = sim_time_;
+
+  drs_params_.paused = false;
+
+  tf_broadcaster_ = std::make_shared<mrs_lib::TransformBroadcaster>(node_);
+
+  std::vector<std::string> uav_names;
+
+  param_loader.loadParam("uav_names", uav_names);
+
+  for (size_t i = 0; i < uav_names.size(); i++) {
+
+    std::string uav_name = uav_names.at(i);
+
+    RCLCPP_INFO(get_logger(), "initializing '%s'", uav_name.c_str());
+
+    UavSystemRos_CommonHandlers_t common_handlers;
+
+    common_handlers.node                  = node_;
+    common_handlers.uav_name              = uav_name;
+    common_handlers.transform_broadcaster = tf_broadcaster_;
+
+    uavs_.push_back(std::make_unique<UavSystemRos>(common_handlers));
+  }
+
+  RCLCPP_INFO(node_->get_logger(), "all uavs initialized");
+
+  // | --------------- dynamic reconfigure server --------------- |
+
+  if (!param_loader.loadedSuccessfully()) {
+    RCLCPP_ERROR(get_logger(), "could not load all parameters!");
+    rclcpp::shutdown();
+  }
+
+  // | ---------------- bind param server callback -------------- |
+
+  param_callback_handle_ = add_on_set_parameters_callback(std::bind(&MultirotorSimulator::callbackParameters, this, std::placeholders::_1));
+
+  // | ----------------------- publishers ----------------------- |
+
+  ph_clock_ = mrs_lib::PublisherHandler<rosgraph_msgs::msg::Clock>(node_, "~/clock_out");
+
+  ph_poses_ = mrs_lib::PublisherHandler<geometry_msgs::msg::PoseArray>(node_, "~/uav_poses_out");
+
+  // | ------------------------- timers ------------------------- |
+
+  timer_main_ = create_wall_timer(std::chrono::duration<double>(1.0 / (_clock_rate_ * drs_params_.realtime_factor)), std::bind(&MultirotorSimulator::timerMain, this), cbgrp_main_);
+
+  timer_status_ = create_wall_timer(std::chrono::duration<double>(1.0), std::bind(&MultirotorSimulator::timerStatus, this), cbgrp_status_);
+
+  // | ----------------------- scope timer ---------------------- |
+
+  scope_timer_logger_ = std::make_shared<mrs_lib::ScopeTimerLogger>(node_, "", false);
+
+
+  // | -------------------- finishing methods ------------------- |
+
+  fabricateCamInfo();
+
+  publishStaticTfs();
+
+  // | ----------------------- finish init ---------------------- |
+
+  is_initialized_ = true;
+
+  RCLCPP_INFO(get_logger(), "FlightForge initialized");
+
+  timer_init_->cancel();
+}
+
+//}
+
 /* timerDynamics() //{ */
 
-void UnrealSimulator::timerDynamics([[maybe_unused]] const ros::WallTimerEvent& event) {
+void UnrealSimulator::timerDynamics([[maybe_unused]] const rclcpp::TimerEvent& event) {
 
   if (!is_initialized_) {
     return;
