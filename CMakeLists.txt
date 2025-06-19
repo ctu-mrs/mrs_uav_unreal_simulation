@@ -47,7 +47,10 @@ set(DEPENDENCIES
   pcl_ros
   pcl_conversions
   Eigen3
-  )
+  ament_cmake
+  rosidl_default_generators
+  tutorial_interfaces
+)
 
 
 set(LIBRARIES
@@ -59,6 +62,13 @@ set(LIBRARIES
 foreach(DEP IN LISTS DEPENDENCIES)
   find_package(${DEP} REQUIRED)
 endforeach()
+
+find_package(rosidl_default_generators REQUIRED)
+
+rosidl_generate_interfaces(${PROJECT_NAME}
+  "srv/SetOrientation.srv"
+  DEPENDENCIES geometry_msgs
+)
 
 include_directories(
   include
@@ -106,6 +116,10 @@ ament_target_dependencies(MrsUavFlightforgeSimulation_FlightforgeSimulator
   cv_bridge
   pcl_ros
   pcl_conversions
+  rosidl_default_generators
+  ${DEPENDENCIES}
+  geometry_msgs
+  tutorial_interfaces
 )
 ## | ---------------------- HW Api Plugin --------------------- |
 
@@ -159,10 +173,6 @@ pluginlib_export_plugin_description_file(mrs_uav_hw_api plugins.xml)
 #   CATKIN_DEPENDS ${CATKIN_DEPENDENCIES}
 #   )
 
-# find_package(rosidl_default_generators REQUIRED)
-# rosidl_generate_interfaces(${PROJECT_NAME}
-#   "srv/SetOrientation.srv"
-# )
 
 
 ## --------------------------------------------------------------
