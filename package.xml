@@ -21,7 +21,6 @@
   <depend>pluginlib</depend>
   <depend>builtin_interfaces</depend>
 
-  <depend>geometry_msgs</depend>
   <depend>mrs_lib</depend>
   <depend>mrs_msgs</depend>
   <depend>mrs_uav_hw_api</depend>
@@ -35,6 +34,12 @@
   <depend>image_transport</depend>
   <depend>pcl_ros</depend>
   <depend>pcl_conversions</depend>
+  
+  <depend>geometry_msgs</depend>
+  <build_depend>rosidl_default_generators</build_depend>
+  <exec_depend>rosidl_default_runtime</exec_depend>
+  <member_of_group>rosidl_interface_packages</member_of_group>
+  <depend>tutorial_interfaces</depend>
 
   <export>
     <build_type>ament_cmake</build_type>
