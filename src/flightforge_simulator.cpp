@@ -14,8 +14,11 @@
 #include <mrs_lib/timer_handler.h>
 #include <mrs_lib/scope_timer.h>
 #include <mrs_lib/transform_broadcaster.h>
+#include <mrs_lib/attitude_converter.h>
 #include <tf2_ros/static_transform_broadcaster.h>
 #include <tf2_ros/transform_broadcaster.h>
+#include <tf2/LinearMath/Vector3.h>
+#include <tf2/LinearMath/Quaternion.h>
 
 #include <Eigen/Dense>
 
@@ -34,7 +37,6 @@
 #include <flight_forge_connector/flight_forge_connector.h>
 #include <flight_forge_connector/game_mode_controller.h>
 
-#include <pcl_ros/transforms.hpp>
 #include <pcl/point_types.h>
 #include <pcl/conversions.h>
 #include <pcl/io/pcd_io.h>
@@ -43,13 +45,16 @@
 
 #include <random>
 #include <vector>
-/* TODO: Add the services */
-/* #include "mrs_uav_flightforge_simulation/srv/set_orientation.hpp" */
-/* #include <mrs_uav_flightforge_simulation/srv/set_orientation.hpp> */
-#include <tutorial_interfaces/srv/set_orientation.hpp>
+#include <chrono>
+
+#include <mrs_msgs/srv/float64_srv.hpp>
+#include <mrs_uav_flightforge_simulation/srv/set_orientation.hpp>
+
 //}
 
 /* defines //{ */
+
+using namespace std::chrono_literals;
 
 using PCLPoint               = pcl::PointXYZ;
 using PCLPointCloud          = pcl::PointCloud<PCLPoint>;
@@ -58,7 +63,7 @@ using PCLPointCloudIntensity = pcl::PointCloud<pcl::PointXYZI>;
 
 //}
 
-namespace mrs_uav_unreal_simulation
+namespace mrs_uav_flightforge_simulation
 {
 
 /* class FlightforgeSimulator //{ */
@@ -66,93 +71,129 @@ namespace mrs_uav_unreal_simulation
 class FlightforgeSimulator : public rclcpp::Node {
 
 public:
-    
   FlightforgeSimulator(rclcpp::NodeOptions options);
 
 private:
+  // | --------------------- ROS 2 infrastructure --------------------- |
   rclcpp::CallbackGroup::SharedPtr cbgrp_main_;
+  rclcpp::CallbackGroup::SharedPtr cbgrp_sensors_;
   rclcpp::CallbackGroup::SharedPtr cbgrp_status_;
 
   rclcpp::TimerBase::SharedPtr timer_init_;
   void                         timerInit();
 
-  rclcpp::Node::SharedPtr  node_;
-  rclcpp::Clock::SharedPtr clock_;
-  std::atomic<bool>        is_initialized_ = false;
-  
-  std::shared_ptr<mrs_lib::ScopeTimerLogger> scope_timer_logger_;
+  std::atomic<bool> is_initialized_ = false;
 
+  std::shared_ptr<mrs_lib::ScopeTimerLogger>       scope_timer_logger_;
   std::shared_ptr<image_transport::ImageTransport> it_;
 
   // | ------------------------- params ------------------------- |
-
-  double _simulation_rate_;
-  bool   _collisions_;
-
-  rclcpp::Time sim_time_;
-  std::mutex mutex_sim_time_;
-
-  double _clock_min_dt_;
-
+  double      _simulation_rate_;
+  double      _clock_rate_;
   std::string _world_frame_name_;
+  bool        _collisions_;
+
+  // | --------------------- dynamic params --------------------- |
+  double realtime_factor_;
+  bool   dynamic_rtf_;
+  bool   paused_;
+
+  bool   rangefinder_enabled_;
+  double rangefinder_rate_;
+
+  bool   lidar_enabled_;
+  double lidar_rate_;
+  bool   lidar_seg_enabled_;
+  double lidar_seg_rate_;
+  bool   lidar_int_enabled_;
+  double lidar_int_rate_;
+  bool   lidar_noise_enabled_;
+  double lidar_std_at_1m_;
+  double lidar_std_slope_;
+
+  bool   rgb_enabled_;
+  double rgb_rate_;
+  bool   rgb_segmented_enabled_;
+  double rgb_segmented_rate_;
+  bool   rgb_depth_enabled_;
+  double rgb_depth_rate_;
+
+  bool   stereo_enabled_;
+  double stereo_rate_;
+
+  double lidar_int_value_grass_;
+  double lidar_int_value_road_;
+  double lidar_int_value_tree_;
+  double lidar_int_value_building_;
+  double lidar_int_value_fence_;
+  double lidar_int_value_dirt_road_;
+  double lidar_int_value_other_;
+  bool   lidar_int_noise_enabled_;
+  double lidar_int_std_at_1m_;
+  double lidar_int_std_slope_;
+
+  // | -------------------- parameter callbacks ------------------- |
+  rcl_interfaces::msg::SetParametersResult parametersCallback(const std::vector<rclcpp::Parameter>& parameters);
+  OnSetParametersCallbackHandle::SharedPtr param_callback_handle_;
+
+  // | -------------------------- time -------------------------- |
+  rclcpp::Time sim_time_;
+  std::mutex   mutex_sim_time_;
+  double       _clock_min_dt_;
 
   // | ------------------------- timers ------------------------- |
-
   rclcpp::TimerBase::SharedPtr timer_dynamics_;
-  void           timerDynamics();
+  void                         timerDynamics();
 
   rclcpp::TimerBase::SharedPtr timer_status_;
-  void           timerStatus();
+  void                         timerStatus();
 
   rclcpp::TimerBase::SharedPtr timer_time_sync_;
-  void           timerTimeSync();
+  void                         timerTimeSync();
 
   rclcpp::TimerBase::SharedPtr timer_unreal_sync_;
-  void       timerUnrealSync();
+  void                         timerUnrealSync();
 
   rclcpp::TimerBase::SharedPtr timer_rangefinder_;
-  void       timerRangefinder();
+  void                         timerRangefinder();
 
   rclcpp::TimerBase::SharedPtr timer_lidar_;
-  void       timerLidar();
+  void                         timerLidar();
 
   rclcpp::TimerBase::SharedPtr timer_seg_lidar_;
-  void       timerSegLidar();
+  void                         timerSegLidar();
 
   rclcpp::TimerBase::SharedPtr timer_int_lidar_;
-  void       timerIntLidar();
+  void                         timerIntLidar();
 
   rclcpp::TimerBase::SharedPtr timer_rgb_;
-  void       timerRgb();
+  void                         timerRgb();
 
   rclcpp::TimerBase::SharedPtr timer_rgb_segmented_;
-  void       timerRgbSegmented();
+  void                         timerRgbSegmented();
 
   rclcpp::TimerBase::SharedPtr timer_depth_;
-  void       timerDepth();
+  void                         timerDepth();
 
   rclcpp::TimerBase::SharedPtr timer_stereo_;
-  void       timerStereo();
+  void                         timerStereo();
 
   // | --------------------- service servers -------------------- |
-
   rclcpp::Service<mrs_msgs::srv::Float64Srv>::SharedPtr service_server_realtime_factor_;
+  void callbackSetRealtimeFactor(const std::shared_ptr<mrs_msgs::srv::Float64Srv::Request> request, std::shared_ptr<mrs_msgs::srv::Float64Srv::Response> response);
 
-  bool callbackSetRealtimeFactor(const std::shared_ptr<mrs_msgs::srv::Float64Srv::Request> request, const std::shared_ptr<mrs_msgs::srv::Float64Srv::Response> response);
+  std::vector<rclcpp::Client<mrs_msgs::srv::Float64Srv>::SharedPtr> set_ground_z_clients_;
 
-  std::vector<rclcpp::Service<mrs_msgs::srv::Float64Srv>::SharedPtr> set_ground_z_clients_;
-
-  std::vector<rclcpp::Service<mrs_uav_unreal_simulation::SetOrientation>::SharedPtr> service_gimbal_control_servers_;
-  bool callbackSetGimbalOrientation(const std::shared_ptr<tutorial_interfaces::srv::SetOrientation::Request> request, const std::shared_ptr<tutorial_interfaces::srv::SetOrientation::Response> response,
-                                    int uav_index);
+  std::vector<rclcpp::Service<tutorial_interfaces::srv::SetOrientation>::SharedPtr> service_gimbal_control_servers_;
+  void                                                                            callbackSetGimbalOrientation(
+      const std::shared_ptr<tutorial_interfaces::srv::SetOrientation::Request> request, std::shared_ptr<tutorial_interfaces::srv::SetOrientation::Response> response,
+      int uav_index);
 
   // | --------------------------- tfs -------------------------- |
-
-  tf2_ros::StaticTransformBroadcaster static_broadcaster_;
-  tf2_ros::TransformBroadcaster       dynamic_broadcaster_;
+  std::shared_ptr<tf2_ros::StaticTransformBroadcaster> static_broadcaster_;
+  std::shared_ptr<tf2_ros::TransformBroadcaster>       dynamic_broadcaster_;
 
   // | ----------------------- camera info ---------------------- |
-
   sensor_msgs::msg::CameraInfo rgb_camera_info_;
   sensor_msgs::msg::CameraInfo stereo_camera_info_;
 
@@ -163,12 +204,10 @@ private:
   std::vector<Eigen::Quaterniond> rgb_camera_orientations_;
 
   // | --------------------------- rtf -------------------------- |
-
-  double    actual_rtf_ = 1.0;
+  double       actual_rtf_ = 1.0;
   rclcpp::Time last_sim_time_status_;
 
   // | ------------------------- sensors ------------------------ |
-
   double lidar_horizontal_fov_left_;
   double lidar_horizontal_fov_right_;
   double lidar_vertical_fov_up_;
@@ -215,280 +254,37 @@ private:
   bool   stereo_enable_temporal_aa_;
   bool   stereo_enable_raytracing_;
 
-  double lidar_int_grass;
-  double lidar_int_road;
-  double lidar_int_tree;
-  double lidar_int_building;
-  double lidar_int_fence;
-  double lidar_int_dirt_road;
-  double lidar_int_other;
-  bool   lidar_int_noise;
-
   // segmentation decode array//{
   uint8_t seg_rgb_[256][3] = {
-      255, 255, 255,
-      153, 108, 6 ,
-      112, 105, 191 ,
-      89, 121, 72 ,
-      190, 225, 64 ,
-      206, 190, 59 ,
-      81, 13, 36 ,
-      115, 176, 195 ,
-      161, 171, 27 ,
-      135, 169, 180 ,
-      29, 26, 199 ,
-      102, 16, 239 ,
-      242, 107, 146 ,
-      156, 198, 23 ,
-      49, 89, 160 ,
-      68, 218, 116 ,
-      11, 236, 9 ,
-      196, 30, 8 ,
-      121, 67, 28 ,
-      0, 53, 65 ,
-      146, 52, 70 ,
-      226, 149, 143 ,
-      151, 126, 171 ,
-      194, 39, 7 ,
-      205, 120, 161 ,
-      212, 51, 60 ,
-      211, 80, 208 ,
-      189, 135, 188 ,
-      54, 72, 205 ,
-      103, 252, 157 ,
-      124, 21, 123 ,
-      19, 132, 69 ,
-      195, 237, 132 ,
-      94, 253, 175 ,
-      182, 251, 87 ,
-      90, 162, 242 ,
-      199, 29, 1 ,
-      254, 12, 229 ,
-      35, 196, 244 ,
-      220, 163, 49 ,
-      86, 254, 214 ,
-      152, 3, 129 ,
-      92, 31, 106 ,
-      207, 229, 90 ,
-      125, 75, 48 ,
-      98, 55, 74 ,
-      126, 129, 238 ,
-      222, 153, 109 ,
-      85, 152, 34 ,
-      173, 69, 31 ,
-      37, 128, 125 ,
-      58, 19, 33 ,
-      134, 57, 119 ,
-      218, 124, 115 ,
-      120, 0, 200 ,
-      225, 131, 92 ,
-      246, 90, 16 ,
-      51, 155, 241 ,
-      202, 97, 155 ,
-      184, 145, 182 ,
-      96, 232, 44 ,
-      133, 244, 133 ,
-      180, 191, 29 ,
-      1, 222, 192 ,
-      99, 242, 104 ,
-      91, 168, 219 ,
-      65, 54, 217 ,
-      148, 66, 130 ,
-      203, 102, 204 ,
-      216, 78, 75 ,
-      234, 20, 250 ,
-      109, 206, 24 ,
-      164, 194, 17 ,
-      157, 23, 236 ,
-      158, 114, 88 ,
-      245, 22, 110 ,
-      67, 17, 35 ,
-      181, 213, 93 ,
-      170, 179, 42 ,
-      52, 187, 148 ,
-      247, 200, 111 ,
-      25, 62, 174 ,
-      100, 25, 240 ,
-      191, 195, 144 ,
-      252, 36, 67 ,
-      241, 77, 149 ,
-      237, 33, 141 ,
-      119, 230, 85 ,
-      28, 34, 108 ,
-      78, 98, 254 ,
-      114, 161, 30 ,
-      75, 50, 243 ,
-      66, 226, 253 ,
-      46, 104, 76 ,
-      8, 234, 216 ,
-      15, 241, 102 ,
-      93, 14, 71 ,
-      192, 255, 193 ,
-      253, 41, 164 ,
-      24, 175, 120 ,
-      185, 243, 231 ,
-      169, 233, 97 ,
-      243, 215, 145 ,
-      72, 137, 21 ,
-      160, 113, 101 ,
-      214, 92, 13 ,
-      167, 140, 147 ,
-      101, 109, 181 ,
-      53, 118, 126 ,
-      3, 177, 32 ,
-      40, 63, 99 ,
-      186, 139, 153 ,
-      88, 207, 100 ,
-      71, 146, 227 ,
-      236, 38, 187 ,
-      215, 4, 215 ,
-      18, 211, 66 ,
-      113, 49, 134 ,
-      47, 42, 63 ,
-      219, 103, 127 ,
-      57, 240, 137 ,
-      227, 133, 211 ,
-      145, 71, 201 ,
-      217, 173, 183 ,
-      250, 40, 113 ,
-      208, 125, 68 ,
-      224, 186, 249 ,
-      69, 148, 46 ,
-      239, 85, 20 ,
-      108, 116, 224 ,
-      56, 214, 26 ,
-      179, 147, 43 ,
-      48, 188, 172 ,
-      221, 83, 47 ,
-      155, 166, 218 ,
-      62, 217, 189 ,
-      198, 180, 122 ,
-      201, 144, 169 ,
-      132, 2, 14 ,
-      128, 189, 114 ,
-      163, 227, 112 ,
-      45, 157, 177 ,
-      64, 86, 142 ,
-      118, 193, 163 ,
-      14, 32, 79 ,
-      200, 45, 170 ,
-      74, 81, 2 ,
-      59, 37, 212 ,
-      73, 35, 225 ,
-      95, 224, 39 ,
-      84, 170, 220 ,
-      159, 58, 173 ,
-      17, 91, 237 ,
-      31, 95, 84 ,
-      34, 201, 248 ,
-      63, 73, 209 ,
-      129, 235, 107 ,
-      231, 115, 40 ,
-      36, 74, 95 ,
-      238, 228, 154 ,
-      61, 212, 54 ,
-      13, 94, 165 ,
-      141, 174, 0 ,
-      140, 167, 255 ,
-      117, 93, 91 ,
-      183, 10, 186 ,
-      165, 28, 61 ,
-      144, 238, 194 ,
-      12, 158, 41 ,
-      76, 110, 234 ,
-      150, 9, 121 ,
-      142, 1, 246 ,
-      230, 136, 198 ,
-      5, 60, 233 ,
-      232, 250, 80 ,
-      143, 112, 56 ,
-      187, 70, 156 ,
-      2, 185, 62 ,
-      138, 223, 226 ,
-      122, 183, 222 ,
-      166, 245, 3 ,
-      175, 6, 140 ,
-      240, 59, 210 ,
-      248, 44, 10 ,
-      83, 82, 52 ,
-      223, 248, 167 ,
-      87, 15, 150 ,
-      111, 178, 117 ,
-      197, 84, 22 ,
-      235, 208, 124 ,
-      9, 76, 45 ,
-      176, 24, 50 ,
-      154, 159, 251 ,
-      149, 111, 207 ,
-      168, 231, 15 ,
-      209, 247, 202 ,
-      80, 205, 152 ,
-      178, 221, 213 ,
-      27, 8, 38 ,
-      244, 117, 51 ,
-      107, 68, 190 ,
-      23, 199, 139 ,
-      171, 88, 168 ,
-      136, 202, 58 ,
-      6, 46, 86 ,
-      105, 127, 176 ,
-      174, 249, 197 ,
-      172, 172, 138 ,
-      228, 142, 81 ,
-      7, 204, 185 ,
-      22, 61, 247 ,
-      233, 100, 78 ,
-      127, 65, 105 ,
-      33, 87, 158 ,
-      139, 156, 252 ,
-      42, 7, 136 ,
-      20, 99, 179 ,
-      79, 150, 223 ,
-      131, 182, 184 ,
-      110, 123, 37 ,
-      60, 138, 96 ,
-      210, 96, 94 ,
-      123, 48, 18 ,
-      137, 197, 162 ,
-      188, 18, 5 ,
-      39, 219, 151 ,
-      204, 143, 135 ,
-      249, 79, 73 ,
-      77, 64, 178 ,
-      41, 246, 77 ,
-      16, 154, 4 ,
-      116, 134, 19 ,
-      4, 122, 235 ,
-      177, 106, 230 ,
-      21, 119, 12 ,
-      104, 5, 98 ,
-      50, 130, 53 ,
-      30, 192, 25 ,
-      26, 165, 166 ,
-      10, 160, 82 ,
-      106, 43, 131 ,
-      44, 216, 103 ,
-      255, 101, 221 ,
-      32, 151, 196 ,
-      213, 220, 89 ,
-      70, 209, 228 ,
-      97, 184, 83 ,
-      82, 239, 232 ,
-      251, 164, 128 ,
-      193, 11, 245 ,
-      38, 27, 159 ,
-      229, 141, 203 ,
-      130, 56, 55 ,
-      147, 210, 11 ,
-      162, 203, 118 ,
-      0, 0, 0 
-  };
-/*//}*/
-
-  // clang-format on
+      255, 255, 255, 153, 108, 6,   112, 105, 191, 89,  121, 72,  190, 225, 64,  206, 190, 59,  81,  13,  36,  115, 176, 195, 161, 171, 27,  135, 169,
+      180, 29,  26,  199, 102, 16,  239, 242, 107, 146, 156, 198, 23,  49,  89,  160, 68,  218, 116, 11,  236, 9,   196, 30,  8,   121, 67,  28,  0,   53,
+      65,  146, 52,  70,  226, 149, 143, 151, 126, 171, 194, 39,  7,   205, 120, 161, 212, 51,  60,  211, 80,  208, 189, 135, 188, 54,  72,  205, 103, 252,
+      157, 124, 21,  123, 19,  132, 69,  195, 237, 132, 94,  253, 175, 182, 251, 87,  90,  162, 242, 199, 29,  1,   254, 12,  229, 35,  196, 244, 220, 163,
+      49,  86,  254, 214, 152, 3,   129, 92,  31,  106, 207, 229, 90,  125, 75,  48,  98,  55,  74,  126, 129, 238, 222, 153, 109, 85,  152, 34,  173, 69,
+      31,  37,  128, 125, 58,  19,  33,  134, 57,  119, 218, 124, 115, 120, 0,   200, 225, 131, 92,  246, 90,  16,  51,  155, 241, 202, 97,  155, 184, 145,
+      182, 96,  232, 44,  133, 244, 133, 180, 191, 29,  1,   222, 192, 99,  242, 104, 91,  168, 219, 65,  54,  217, 148, 66,  130, 203, 102, 204, 216, 78,
+      75,  234, 20,  250, 109, 206, 24,  164, 194, 17,  157, 23,  236, 158, 114, 88,  245, 22,  110, 67,  17,  35,  181, 213, 93,  170, 179, 42,  52,  187,
+      148, 247, 200, 111, 25,  62,  174, 100, 25,  240, 191, 195, 144, 252, 36,  67,  241, 77,  149, 237, 33,  141, 119, 230, 85,  28,  34,  108, 78,  98,
+      254, 114, 161, 30,  75,  50,  243, 66,  226, 253, 46,  104, 76,  8,   234, 216, 15,  241, 102, 93,  14,  71,  192, 255, 193, 253, 41,  164, 24,  175,
+      120, 185, 243, 231, 169, 233, 97,  243, 215, 145, 72,  137, 21,  160, 113, 101, 214, 92,  13,  167, 140, 147, 101, 109, 181, 53,  118, 126, 3,   177,
+      32,  40,  63,  99,  186, 139, 153, 88,  207, 100, 71,  146, 227, 236, 38,  187, 215, 4,   215, 18,  211, 66,  113, 49,  134, 47,  42,  63,  219, 103,
+      127, 57,  240, 137, 227, 133, 211, 145, 71,  201, 217, 173, 183, 250, 40,  113, 208, 125, 68,  224, 186, 249, 69,  148, 46,  239, 85,  20,  108, 116,
+      224, 56,  214, 26,  179, 147, 43,  48,  188, 172, 221, 83,  47,  155, 166, 218, 62,  217, 189, 198, 180, 122, 201, 144, 169, 132, 2,   14,  128, 189,
+      114, 163, 227, 112, 45,  157, 177, 64,  86,  142, 118, 193, 163, 14,  32,  79,  200, 45,  170, 74,  81,  2,   59,  37,  212, 73,  35,  225, 95,  224,
+      39,  84,  170, 220, 159, 58,  173, 17,  91,  237, 31,  95,  84,  34,  201, 248, 63,  73,  209, 129, 235, 107, 231, 115, 40,  36,  74,  95,  238, 228,
+      154, 61,  212, 54,  13,  94,  165, 141, 174, 0,   140, 167, 255, 117, 93,  91,  183, 10,  186, 165, 28,  61,  144, 238, 194, 12,  158, 41,  76,  110,
+      234, 150, 9,   121, 142, 1,   246, 230, 136, 198, 5,   60,  233, 232, 250, 80,  143, 112, 56,  187, 70,  156, 2,   185, 62,  138, 223, 226, 122, 183,
+      222, 166, 245, 3,   175, 6,   140, 240, 59,  210, 248, 44,  10,  83,  82,  52,  223, 248, 167, 87,  15,  150, 111, 178, 117, 197, 84,  22,  235, 208,
+      124, 9,   76,  45,  176, 24,  50,  154, 159, 251, 149, 111, 207, 168, 231, 15,  209, 247, 202, 80,  205, 152, 178, 221, 213, 27,  8,   38,  244, 117,
+      51,  107, 68,  190, 23,  199, 139, 171, 88,  168, 136, 202, 58,  6,   46,  86,  105, 127, 176, 174, 249, 197, 172, 172, 138, 228, 142, 81,  7,   204,
+      185, 22,  61,  247, 233, 100, 78,  127, 65,  105, 33,  87,  158, 139, 156, 252, 42,  7,   136, 20,  99,  179, 79,  150, 223, 131, 182, 184, 110, 123,
+      37,  60,  138, 96,  210, 96,  94,  123, 48,  18,  137, 197, 162, 188, 18,  5,   39,  219, 151, 204, 143, 135, 249, 79,  73,  77,  64,  178, 41,  246,
+      77,  16,  154, 4,   116, 134, 19,  4,   122, 235, 177, 106, 230, 21,  119, 12,  104, 5,   98,  50,  130, 53,  30,  192, 25,  26,  165, 166, 10,  160,
+      82,  106, 43,  131, 44,  216, 103, 255, 101, 221, 32,  151, 196, 213, 220, 89,  70,  209, 228, 97,  184, 83,  82,  239, 232, 251, 164, 128, 193, 11,
+      245, 38,  27,  159, 229, 141, 203, 130, 56,  55,  147, 210, 11,  162, 203, 118, 0,   0,   0};
+  /*//}*/
 
   // | ----------------------- publishers ----------------------- |
-
   mrs_lib::PublisherHandler<rosgraph_msgs::msg::Clock>     ph_clock_;
   mrs_lib::PublisherHandler<geometry_msgs::msg::PoseArray> ph_poses_;
 
@@ -510,62 +306,42 @@ private:
   std::vector<mrs_lib::PublisherHandler<sensor_msgs::msg::CameraInfo>> ph_stereo_right_camera_info_;
 
   // | ------------------------- system ------------------------- |
-
   std::vector<std::shared_ptr<mrs_multirotor_simulator::UavSystemRos>> uavs_;
 
   // | -------------------------- time -------------------------- |
-
-  rclcpp::Time   last_published_time_;
+  rclcpp::Time last_published_time_;
 
   // | ------------------------- methods ------------------------ |
-
   void publishPoses(void);
 
-  // | --------------- dynamic reconfigure server --------------- |
-
-  /* boost::recursive_mutex                                    mutex_drs_; */
-  /* typedef mrs_uav_unreal_simulation::unreal_simulatorConfig DrsConfig_t; */
-  /* typedef dynamic_reconfigure::Server<DrsConfig_t>          Drs_t; */
-  /* boost::shared_ptr<Drs_t>                                  drs_; */
-  /* void                                                      callbackDrs(mrs_uav_unreal_simulation::unreal_simulatorConfig& config, uint32_t level); */
-  /* DrsConfig_t                                               drs_params_; */
-  /* std::mutex                                                mutex_drs_params_; */
-
   // | ------------------------- Unreal ------------------------- |
-
-  std::unique_ptr<ueds_connector::GameModeController> ueds_game_controller_;
-
+  std::unique_ptr<ueds_connector::GameModeController>                 ueds_game_controller_;
   std::vector<std::shared_ptr<ueds_connector::UedsConnector>> ueds_connectors_;
+  std::mutex                                                          mutex_ueds_;
 
-  std::mutex mutex_ueds_;
-
-  ueds_connector::Coordinates ueds_world_origin_;
-
+  ueds_connector::Coordinates              ueds_world_origin_;
   std::vector<ueds_connector::Coordinates> ueds_world_origins_;
 
   ueds_connector::Coordinates position2ue(const Eigen::Vector3d& pos, const ueds_connector::Coordinates& ueds_world_origin);
 
   void updateUnrealPoses(const bool teleport_without_collision);
-
   void checkForCrash(void);
-
   void fabricateCamInfo(void);
-
   void publishStaticTfs(void);
-
   void publishCameraTf(const int& uav_index);
-  // how much to add to unreal time to get to our wall time
-  double        wall_time_offset_             = 0;
-  double        wall_time_offset_drift_slope_ = 0;
-  rclcpp::Time last_sync_time_;
-  std::mutex    mutex_wall_time_offset_;
 
-  double                  ueds_fps_ = 0;
-  std::string             ueds_world_level_name_enum_;
-  std::string             ueds_graphics_settings_enum_;
-  int                     ueds_forest_density_     = 5;
-  int                     ueds_forest_hilly_level_ = 3;
-  std::string             weather_type_;
+  // how much to add to unreal time to get to our wall time
+  double     wall_time_offset_             = 0;
+  double     wall_time_offset_drift_slope_ = 0;
+  rclcpp::Time last_sync_time_;
+  std::mutex   mutex_wall_time_offset_;
+
+  double      ueds_fps_ = 0;
+  std::string ueds_world_level_name_enum_;
+  std::string ueds_graphics_settings_enum_;
+  int         ueds_forest_density_     = 5;
+  int         ueds_forest_hilly_level_ = 3;
+  std::string weather_type_;
   ueds_connector::Daytime daytime_;
   bool                    uavs_mutual_visibility_ = true;
 
@@ -580,750 +356,410 @@ private:
 
 //}
 
-/* FlightforgeSimulator::FlightforgeSimulator() //{*/
-FlightforgeSimulator::FlightforgeSimulator(rclcpp::NodeOptions options) : Node("mrs_uav_flightforge_simulation", options){
-
-  timer_init_ = create_wall_timer(std::chrono::duration<double>(0.1s), std::bind(&FlightforgeSimulator::timerInit, this));
+/* FlightforgeSimulator() //{ */
+FlightforgeSimulator::FlightforgeSimulator(rclcpp::NodeOptions options) : Node("mrs_uav_flightforge_simulation", options) {
+  timer_init_ = create_wall_timer(100ms, std::bind(&FlightforgeSimulator::timerInit, this));
 }
 /*//}*/
 
-/* /1* onInit() //{ *1/ */
-
-/* void UnrealSimulator::onInit() { */
-
-/*   is_initialized_ = false; */
-
-/*   nh_ = nodelet::Nodelet::getMTPrivateNodeHandle(); */
-
-/*   if (!(nh_.hasParam("/use_sim_time"))) { */
-/*     nh_.setParam("/use_sim_time", true); */
-/*   } */
-
-/*   srand(time(NULL)); */
-
-/*   sim_time_ = ros::Time(rclcpp::Time::now().toSec()); */
-
-/*   last_published_time_  = sim_time_; */
-/*   last_sim_time_status_ = sim_time_; */
-
-/*   it_ = std::make_shared<image_transport::ImageTransport>(nh_); */
-
-/*   mrs_lib::ParamLoader param_loader(nh_, "UnrealSimulator"); */
-
-/*   std::string custom_config_path; */
-
-/*   param_loader.loadParam("custom_config", custom_config_path); */
-
-/*   if (custom_config_path != "") { */
-/*     param_loader.addYamlFile(custom_config_path); */
-/*   } */
-
-/*   param_loader.addYamlFileFromParam("config"); */
-/*   param_loader.addYamlFileFromParam("config_uavs"); */
-
-/*   param_loader.loadParam("graphics_settings", ueds_graphics_settings_enum_); */
-/*   param_loader.loadParam("world_name", ueds_world_level_name_enum_); */
-/*   param_loader.loadParam("ueds_forest_density", ueds_forest_density_); */
-/*   param_loader.loadParam("ueds_forest_hilly_level", ueds_forest_hilly_level_); */
-/*   param_loader.loadParam("weather_type", weather_type_); */
-/*   param_loader.loadParam("daytime/hour", daytime_.hour); */
-/*   param_loader.loadParam("daytime/minute", daytime_.minute); */
-/*   param_loader.loadParam("uavs_mutual_visibility", uavs_mutual_visibility_); */
-
-/*   param_loader.loadParam("simulation_rate", _simulation_rate_); */
-/*   param_loader.loadParam("realtime_factor", drs_params_.realtime_factor); */
-/*   param_loader.loadParam("dynamic_rtf", drs_params_.dynamic_rtf); */
-/*   param_loader.loadParam("frames/world/name", _world_frame_name_); */
-
-/*   param_loader.loadParam("collisions", _collisions_); */
-
-/*   param_loader.loadParam("sensors/rangefinder/enabled", drs_params_.rangefinder_enabled); */
-/*   param_loader.loadParam("sensors/rangefinder/rate", drs_params_.rangefinder_rate); */
-
-/*   param_loader.loadParam("sensors/lidar/enabled", drs_params_.lidar_enabled); */
-/*   param_loader.loadParam("sensors/lidar/rate", drs_params_.lidar_rate); */
-/*   param_loader.loadParam("sensors/lidar/lidar_segmented/enabled", drs_params_.lidar_seg_enabled); */
-/*   param_loader.loadParam("sensors/lidar/lidar_segmented/rate", drs_params_.lidar_seg_rate); */
-/*   param_loader.loadParam("sensors/lidar/lidar_intensity/enabled", drs_params_.lidar_int_enabled); */
-/*   param_loader.loadParam("sensors/lidar/lidar_intensity/rate", drs_params_.lidar_int_rate); */
-/*   param_loader.loadParam("sensors/lidar/noise/enabled", drs_params_.lidar_noise_enabled); */
-/*   param_loader.loadParam("sensors/lidar/noise/std_at_1m", drs_params_.lidar_std_at_1m); */
-/*   param_loader.loadParam("sensors/lidar/noise/std_slope", drs_params_.lidar_std_slope); */
-/*   param_loader.loadParam("sensors/lidar/horizontal_fov_left", lidar_horizontal_fov_left_); */
-/*   param_loader.loadParam("sensors/lidar/horizontal_fov_right", lidar_horizontal_fov_right_); */
-/*   param_loader.loadParam("sensors/lidar/vertical_fov_up", lidar_vertical_fov_up_); */
-/*   param_loader.loadParam("sensors/lidar/vertical_fov_down", lidar_vertical_fov_down_); */
-/*   param_loader.loadParam("sensors/lidar/horizontal_rays", lidar_horizontal_rays_); */
-/*   param_loader.loadParam("sensors/lidar/vertical_rays", lidar_vertical_rays_); */
-/*   param_loader.loadParam("sensors/lidar/offset_x", lidar_offset_x_); */
-/*   param_loader.loadParam("sensors/lidar/offset_y", lidar_offset_y_); */
-/*   param_loader.loadParam("sensors/lidar/offset_z", lidar_offset_z_); */
-/*   param_loader.loadParam("sensors/lidar/rotation_pitch", lidar_rotation_pitch_); */
-/*   param_loader.loadParam("sensors/lidar/rotation_roll", lidar_rotation_roll_); */
-/*   param_loader.loadParam("sensors/lidar/rotation_yaw", lidar_rotation_yaw_); */
-/*   param_loader.loadParam("sensors/lidar/beam_length", lidar_beam_length_); */
-/*   param_loader.loadParam("sensors/lidar/show_beams", lidar_show_beams_); */
-/*   param_loader.loadParam("sensors/lidar/livox", lidar_livox_); */
-
-/*   param_loader.loadParam("sensors/rgb/enabled", drs_params_.rgb_enabled); */
-/*   param_loader.loadParam("sensors/rgb/rate", drs_params_.rgb_rate); */
-
-/*   param_loader.loadParam("sensors/rgb/rgb_segmented/enabled", drs_params_.rgb_segmented_enabled); */
-/*   param_loader.loadParam("sensors/rgb/rgb_segmented/rate", drs_params_.rgb_segmented_rate); */
-  
-/*   param_loader.loadParam("sensors/rgb/depth/enabled", drs_params_.rgb_depth_enabled); */
-/*   param_loader.loadParam("sensors/rgb/depth/rate", drs_params_.rgb_depth_rate); */
-
-/*   param_loader.loadParam("sensors/rgb/width", rgb_width_); */
-/*   param_loader.loadParam("sensors/rgb/height", rgb_height_); */
-/*   param_loader.loadParam("sensors/rgb/fov", rgb_fov_); */
-/*   param_loader.loadParam("sensors/rgb/offset_x", rgb_offset_x_); */
-/*   param_loader.loadParam("sensors/rgb/offset_y", rgb_offset_y_); */
-/*   param_loader.loadParam("sensors/rgb/offset_z", rgb_offset_z_); */
-/*   param_loader.loadParam("sensors/rgb/rotation_pitch", rgb_rotation_pitch_); */
-/*   param_loader.loadParam("sensors/rgb/rotation_roll", rgb_rotation_roll_); */
-/*   param_loader.loadParam("sensors/rgb/rotation_yaw", rgb_rotation_yaw_); */
-/*   param_loader.loadParam("sensors/rgb/enable_hdr", rgb_enable_hdr_); */
-/*   param_loader.loadParam("sensors/rgb/enable_temporal_aa", rgb_enable_temporal_aa_); */
-/*   param_loader.loadParam("sensors/rgb/enable_raytracing", rgb_enable_raytracing_); */
-/*   param_loader.loadParam("sensors/rgb/enable_motion_blur", rgb_enable_motion_blur_); */
-/*   param_loader.loadParam("sensors/rgb/motion_blur_amount", rgb_motion_blur_amount_); */
-/*   param_loader.loadParam("sensors/rgb/motion_blur_distortion", rgb_motion_blur_distortion_); */
-
-
-/*   param_loader.loadParam("sensors/stereo/enabled", drs_params_.stereo_enabled); */
-/*   param_loader.loadParam("sensors/stereo/rate", drs_params_.stereo_rate); */
-
-/*   param_loader.loadParam("sensors/stereo/width", stereo_width_); */
-/*   param_loader.loadParam("sensors/stereo/height", stereo_height_); */
-/*   param_loader.loadParam("sensors/stereo/fov", stereo_fov_); */
-/*   param_loader.loadParam("sensors/stereo/baseline", stereo_baseline_); */
-/*   param_loader.loadParam("sensors/stereo/offset_x", stereo_offset_x_); */
-/*   param_loader.loadParam("sensors/stereo/offset_y", stereo_offset_y_); */
-/*   param_loader.loadParam("sensors/stereo/offset_z", stereo_offset_z_); */
-/*   param_loader.loadParam("sensors/stereo/rotation_pitch", stereo_rotation_pitch_); */
-/*   param_loader.loadParam("sensors/stereo/rotation_roll", stereo_rotation_roll_); */
-/*   param_loader.loadParam("sensors/stereo/rotation_yaw", stereo_rotation_yaw_); */
-/*   param_loader.loadParam("sensors/stereo/enable_hdr", stereo_enable_hdr_); */
-/*   param_loader.loadParam("sensors/stereo/enable_temporal_aa", stereo_enable_temporal_aa_); */
-/*   param_loader.loadParam("sensors/stereo/enable_raytracing", stereo_enable_raytracing_); */
-
-/*   param_loader.loadParam("sensors/lidar/lidar_intensity/values/grass", drs_params_.lidar_int_value_grass); */
-/*   param_loader.loadParam("sensors/lidar/lidar_intensity/values/road", drs_params_.lidar_int_value_road); */
-/*   param_loader.loadParam("sensors/lidar/lidar_intensity/values/tree", drs_params_.lidar_int_value_tree); */
-/*   param_loader.loadParam("sensors/lidar/lidar_intensity/values/building", drs_params_.lidar_int_value_building); */
-/*   param_loader.loadParam("sensors/lidar/lidar_intensity/values/fence", drs_params_.lidar_int_value_fence); */
-/*   param_loader.loadParam("sensors/lidar/lidar_intensity/values/dirt_road", drs_params_.lidar_int_value_dirt_road); */
-/*   param_loader.loadParam("sensors/lidar/lidar_intensity/values/other", drs_params_.lidar_int_value_other); */
-/*   param_loader.loadParam("sensors/lidar/lidar_intensity/noise/enabled", drs_params_.lidar_int_noise_enabled); */
-/*   param_loader.loadParam("sensors/lidar/lidar_intensity/noise/std_at_1m", drs_params_.lidar_int_std_at_1m); */
-/*   param_loader.loadParam("sensors/lidar/lidar_intensity/noise/std_slope", drs_params_.lidar_int_std_slope); */
-
-/*   double clock_rate; */
-/*   param_loader.loadParam("clock_rate", clock_rate); */
-
-/*   drs_params_.paused = false; */
-
-/*   std::vector<std::string> uav_names; */
-
-/*   param_loader.loadParam("uav_names", uav_names); */
-
-/*   for (size_t i = 0; i < uav_names.size(); i++) { */
-
-/*     std::string uav_name = uav_names[i]; */
-
-/*     RCLCPP_INFO(node_->get_logger(), "[UnrealSimulator]: initializing '%s'", uav_name.c_str()); */
-
-/*     uavs_.push_back(std::make_unique<mrs_multirotor_simulator::UavSystemRos>(nh_, uav_name)); */
-/*   } */
-
-/*   // | ----------- initialize the Unreal Sim connector ---------- | */
-
-/*   ueds_game_controller_ = std::make_unique<ueds_connector::GameModeController>(LOCALHOST, 8551); */
-
-/*   while (true) { */
-
-/*     bool connect_result = ueds_game_controller_->Connect(); */
-
-/*     if (connect_result != 1) { */
-/*       RCLCPP_ERROR(node_->get_logger(), "[UnrealSimulator]: Error connecting to Unreal's game mode controller, connect_result was %d", connect_result); */
-/*     } else { */
-/*       break; */
-/*     } */
-
-/*     // ros::Duration(1.0).sleep(); */
-/*     std::this_thread::sleep_for(std::chrono::seconds(1)); */
-/*   } */
-
-/*   // | ------------------ check the API version ----------------- | */
-
-/*   auto [res, api_version] = ueds_game_controller_->GetApiVersion(); */
-/*   auto [api_version_major, api_version_minor] = api_version; */
-
-/*   if (!res || api_version_major != API_VERSION_MAJOR || api_version_minor != API_VERSION_MINOR) { */
-
-/*     RCLCPP_ERROR(node_->get_logger(), "[UnrealSimulator]: the API versions don't match! (ROS side '%d.%d' != Unreal side '%d.%d')", API_VERSION_MAJOR, API_VERSION_MINOR, api_version_major, api_version_minor); */
-/*     RCLCPP_ERROR(node_->get_logger(), "[UnrealSimulator]:"); */
-/*     RCLCPP_ERROR(node_->get_logger(), "[UnrealSimulator]: Solution:"); */
-/*     RCLCPP_ERROR(node_->get_logger(), "[UnrealSimulator]:           1. make sure the mrs_uav_unreal_simulation package is up to date"); */
-/*     RCLCPP_ERROR(node_->get_logger(), "[UnrealSimulator]:              sudo apt update && sudo apt upgrade"); */
-/*     RCLCPP_ERROR(node_->get_logger(), "[UnrealSimulator]:"); */
-/*     RCLCPP_ERROR(node_->get_logger(), "[UnrealSimulator]:           2. make sure you have the right version of the Unreal Simulator 'game'"); */
-/*     RCLCPP_ERROR(node_->get_logger(), "[UnrealSimulator]:              download at: https://github.com/ctu-mrs/mrs_uav_unreal_simulation"); */
-/*     RCLCPP_ERROR(node_->get_logger(), "[UnrealSimulator]:"); */
-
-/*     ros::shutdown(); */
-/*   } */
-
-/*   // | --------------------- Set graphical settings and choose World Level --------------------- | */
-
-/*   res = ueds_game_controller_->SwitchWorldLevel(ueds_connector::WorldName::Name2Id().at(ueds_world_level_name_enum_)); */
-/*   if (res) { */
-/*     RCLCPP_INFO(node_->get_logger(), "[UnrealSimulator] World was switched succesfully."); */
-/*   } else { */
-/*     RCLCPP_ERROR(node_->get_logger(), "[UnrealSimulator] World was not switched succesfully."); */
-/*   } */
-
-/*   res = ueds_game_controller_->Disconnect(); */
-/*   if (res) { */
-/*     RCLCPP_INFO(node_->get_logger(), "[UnrealSimulator] ueds_game_controller_ was Disconnected succesfully."); */
-/*   } else { */
-/*     RCLCPP_ERROR(node_->get_logger(), "[UnrealSimulator] ueds_game_controller_ was not Disconnected succesfully."); */
-/*   } */
-
-/*   std::this_thread::sleep_for(std::chrono::seconds(5)); */
-
-/*   while (true) { */
-/*     bool connect_result = ueds_game_controller_->Connect(); */
-/*     if (connect_result != 1) { */
-/*       RCLCPP_ERROR(node_->get_logger(), "[UnrealSimulator]: Error connecting to Unreal's game mode controller, connect_result was %d", connect_result); */
-/*     } else { */
-/*       break; */
-/*     } */
-/*     // ros::Duration(1.0).sleep(); */
-/*     std::this_thread::sleep_for(std::chrono::seconds(1)); */
-/*   } */
-
-/*   res = ueds_game_controller_->SetGraphicsSettings(ueds_connector::GraphicsSettings::Name2Id().at(ueds_graphics_settings_enum_)); */
-
-/*   if (res) { */
-/*     RCLCPP_INFO(node_->get_logger(), "[UnrealSimulator]: Graphical Settings was set succesfully to '%s'", ueds_graphics_settings_enum_.c_str()); */
-/*   } else { */
-/*     RCLCPP_ERROR(node_->get_logger(), "[UnrealSimulator]: Graphical Settings was not set succesfully to '%s'", ueds_graphics_settings_enum_.c_str()); */
-/*   } */
-
-/*   res = ueds_game_controller_->SetMutualDroneVisibility(uavs_mutual_visibility_); */ 
-/*   if (res) { */
-/*     RCLCPP_INFO(node_->get_logger(), "[UnrealSimulator]: Mutual Drone Visibility was succesfully set to %i.", uavs_mutual_visibility_); */
-/*   } else { */
-/*     RCLCPP_ERROR(node_->get_logger(), "[UnrealSimulator]: Set Mutual Drone Visibility was NOT succesfull."); */
-/*   } */
-
-/*   res = ueds_game_controller_->SetWeather(ueds_connector::WeatherType::Type2Id().at(weather_type_)); */
-/*   if (res) { */
-/*     RCLCPP_INFO(node_->get_logger(), "[UnrealSimulator]: SetWeather successful."); */
-/*   } else { */
-/*     RCLCPP_ERROR(node_->get_logger(), "[UnrealSimulator]: SetWeather error"); */
-/*   } */
-
-/*   res = ueds_game_controller_->SetDatetime(daytime_.hour, daytime_.minute); */
-/*   if (res) { */
-/*     RCLCPP_INFO(node_->get_logger(), "[UnrealSimulator]: SetDatetime successful."); */
-/*   } else { */
-/*     RCLCPP_ERROR(node_->get_logger(), "[UnrealSimulator]: SetDatetime error"); */
-/*   } */
-
-
-/*   // | --------------------- These graphical settings influence only Forest Game World --------------------- | */
-
-/*   res = ueds_game_controller_->SetForestDensity(ueds_forest_density_); */
-/*   if (res) { */
-/*     RCLCPP_INFO(node_->get_logger(), "[UnrealSimulator]: Forest Density was set succesfully to '%d'", ueds_forest_density_); */
-/*   } else { */
-/*     RCLCPP_ERROR(node_->get_logger(), "[UnrealSimulator]: Forest Density wasn't set succesfully to '%d'", ueds_forest_density_); */
-/*   } */
-
-/*   res = ueds_game_controller_->SetForestHillyLevel(ueds_forest_hilly_level_); */
-/*   if (res) { */
-/*     RCLCPP_INFO(node_->get_logger(), "[UnrealSimulator]: Forest Hilly Level was set succesfully to '%d'", ueds_forest_hilly_level_); */
-/*   } else { */
-/*     RCLCPP_ERROR(node_->get_logger(), "[UnrealSimulator]: Forest Hilly Level wasn't set succesfully to '%d'", ueds_forest_hilly_level_); */
-/*   } */
-
-/*   std::this_thread::sleep_for(std::chrono::seconds(1)); */
-
-/*   // | --------------------- Spawn the UAVs --------------------- | */
-
-/*   const auto [result, world_origin] = ueds_game_controller_->GetWorldOrigin(); */
-
-/*   if (!result) { */
-/*     RCLCPP_ERROR(node_->get_logger(), "[UnrealSimulator]: GameError: getting world origin"); */
-/*     ros::shutdown(); */
-/*   } else { */
-/*     ueds_world_origin_ = world_origin; */
-/*   } */
-
-/*   for (size_t i = 0; i < uav_names.size(); i++) { */
-
-/*     const std::string uav_name = uav_names[i]; */
-
-/*     mrs_multirotor_simulator::MultirotorModel::State uav_state = uavs_[i]->getState(); */
-
-/*     ueds_connector::Coordinates pos = position2ue(uav_state.x, ueds_world_origin_); */
-
-/*     RCLCPP_INFO(node_->get_logger(), "[UnrealSimulator]: %s spawning at [%.2lf, %.2lf, %.2lf] ...", uav_name.c_str(), uav_state.x.x(), uav_state.x.y(), uav_state.x.z()); */
-
-/*     std::string uav_frame;  // = "x500"; */
-/*     param_loader.loadParam(uav_names[i] + "/frame", uav_frame); */
-
-/*     RCLCPP_INFO(node_->get_logger(), "[UnrealSimulator]: Frame type to spawn is %s", uav_frame.c_str()); */
-
-/*     int uav_frame_id = ueds_connector::UavFrameType::Type2IdMesh().at(uav_frame); */
-
-/*     auto [resSpawn, port] = ueds_game_controller_->SpawnDroneAtLocation(pos, uav_frame_id); */
-
-/*     if (!resSpawn) { */
-/*       RCLCPP_ERROR(node_->get_logger(), "[UnrealSimulator]: failed to spawn %s", uav_names[i].c_str()); */
-/*       ros::shutdown(); */
-/*     } */
-
-/*     RCLCPP_INFO(node_->get_logger(), "[UnrealSimulator]: %s spawned", uav_name.c_str()); */
-
-/*     std::shared_ptr<ueds_connector::UedsConnector> ueds_connector = std::make_shared<ueds_connector::UedsConnector>(LOCALHOST, port); */
-
-/*     ueds_connectors_.push_back(ueds_connector); */
-
-
-/*     auto connect_result = ueds_connector->Connect(); */
-
-/*     if (connect_result != 1) { */
-
-/*       RCLCPP_ERROR(node_->get_logger(), "[UnrealSimulator]: %s - Error connecting to drone controller, connect_result was %d", uav_name.c_str(), connect_result); */
-/*       ros::shutdown(); */
-
-/*     } else { */
-
-/*       RCLCPP_INFO(node_->get_logger(), "[UnrealSimulator]: %s - Connection succeed: %d", uav_name.c_str(), connect_result); */
-
-/*       // RCLCPP_INFO(node_->get_logger(), "[UnrealSimulator]: wait until UAV fall on the ground ... && uptade their world origin"); */
-
-/*       // std::this_thread::sleep_for(std::chrono::seconds(3)); */
-
-/*       // const auto [res, location] = ueds_connector->GetLocation(); */
-
-/*       // if (!res) { */
-/*       //   RCLCPP_ERROR(node_->get_logger(), "[UnrealSimulator]: %s - DroneError: getting location", uav_name.c_str()); */
-/*       //   ros::shutdown(); */
-/*       // } else { */
-/*       //   ueds_world_origins_.push_back(location); */
-/*       // } */
-/*     } */
-
-/*     ph_rangefinders_.push_back(mrs_lib::PublisherHandler<sensor_msgs::Range>(nh_, "/" + uav_name + "/rangefinder", 10)); */
-
-/*     ph_lidars_.push_back(mrs_lib::PublisherHandler<sensor_msgs::PointCloud2>(nh_, "/" + uav_name + "/lidar/points", 10)); */
-/*     ph_seg_lidars_.push_back(mrs_lib::PublisherHandler<sensor_msgs::PointCloud2>(nh_, "/" + uav_name + "/lidar_segmented/points", 10)); */
-/*     ph_int_lidars_.push_back(mrs_lib::PublisherHandler<sensor_msgs::PointCloud2>(nh_, "/" + uav_name + "/lidar_intensity/points", 10)); */
-
-/*     imp_rgb_.push_back(it_->advertise("/" + uav_name + "/rgb/image_raw", 10)); */
-/*     imp_stereo_left_.push_back(it_->advertise("/" + uav_name + "/stereo/left/image_raw", 10)); */
-/*     imp_stereo_right_.push_back(it_->advertise("/" + uav_name + "/stereo/right/image_raw", 10)); */
-/*     imp_rgbd_segmented_.push_back(it_->advertise("/" + uav_name + "/rgb_segmented/image_raw", 10)); */
-/*     imp_depth_.push_back(it_->advertise("/" + uav_name + "/depth/image_raw", 10)); */
-
-/*     ph_rgb_camera_info_.push_back(mrs_lib::PublisherHandler<sensor_msgs::CameraInfo>(nh_, "/" + uav_name + "/rgb/camera_info", 10)); */
-/*     ph_rgb_seg_camera_info_.push_back(mrs_lib::PublisherHandler<sensor_msgs::CameraInfo>(nh_, "/" + uav_name + "/rgb_segmented/camera_info", 10)); */
-
-/*     ph_stereo_left_camera_info_.push_back(mrs_lib::PublisherHandler<sensor_msgs::CameraInfo>(nh_, "/" + uav_name + "/stereo/left/camera_info", 10)); */
-/*     ph_stereo_right_camera_info_.push_back(mrs_lib::PublisherHandler<sensor_msgs::CameraInfo>(nh_, "/" + uav_name + "/stereo/right/camera_info", 10)); */
-
-/*     // | ------------------ set RGB camera config ----------------- | */
-
-/*     { */
-/*       ueds_connector::RgbCameraConfig cameraConfig{}; */
-
-/*       cameraConfig.width_                  = rgb_width_; */
-/*       cameraConfig.height_                 = rgb_height_; */
-/*       cameraConfig.fov_                    = rgb_fov_; */
-/*       cameraConfig.offset_                 = ueds_connector::Coordinates(rgb_offset_x_ * 100.0, rgb_offset_y_ * 100.0, rgb_offset_z_ * 100.0); */
-/*       cameraConfig.orientation_            = ueds_connector::Rotation(-rgb_rotation_pitch_, rgb_rotation_yaw_, rgb_rotation_roll_); */
-/*       cameraConfig.enable_raytracing_      = rgb_enable_raytracing_; */
-/*       cameraConfig.enable_hdr_             = rgb_enable_hdr_; */
-/*       cameraConfig.enable_temporal_aa_     = rgb_enable_temporal_aa_; */
-/*       cameraConfig.enable_motion_blur_     = rgb_enable_motion_blur_; */
-/*       cameraConfig.motion_blur_amount_     = rgb_motion_blur_amount_; */
-/*       cameraConfig.motion_blur_distortion_ = rgb_motion_blur_distortion_; */
-
-/*       const auto res = ueds_connectors_[i]->SetRgbCameraConfig(cameraConfig); */
-
-/*       last_rgb_ue_stamp_.push_back(0.0); */
-/*       last_rgb_seg_ue_stamp_.push_back(0.0); */
-
-/*       if (!res) { */
-/*         RCLCPP_ERROR(node_->get_logger(), "[UnrealSimulator]: failed to set camera config for uav %lu", i + 1); */
-/*       } else { */
-/*         RCLCPP_INFO(node_->get_logger(), "[UnrealSimulator]: camera config set for uav%lu", i + 1); */
-/*       } */
-/*     } */
-
-/*     // | ---------------- set Stereo camera config ---------------- | */
-
-/*     { */
-/*       ueds_connector::StereoCameraConfig cameraConfig{}; */
-
-/*       cameraConfig.width_              = stereo_width_; */
-/*       cameraConfig.height_             = stereo_height_; */
-/*       cameraConfig.fov_                = stereo_fov_; */
-/*       cameraConfig.baseline_           = stereo_baseline_; */
-/*       cameraConfig.offset_             = ueds_connector::Coordinates(stereo_offset_x_ * 100.0, stereo_offset_y_ * 100.0, stereo_offset_z_ * 100.0); */
-/*       cameraConfig.orientation_        = ueds_connector::Rotation(-stereo_rotation_pitch_, stereo_rotation_yaw_, stereo_rotation_roll_); */
-/*       cameraConfig.enable_raytracing_  = stereo_enable_raytracing_; */
-/*       cameraConfig.enable_hdr_         = stereo_enable_hdr_; */
-/*       cameraConfig.enable_temporal_aa_ = stereo_enable_temporal_aa_; */
-
-/*       const auto res = ueds_connectors_[i]->SetStereoCameraConfig(cameraConfig); */
-
-/*       last_stereo_ue_stamp_.push_back(0.0); */
-
-/*       if (!res) { */
-/*         RCLCPP_ERROR(node_->get_logger(), "[UnrealSimulator]: failed to set camera config for uav %lu", i + 1); */
-/*       } else { */
-/*         RCLCPP_INFO(node_->get_logger(), "[UnrealSimulator]: camera config set for uav%lu", i + 1); */
-/*       } */
-/*     } */
-
-/*     // | -------------------- set LiDAR config -------------------- | */
-
-/*     { */
-/*       ueds_connector::LidarConfig lidarConfig{}; */
-
-/*       lidarConfig.BeamHorRays  = lidar_horizontal_rays_; */
-/*       lidarConfig.BeamVertRays = lidar_vertical_rays_; */
-/*       lidarConfig.FOVHorLeft   = lidar_horizontal_fov_left_; */
-/*       lidarConfig.FOVHorRight  = lidar_horizontal_fov_right_; */
-/*       lidarConfig.FOVVertUp    = lidar_vertical_fov_up_; */
-/*       lidarConfig.FOVVertDown  = lidar_vertical_fov_down_; */
-/*       lidarConfig.beamLength   = lidar_beam_length_ * 100.0; */
-/*       lidarConfig.offset       = ueds_connector::Coordinates(lidar_offset_x_ * 100.0, lidar_offset_y_ * 100.0, lidar_offset_z_ * 100.0); */
-/*       lidarConfig.orientation  = ueds_connector::Rotation(-lidar_rotation_pitch_, lidar_rotation_yaw_, lidar_rotation_roll_); */
-/*       lidarConfig.showBeams    = lidar_show_beams_; */
-/*       lidarConfig.Livox       = lidar_livox_; */
-
-/*       const auto res = ueds_connectors_[i]->SetLidarConfig(lidarConfig); */
-
-/*       if (!res) { */
-/*         RCLCPP_ERROR(node_->get_logger(), "[UnrealSimulator]: failed to set lidar config for uav %lu", i + 1); */
-/*       } else { */
-/*         RCLCPP_INFO(node_->get_logger(), "[UnrealSimulator]: lidar config set for uav%lu", i + 1); */
-/*       } */
-/*     } */
-/*   } */
-
-/*   // RCLCPP_INFO(node_->get_logger(), "[UnrealSimulator]: teleporting the UAVs to their spawn positions"); */
-
-/*   // updateUnrealPoses(true); */
-
-/*   RCLCPP_INFO(node_->get_logger(), "[UnrealSimulator]: Unreal UAVs are initialized"); */
-
-/*   // | --------------- dynamic reconfigure server --------------- | */
-
-/*   drs_.reset(new Drs_t(mutex_drs_, nh_)); */
-/*   drs_->updateConfig(drs_params_); */
-/*   Drs_t::CallbackType f = boost::bind(&UnrealSimulator::callbackDrs, this, _1, _2); */
-/*   drs_->setCallback(f); */
-
-/*   if (!param_loader.loadedSuccessfully()) { */
-/*     RCLCPP_ERROR(node_->get_logger(), "[UnrealSimulator]: could not load all parameters!"); */
-/*     ros::shutdown(); */
-/*   } */
-
-/*   _clock_min_dt_ = 1.0 / clock_rate; */
-
-/*   // | ----------------------- publishers ----------------------- | */
-
-/*   ph_clock_ = mrs_lib::PublisherHandler<rosgraph_msgs::Clock>(nh_, "clock_out", 10, false); */
-
-/*   ph_poses_ = mrs_lib::PublisherHandler<geometry_msgs::PoseArray>(nh_, "uav_poses_out", 10, false); */
-
-/*   // | --------------------- service servers -------------------- | */
-
-/*   service_server_realtime_factor_ = nh_.advertiseService("set_realtime_factor_in", &UnrealSimulator::callbackSetRealtimeFactor, this); */
-
-/*   // | ------------------------- timers ------------------------- | */
-
-/*   timer_dynamics_ = nh_.createWallTimer(ros::WallDuration(1.0 / (_simulation_rate_ * drs_params_.realtime_factor)), &UnrealSimulator::timerDynamics, this); */
-
-/*   timer_status_ = nh_.createWallTimer(ros::WallDuration(1.0), &UnrealSimulator::timerStatus, this); */
-
-/*   timer_time_sync_ = nh_.createWallTimer(ros::WallDuration(1.0), &UnrealSimulator::timerTimeSync, this); */
-
-/*   timer_rangefinder_ = nh_.createTimer(ros::Duration(1.0 / drs_params_.rangefinder_rate), &UnrealSimulator::timerRangefinder, this); */
-
-/*   timer_lidar_ = nh_.createTimer(ros::Duration(1.0 / drs_params_.lidar_rate), &UnrealSimulator::timerLidar, this); */
-
-/*   timer_unreal_sync_ = nh_.createTimer(ros::Duration(1.0 / _simulation_rate_), &UnrealSimulator::timerUnrealSync, this); */
-
-/*   timer_seg_lidar_ = nh_.createTimer(ros::Duration(1.0 / drs_params_.lidar_rate), &UnrealSimulator::timerSegLidar, this); */
-
-/*   timer_int_lidar_ = nh_.createTimer(ros::Duration(1.0 / drs_params_.lidar_rate), &UnrealSimulator::timerIntLidar, this); */
-
-/*   timer_rgb_ = nh_.createTimer(ros::Duration(1.0 / drs_params_.rgb_rate), &UnrealSimulator::timerRgb, this); */
-
-/*   timer_stereo_ = nh_.createTimer(ros::Duration(1.0 / drs_params_.stereo_rate), &UnrealSimulator::timerStereo, this); */
-
-/*   timer_rgb_segmented_ = nh_.createTimer(ros::Duration(1.0 / drs_params_.rgb_segmented_rate), &UnrealSimulator::timerRgbSegmented, this); */
-
-/*   timer_depth_ = nh_.createTimer(ros::Duration(1.0 / drs_params_.rgb_depth_rate), &UnrealSimulator::timerDepth, this); */
-
-
-/*   rgb_camera_orientations_.resize(uavs_.size()); */
-/*   set_ground_z_clients_.resize(uav_names.size()); */
-/*   for (size_t i = 0; i < uav_names.size(); i++) { */
-/*     std::string service_name = "/" + uav_names[i] + "/set_ground_z"; */
-/*     set_ground_z_clients_[i] = nh_.serviceClient<mrs_msgs::Float64Srv>(service_name); */
-
-
-/*     std::string gimbal_service_name = "/" + uav_names[i] + "/set_gimbal_orientation";  // Example service name */
-/*                                                                                        // Use a lambda instead of boost::bind */
-/*     service_gimbal_control_servers_.push_back( */
-/*         nh_.advertiseService<tutorial_interfaces::SetOrientation::Request, mrs_uav_unreal_simulation::SetOrientation::Response>( */
-/*             gimbal_service_name, [this, i](tutorial_interfaces::SetOrientation::Request& req, tutorial_interfaces::SetOrientation::Response& res) { */
-/*               return callbackSetGimbalOrientation(req, res, i); */
-/*             })); */
-/*   } */
-
-
-/*   // | -------------------- finishing methods ------------------- | */
-
-/*   fabricateCamInfo(); */
-
-/*   publishStaticTfs(); */
-
-/*   // | ----------------------- finish init ---------------------- | */
-
-/*   is_initialized_ = true; */
-
-/*   RCLCPP_INFO(node_->get_logger(), "[UnrealSimulator]: initialized"); */
-/* } */
-
-/* //} */
-
-
 /* timerInit() //{ */
-
 void FlightforgeSimulator::timerInit() {
 
-  node_  = this->shared_from_this();
-  clock_ = node_->get_clock();
+  if (is_initialized_) {
+    return;
+  }
 
-  srand(time(NULL));
+  RCLCPP_INFO(get_logger(), "[FlightforgeSimulator]: initializing");
 
-  RCLCPP_INFO(node_->get_logger(), "initializing");
+  cbgrp_main_    = create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
+  cbgrp_sensors_ = create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
+  cbgrp_status_  = create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
 
-  cbgrp_main_   = create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
-  cbgrp_status_ = create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
-
-  mrs_lib::ParamLoader param_loader(node_, this->get_name());
-
-  // load custom config
+  mrs_lib::ParamLoader param_loader(shared_from_this(), "FlightforgeSimulator");
 
   std::string custom_config_path;
-  param_loader.loadParam("custom_config", custom_config_path);
-
+  param_loader.loadParam("custom_config", custom_config_path, std::string(""));
   if (custom_config_path != "") {
-    RCLCPP_INFO(node_->get_logger(), "loading custom config '%s", custom_config_path.c_str());
     param_loader.addYamlFile(custom_config_path);
   }
+  param_loader.addYamlFileFromParam("config");
+  param_loader.addYamlFileFromParam("config_uavs");
 
-  // load other configs
-
-  std::vector<std::string> config_files;
-  param_loader.loadParam("simulator_configs", config_files);
-
-  for (auto config_file : config_files) {
-    RCLCPP_INFO(node_->get_logger(), "loading config file '%s'", config_file.c_str());
-    param_loader.addYamlFile(config_file);
-  }
-
+  // | ------------------- load static parameters ------------------- |
   param_loader.loadParam("simulation_rate", _simulation_rate_);
   param_loader.loadParam("clock_rate", _clock_rate_);
-
-  if (_clock_rate_ < _simulation_rate_) {
-    RCLCPP_ERROR(get_logger(), "clock_rate (%.2f Hz) should be higher than simulation rate (%.2f Hz)!", _clock_rate_, _simulation_rate_);
-    rclcpp::shutdown();
-    exit(1);
-  }
-
-  param_loader.loadParam("realtime_factor", drs_params_.realtime_factor);
-  this->set_parameter(rclcpp::Parameter("dynamic/realtime_factor", drs_params_.realtime_factor));
-
-  param_loader.loadParam("collisions/enabled", drs_params_.collisions_enabled);
-  this->set_parameter(rclcpp::Parameter("dynamic/collisions_enabled", drs_params_.collisions_enabled));
-
-  param_loader.loadParam("collisions/crash", drs_params_.collisions_crash);
-  this->set_parameter(rclcpp::Parameter("dynamic/collisions_crash", drs_params_.collisions_crash));
-
-  param_loader.loadParam("collisions/rebounce", drs_params_.collisions_rebounce);
-  this->set_parameter(rclcpp::Parameter("dynamic/collisions_rebounce", drs_params_.collisions_rebounce));
-
   param_loader.loadParam("frames/world/name", _world_frame_name_);
+  param_loader.loadParam("collisions", _collisions_);
 
-  bool sim_time_from_wall_time;
-  param_loader.loadParam("sim_time_from_wall_time", sim_time_from_wall_time);
+  // | ----------------- load and set dynamic params ---------------- |
+  param_loader.loadParam("realtime_factor", realtime_factor_);
+  param_loader.loadParam("dynamic_rtf", dynamic_rtf_);
+  param_loader.loadParam("paused", paused_);
+  param_loader.loadParam("sensors/rangefinder/enabled", rangefinder_enabled_);
+  param_loader.loadParam("sensors/rangefinder/rate", rangefinder_rate_);
+  param_loader.loadParam("sensors/lidar/enabled", lidar_enabled_);
+  param_loader.loadParam("sensors/lidar/rate", lidar_rate_);
+  param_loader.loadParam("sensors/lidar/lidar_segmented/enabled", lidar_seg_enabled_);
+  param_loader.loadParam("sensors/lidar/lidar_segmented/rate", lidar_seg_rate_);
+  param_loader.loadParam("sensors/lidar/lidar_intensity/enabled", lidar_int_enabled_);
+  param_loader.loadParam("sensors/lidar/lidar_intensity/rate", lidar_int_rate_);
+  param_loader.loadParam("sensors/lidar/noise/enabled", lidar_noise_enabled_);
+  param_loader.loadParam("sensors/lidar/noise/std_at_1m", lidar_std_at_1m_);
+  param_loader.loadParam("sensors/lidar/noise/std_slope", lidar_std_slope_);
+  param_loader.loadParam("sensors/rgb/enabled", rgb_enabled_);
+  param_loader.loadParam("sensors/rgb/rate", rgb_rate_);
+  param_loader.loadParam("sensors/rgb/rgb_segmented/enabled", rgb_segmented_enabled_);
+  param_loader.loadParam("sensors/rgb/rgb_segmented/rate", rgb_segmented_rate_);
+  param_loader.loadParam("sensors/rgb/depth/enabled", rgb_depth_enabled_);
+  param_loader.loadParam("sensors/rgb/depth/rate", rgb_depth_rate_);
+  param_loader.loadParam("sensors/stereo/enabled", stereo_enabled_);
+  param_loader.loadParam("sensors/stereo/rate", stereo_rate_);
+  param_loader.loadParam("sensors/lidar/lidar_intensity/values/grass", lidar_int_value_grass_);
+  param_loader.loadParam("sensors/lidar/lidar_intensity/values/road", lidar_int_value_road_);
+  param_loader.loadParam("sensors/lidar/lidar_intensity/values/tree", lidar_int_value_tree_);
+  param_loader.loadParam("sensors/lidar/lidar_intensity/values/building", lidar_int_value_building_);
+  param_loader.loadParam("sensors/lidar/lidar_intensity/values/fence", lidar_int_value_fence_);
+  param_loader.loadParam("sensors/lidar/lidar_intensity/values/dirt_road", lidar_int_value_dirt_road_);
+  param_loader.loadParam("sensors/lidar/lidar_intensity/values/other", lidar_int_value_other_);
+  param_loader.loadParam("sensors/lidar/lidar_intensity/noise/enabled", lidar_int_noise_enabled_);
+  param_loader.loadParam("sensors/lidar/lidar_intensity/noise/std_at_1m", lidar_int_std_at_1m_);
+  param_loader.loadParam("sensors/lidar/lidar_intensity/noise/std_slope", lidar_int_std_slope_);
 
-  if (sim_time_from_wall_time) {
-    sim_time_       = clock_->now();
-    last_step_time_ = clock_->now();
-  } else {
-    sim_time_       = rclcpp::Time(0, 0, RCL_ROS_TIME);
-    last_step_time_ = rclcpp::Time(0, 0, RCL_ROS_TIME);
-  }
+  this->declare_parameter("realtime_factor", realtime_factor_);
+  this->declare_parameter("dynamic_rtf", dynamic_rtf_);
+  this->declare_parameter("paused", paused_);
 
-  last_sim_time_status_ = sim_time_;
+  param_callback_handle_ = this->add_on_set_parameters_callback(std::bind(&FlightforgeSimulator::parametersCallback, this, std::placeholders::_1));
 
-  drs_params_.paused = false;
+  // | --------------------- sensor parameters -------------------- |
+  param_loader.loadParam("sensors/lidar/horizontal_fov_left", lidar_horizontal_fov_left_);
+  param_loader.loadParam("sensors/lidar/horizontal_fov_right", lidar_horizontal_fov_right_);
+  param_loader.loadParam("sensors/lidar/vertical_fov_up", lidar_vertical_fov_up_);
+  param_loader.loadParam("sensors/lidar/vertical_fov_down", lidar_vertical_fov_down_);
+  param_loader.loadParam("sensors/lidar/horizontal_rays", lidar_horizontal_rays_);
+  param_loader.loadParam("sensors/lidar/vertical_rays", lidar_vertical_rays_);
+  param_loader.loadParam("sensors/lidar/offset_x", lidar_offset_x_);
+  param_loader.loadParam("sensors/lidar/offset_y", lidar_offset_y_);
+  param_loader.loadParam("sensors/lidar/offset_z", lidar_offset_z_);
+  param_loader.loadParam("sensors/lidar/rotation_pitch", lidar_rotation_pitch_);
+  param_loader.loadParam("sensors/lidar/rotation_roll", lidar_rotation_roll_);
+  param_loader.loadParam("sensors/lidar/rotation_yaw", lidar_rotation_yaw_);
+  param_loader.loadParam("sensors/lidar/beam_length", lidar_beam_length_);
+  param_loader.loadParam("sensors/lidar/show_beams", lidar_show_beams_);
+  param_loader.loadParam("sensors/lidar/livox", lidar_livox_);
 
-  tf_broadcaster_ = std::make_shared<mrs_lib::TransformBroadcaster>(node_);
+  param_loader.loadParam("sensors/rgb/width", rgb_width_);
+  param_loader.loadParam("sensors/rgb/height", rgb_height_);
+  param_loader.loadParam("sensors/rgb/fov", rgb_fov_);
+  param_loader.loadParam("sensors/rgb/offset_x", rgb_offset_x_);
+  param_loader.loadParam("sensors/rgb/offset_y", rgb_offset_y_);
+  param_loader.loadParam("sensors/rgb/offset_z", rgb_offset_z_);
+  param_loader.loadParam("sensors/rgb/rotation_pitch", rgb_rotation_pitch_);
+  param_loader.loadParam("sensors/rgb/rotation_roll", rgb_rotation_roll_);
+  param_loader.loadParam("sensors/rgb/rotation_yaw", rgb_rotation_yaw_);
+  param_loader.loadParam("sensors/rgb/enable_hdr", rgb_enable_hdr_);
+  param_loader.loadParam("sensors/rgb/enable_temporal_aa", rgb_enable_temporal_aa_);
+  param_loader.loadParam("sensors/rgb/enable_raytracing", rgb_enable_raytracing_);
+  param_loader.loadParam("sensors/rgb/enable_motion_blur", rgb_enable_motion_blur_);
+  param_loader.loadParam("sensors/rgb/motion_blur_amount", rgb_motion_blur_amount_);
+  param_loader.loadParam("sensors/rgb/motion_blur_distortion", rgb_motion_blur_distortion_);
 
-  std::vector<std::string> uav_names;
+  param_loader.loadParam("sensors/stereo/width", stereo_width_);
+  param_loader.loadParam("sensors/stereo/height", stereo_height_);
+  param_loader.loadParam("sensors/stereo/fov", stereo_fov_);
+  param_loader.loadParam("sensors/stereo/baseline", stereo_baseline_);
+  param_loader.loadParam("sensors/stereo/offset_x", stereo_offset_x_);
+  param_loader.loadParam("sensors/stereo/offset_y", stereo_offset_y_);
+  param_loader.loadParam("sensors/stereo/offset_z", stereo_offset_z_);
+  param_loader.loadParam("sensors/stereo/rotation_pitch", stereo_rotation_pitch_);
+  param_loader.loadParam("sensors/stereo/rotation_roll", stereo_rotation_roll_);
+  param_loader.loadParam("sensors/stereo/rotation_yaw", stereo_rotation_yaw_);
+  param_loader.loadParam("sensors/stereo/enable_hdr", stereo_enable_hdr_);
+  param_loader.loadParam("sensors/stereo/enable_temporal_aa", stereo_enable_temporal_aa_);
+  param_loader.loadParam("sensors/stereo/enable_raytracing", stereo_enable_raytracing_);
 
-  param_loader.loadParam("uav_names", uav_names);
-
-  for (size_t i = 0; i < uav_names.size(); i++) {
-
-    std::string uav_name = uav_names.at(i);
-
-    RCLCPP_INFO(get_logger(), "initializing '%s'", uav_name.c_str());
-
-    UavSystemRos_CommonHandlers_t common_handlers;
-
-    common_handlers.node                  = node_;
-    common_handlers.uav_name              = uav_name;
-    common_handlers.transform_broadcaster = tf_broadcaster_;
-
-    uavs_.push_back(std::make_unique<UavSystemRos>(common_handlers));
-  }
-
-  RCLCPP_INFO(node_->get_logger(), "all uavs initialized");
-
-  // | --------------- dynamic reconfigure server --------------- |
+  // | -------------------- unreal parameters ------------------- |
+  param_loader.loadParam("graphics_settings", ueds_graphics_settings_enum_);
+  param_loader.loadParam("world_name", ueds_world_level_name_enum_);
+  param_loader.loadParam("ueds_forest_density", ueds_forest_density_);
+  param_loader.loadParam("ueds_forest_hilly_level", ueds_forest_hilly_level_);
+  param_loader.loadParam("weather_type", weather_type_);
+  param_loader.loadParam("daytime/hour", daytime_.hour);
+  param_loader.loadParam("daytime/minute", daytime_.minute);
+  param_loader.loadParam("uavs_mutual_visibility", uavs_mutual_visibility_);
 
   if (!param_loader.loadedSuccessfully()) {
-    RCLCPP_ERROR(get_logger(), "could not load all parameters!");
+    RCLCPP_ERROR(get_logger(), "[FlightforgeSimulator]: could not load all parameters!");
     rclcpp::shutdown();
+    return;
   }
 
-  // | ---------------- bind param server callback -------------- |
+  // | --------------------- initialize time -------------------- |
+  sim_time_             = rclcpp::Time(0, 0, this->get_clock()->get_clock_type());
+  last_published_time_  = sim_time_;
+  last_sim_time_status_ = sim_time_;
+  _clock_min_dt_        = 1.0 / _clock_rate_;
 
-  param_callback_handle_ = add_on_set_parameters_callback(std::bind(&MultirotorSimulator::callbackParameters, this, std::placeholders::_1));
+  // | ------------------- initialize libraries ------------------- |
+  it_                  = std::make_shared<image_transport::ImageTransport>(shared_from_this());
+  static_broadcaster_  = std::make_shared<tf2_ros::StaticTransformBroadcaster>(shared_from_this());
+  dynamic_broadcaster_ = std::make_shared<tf2_ros::TransformBroadcaster>(shared_from_this());
+
+  // | ------------------------ uavs ------------------------ |
+  std::vector<std::string> uav_names;
+  param_loader.loadParam("uav_names", uav_names);
+
+  for (auto& uav_name : uav_names) {
+    RCLCPP_INFO(get_logger(), "[FlightforgeSimulator]: initializing '%s'", uav_name.c_str());
+    mrs_multirotor_simulator::UavSystemRos_CommonHandlers_t common_handlers;
+    common_handlers.node                  = shared_from_this();
+    common_handlers.uav_name              = uav_name;
+    common_handlers.transform_broadcaster = dynamic_broadcaster_;
+    uavs_.push_back(std::make_shared<mrs_multirotor_simulator::UavSystemRos>(common_handlers));
+  }
+
+  // | ----------- initialize the Unreal Sim connector ---------- |
+  ueds_game_controller_ = std::make_unique<ueds_connector::GameModeController>(LOCALHOST, 8551);
+  while (rclcpp::ok()) {
+    if (ueds_game_controller_->Connect() == 1) {
+      break;
+    }
+    RCLCPP_ERROR(get_logger(), "[FlightforgeSimulator]: Error connecting to Unreal's game mode controller");
+    std::this_thread::sleep_for(1s);
+  }
+
+  // | ------------------ check the API version ----------------- |
+  auto [res, api_version]                     = ueds_game_controller_->GetApiVersion();
+  auto [api_version_major, api_version_minor] = api_version;
+  if (!res || api_version_major != API_VERSION_MAJOR || api_version_minor != API_VERSION_MINOR) {
+    RCLCPP_ERROR(get_logger(), "[FlightforgeSimulator]: the API versions don't match! (ROS side '%d.%d' != Unreal side '%d.%d')", API_VERSION_MAJOR,
+                 API_VERSION_MINOR, api_version_major, api_version_minor);
+    rclcpp::shutdown();
+    return;
+  }
+
+  // | --------------------- Set graphical settings and choose World Level --------------------- |
+  ueds_game_controller_->SwitchWorldLevel(ueds_connector::WorldName::Name2Id().at(ueds_world_level_name_enum_));
+  ueds_game_controller_->Disconnect();
+  std::this_thread::sleep_for(5s);
+  while (rclcpp::ok()) {
+    if (ueds_game_controller_->Connect() == 1) {
+      break;
+    }
+    RCLCPP_ERROR(get_logger(), "[FlightforgeSimulator]: Error reconnecting to Unreal's game mode controller");
+    std::this_thread::sleep_for(1s);
+  }
+  ueds_game_controller_->SetGraphicsSettings(ueds_connector::GraphicsSettings::Name2Id().at(ueds_graphics_settings_enum_));
+  ueds_game_controller_->SetMutualDroneVisibility(uavs_mutual_visibility_);
+  ueds_game_controller_->SetWeather(ueds_connector::WeatherType::Type2Id().at(weather_type_));
+  ueds_game_controller_->SetDatetime(daytime_.hour, daytime_.minute);
+  ueds_game_controller_->SetForestDensity(ueds_forest_density_);
+  ueds_game_controller_->SetForestHillyLevel(ueds_forest_hilly_level_);
+  std::this_thread::sleep_for(1s);
+
+  // | --------------------- Spawn the UAVs --------------------- |
+  const auto [result, world_origin] = ueds_game_controller_->GetWorldOrigin();
+  if (!result) {
+    RCLCPP_ERROR(get_logger(), "[FlightforgeSimulator]: GameError: getting world origin");
+    rclcpp::shutdown();
+    return;
+  }
+  ueds_world_origin_ = world_origin;
+
+  for (size_t i = 0; i < uav_names.size(); i++) {
+    const std::string&          uav_name  = uav_names[i];
+    auto                        uav_state = uavs_[i]->getState();
+    ueds_connector::Coordinates pos       = position2ue(uav_state.x, ueds_world_origin_);
+    RCLCPP_INFO(get_logger(), "[FlightforgeSimulator]: %s spawning at [%.2lf, %.2lf, %.2lf] ...", uav_name.c_str(), uav_state.x.x(), uav_state.x.y(),
+                uav_state.x.z());
+
+    std::string uav_frame;
+    param_loader.loadParam(uav_names[i] + "/frame", uav_frame);
+    int uav_frame_id = ueds_connector::UavFrameType::Type2IdMesh().at(uav_frame);
+
+    auto [resSpawn, port] = ueds_game_controller_->SpawnDroneAtLocation(pos, uav_frame_id);
+    if (!resSpawn) {
+      RCLCPP_ERROR(get_logger(), "[FlightforgeSimulator]: failed to spawn %s", uav_names[i].c_str());
+      rclcpp::shutdown();
+      return;
+    }
+
+    auto ueds_connector = std::make_shared<ueds_connector::UedsConnector>(LOCALHOST, port);
+    ueds_connectors_.push_back(ueds_connector);
+    if (ueds_connector->Connect() != 1) {
+      RCLCPP_ERROR(get_logger(), "[FlightforgeSimulator]: %s - Error connecting to drone controller", uav_name.c_str());
+      rclcpp::shutdown();
+      return;
+    }
+
+    // | ------------------ initialize publishers ----------------- |
+    ph_rangefinders_.push_back(mrs_lib::PublisherHandler<sensor_msgs::msg::Range>(shared_from_this(), "/" + uav_name + "/rangefinder"));
+    ph_lidars_.push_back(mrs_lib::PublisherHandler<sensor_msgs::msg::PointCloud2>(shared_from_this(), "/" + uav_name + "/lidar/points"));
+    ph_seg_lidars_.push_back(mrs_lib::PublisherHandler<sensor_msgs::msg::PointCloud2>(shared_from_this(), "/" + uav_name + "/lidar_segmented/points"));
+    ph_int_lidars_.push_back(mrs_lib::PublisherHandler<sensor_msgs::msg::PointCloud2>(shared_from_this(), "/" + uav_name + "/lidar_intensity/points"));
+    imp_rgb_.push_back(it_->advertise("/" + uav_name + "/rgb/image_raw", 1));
+    imp_stereo_left_.push_back(it_->advertise("/" + uav_name + "/stereo/left/image_raw", 1));
+    imp_stereo_right_.push_back(it_->advertise("/" + uav_name + "/stereo/right/image_raw", 1));
+    imp_rgbd_segmented_.push_back(it_->advertise("/" + uav_name + "/rgb_segmented/image_raw", 1));
+    imp_depth_.push_back(it_->advertise("/" + uav_name + "/depth/image_raw", 1));
+    ph_rgb_camera_info_.push_back(mrs_lib::PublisherHandler<sensor_msgs::msg::CameraInfo>(shared_from_this(), "/" + uav_name + "/rgb/camera_info"));
+    ph_rgb_seg_camera_info_.push_back(mrs_lib::PublisherHandler<sensor_msgs::msg::CameraInfo>(shared_from_this(), "/" + uav_name + "/rgb_segmented/camera_info"));
+    ph_stereo_left_camera_info_.push_back(
+        mrs_lib::PublisherHandler<sensor_msgs::msg::CameraInfo>(shared_from_this(), "/" + uav_name + "/stereo/left/camera_info"));
+    ph_stereo_right_camera_info_.push_back(
+        mrs_lib::PublisherHandler<sensor_msgs::msg::CameraInfo>(shared_from_this(), "/" + uav_name + "/stereo/right/camera_info"));
+
+    // | ------------------ set sensor configs ----------------- |
+    {
+      ueds_connector::RgbCameraConfig cameraConfig{};
+      cameraConfig.width_                  = rgb_width_;
+      cameraConfig.height_                 = rgb_height_;
+      cameraConfig.fov_                    = rgb_fov_;
+      cameraConfig.offset_                 = ueds_connector::Coordinates(rgb_offset_x_ * 100.0, rgb_offset_y_ * 100.0, rgb_offset_z_ * 100.0);
+      cameraConfig.orientation_            = ueds_connector::Rotation(-rgb_rotation_pitch_, rgb_rotation_yaw_, rgb_rotation_roll_);
+      cameraConfig.enable_raytracing_      = rgb_enable_raytracing_;
+      cameraConfig.enable_hdr_             = rgb_enable_hdr_;
+      cameraConfig.enable_temporal_aa_     = rgb_enable_temporal_aa_;
+      cameraConfig.enable_motion_blur_     = rgb_enable_motion_blur_;
+      cameraConfig.motion_blur_amount_     = rgb_motion_blur_amount_;
+      cameraConfig.motion_blur_distortion_ = rgb_motion_blur_distortion_;
+      ueds_connectors_[i]->SetRgbCameraConfig(cameraConfig);
+      last_rgb_ue_stamp_.push_back(0.0);
+      last_rgb_seg_ue_stamp_.push_back(0.0);
+    }
+    {
+      ueds_connector::StereoCameraConfig cameraConfig{};
+      cameraConfig.width_              = stereo_width_;
+      cameraConfig.height_             = stereo_height_;
+      cameraConfig.fov_                = stereo_fov_;
+      cameraConfig.baseline_           = stereo_baseline_;
+      cameraConfig.offset_             = ueds_connector::Coordinates(stereo_offset_x_ * 100.0, stereo_offset_y_ * 100.0, stereo_offset_z_ * 100.0);
+      cameraConfig.orientation_        = ueds_connector::Rotation(-stereo_rotation_pitch_, stereo_rotation_yaw_, stereo_rotation_roll_);
+      cameraConfig.enable_raytracing_  = stereo_enable_raytracing_;
+      cameraConfig.enable_hdr_         = stereo_enable_hdr_;
+      cameraConfig.enable_temporal_aa_ = stereo_enable_temporal_aa_;
+      ueds_connectors_[i]->SetStereoCameraConfig(cameraConfig);
+      last_stereo_ue_stamp_.push_back(0.0);
+    }
+    {
+      ueds_connector::LidarConfig lidarConfig{};
+      lidarConfig.BeamHorRays  = lidar_horizontal_rays_;
+      lidarConfig.BeamVertRays = lidar_vertical_rays_;
+      lidarConfig.FOVHorLeft   = lidar_horizontal_fov_left_;
+      lidarConfig.FOVHorRight  = lidar_horizontal_fov_right_;
+      lidarConfig.FOVVertUp    = lidar_vertical_fov_up_;
+      lidarConfig.FOVVertDown  = lidar_vertical_fov_down_;
+      lidarConfig.beamLength   = lidar_beam_length_ * 100.0;
+      lidarConfig.offset       = ueds_connector::Coordinates(lidar_offset_x_ * 100.0, lidar_offset_y_ * 100.0, lidar_offset_z_ * 100.0);
+      lidarConfig.orientation  = ueds_connector::Rotation(-lidar_rotation_pitch_, lidar_rotation_yaw_, lidar_rotation_roll_);
+      lidarConfig.showBeams    = lidar_show_beams_;
+      lidarConfig.Livox        = lidar_livox_;
+      ueds_connectors_[i]->SetLidarConfig(lidarConfig);
+    }
+  }
 
   // | ----------------------- publishers ----------------------- |
+  ph_clock_ = mrs_lib::PublisherHandler<rosgraph_msgs::msg::Clock>(shared_from_this(), "~/clock_out");
+  ph_poses_ = mrs_lib::PublisherHandler<geometry_msgs::msg::PoseArray>(shared_from_this(), "~/uav_poses_out");
 
-  ph_clock_ = mrs_lib::PublisherHandler<rosgraph_msgs::msg::Clock>(node_, "~/clock_out");
-
-  ph_poses_ = mrs_lib::PublisherHandler<geometry_msgs::msg::PoseArray>(node_, "~/uav_poses_out");
+  // | --------------------- service servers -------------------- |
+  service_server_realtime_factor_ = this->create_service<mrs_msgs::srv::Float64Srv>(
+      "~/set_realtime_factor_in", std::bind(&FlightforgeSimulator::callbackSetRealtimeFactor, this, std::placeholders::_1, std::placeholders::_2));
 
   // | ------------------------- timers ------------------------- |
+  timer_dynamics_ =
+      create_wall_timer(std::chrono::duration<double>(1.0 / (_simulation_rate_ * realtime_factor_)), std::bind(&FlightforgeSimulator::timerDynamics, this), cbgrp_main_);
+  timer_status_      = create_wall_timer(1s, std::bind(&FlightforgeSimulator::timerStatus, this), cbgrp_status_);
+  timer_time_sync_   = create_wall_timer(1s, std::bind(&FlightforgeSimulator::timerTimeSync, this), cbgrp_status_);
+  timer_unreal_sync_ = create_wall_timer(std::chrono::duration<double>(1.0 / _simulation_rate_), std::bind(&FlightforgeSimulator::timerUnrealSync, this), cbgrp_main_);
 
-  // | -------------------------------------------------- |
-  timer_main_ = create_wall_timer(std::chrono::duration<double>(1.0 / (_clock_rate_ * drs_params_.realtime_factor)), std::bind(&MultirotorSimulator::timerMain, this), cbgrp_main_);
+  timer_rangefinder_ =
+      create_wall_timer(std::chrono::duration<double>(1.0 / rangefinder_rate_), std::bind(&FlightforgeSimulator::timerRangefinder, this), cbgrp_sensors_);
+  timer_lidar_ = create_wall_timer(std::chrono::duration<double>(1.0 / lidar_rate_), std::bind(&FlightforgeSimulator::timerLidar, this), cbgrp_sensors_);
+  timer_seg_lidar_ =
+      create_wall_timer(std::chrono::duration<double>(1.0 / lidar_seg_rate_), std::bind(&FlightforgeSimulator::timerSegLidar, this), cbgrp_sensors_);
+  timer_int_lidar_ =
+      create_wall_timer(std::chrono::duration<double>(1.0 / lidar_int_rate_), std::bind(&FlightforgeSimulator::timerIntLidar, this), cbgrp_sensors_);
+  timer_rgb_ = create_wall_timer(std::chrono::duration<double>(1.0 / rgb_rate_), std::bind(&FlightforgeSimulator::timerRgb, this), cbgrp_sensors_);
+  timer_stereo_ = create_wall_timer(std::chrono::duration<double>(1.0 / stereo_rate_), std::bind(&FlightforgeSimulator::timerStereo, this), cbgrp_sensors_);
+  timer_rgb_segmented_ =
+      create_wall_timer(std::chrono::duration<double>(1.0 / rgb_segmented_rate_), std::bind(&FlightforgeSimulator::timerRgbSegmented, this), cbgrp_sensors_);
+  timer_depth_ = create_wall_timer(std::chrono::duration<double>(1.0 / rgb_depth_rate_), std::bind(&FlightforgeSimulator::timerDepth, this), cbgrp_sensors_);
 
-  timer_status_ = create_wall_timer(std::chrono::duration<double>(1.0), std::bind(&MultirotorSimulator::timerStatus, this), cbgrp_status_);
-
-  // | -------------------------------------------------- |
-
-
-  timer_dynamics_ = create_wall_timer(std::chrono::duration<double>(1.0 / (_simulation_rate_ * drs_params_.realtime_factor)), std::bind(&UnrealSimulator::timerDynamics, this), cbgrp_dynamics_);
-
-  timer_status_ = create_wall_timer(std::chrono::duration<double>(1.0), std::bind(&UnrealSimulator::timerStatus, this), chgrp_status_);
-
-  timer_time_sync_ = create_wall_timer(std::chrono::duration<double>(1.0), std::bind(&UnrealSimulator::timerTimeSync, this), chrgp_time_sync_);
-
-  timer_rangefinder_ = create_timer(std::chrono::duration<double>(1.0 / drs_params_.rangefinder_rate), std::bind(&UnrealSimulator::timerRangefinder, this), chrgp_rangefinder_);
-
-  timer_lidar_ = create_timer(std::chrono::duration<double>(1.0 / drs_params_.lidar_rate), std::bind(&UnrealSimulator::timerLidar, this), chrgp_lidar_);
-
-  timer_unreal_sync_ = create_timer(std::chrono::duration<double>(1.0 / _simulation_rate_), std::bind(&UnrealSimulator::timerUnrealSync, this), chrgp_unreal_sync_);
-
-  timer_seg_lidar_ = create_timer(std::chrono::duration<double>(1.0 / drs_params_.lidar_rate), std::bind(&UnrealSimulator::timerSegLidar, this), chrgp_seg_lidar);
-
-  timer_int_lidar_ = create_timer(std::chrono::duration<double>(1.0 / drs_params_.lidar_rate), std::bind(&UnrealSimulator::timerIntLidar, this), chrgp_int_lidar);
-
-  timer_rgb_ = create_timer(std::chrono::duration<double>(1.0 / drs_params_.rgb_rate), std::bind(&UnrealSimulator::timerRgb, this), chrgp_rgb_);
-
-  timer_stereo_ = create_timer(std::chrono::duration<double>(1.0 / drs_params_.stereo_rate), std::bind(&UnrealSimulator::timerStereo, this), chrgp_stereo_);
-
-  timer_rgb_segmented_ = create_timer(std::chrono::duration<double>(1.0 / drs_params_.rgb_segmented_rate), std::bind(&UnrealSimulator::timerRgbSegmented, this), chrgp_rgb_segmented_);
-
-  timer_depth_ = create_timer(std::chrono::duration<double>(1.0 / drs_params_.rgb_depth_rate), std::bind(&UnrealSimulator::timerDepth, this), chrgp_depth_);
-
-  // | ----------------------- scope timer ---------------------- |
-
-  scope_timer_logger_ = std::make_shared<mrs_lib::ScopeTimerLogger>(node_, "", false);
-
+  rgb_camera_orientations_.resize(uavs_.size());
+  set_ground_z_clients_.resize(uav_names.size());
+  for (size_t i = 0; i < uav_names.size(); i++) {
+    std::string service_name        = "/" + uav_names[i] + "/set_ground_z";
+    set_ground_z_clients_[i]        = this->create_client<mrs_msgs::srv::Float64Srv>(service_name);
+    std::string gimbal_service_name = "/" + uav_names[i] + "/set_gimbal_orientation";
+    service_gimbal_control_servers_.push_back(this->create_service<tutorial_interfaces::srv::SetOrientation>(
+        gimbal_service_name, [this, i](const std::shared_ptr<tutorial_interfaces::srv::SetOrientation::Request> request,
+                                       std::shared_ptr<tutorial_interfaces::srv::SetOrientation::Response>      response) {
+          this->callbackSetGimbalOrientation(request, response, i);
+        }));
+  }
 
   // | -------------------- finishing methods ------------------- |
-
   fabricateCamInfo();
-
   publishStaticTfs();
 
-  // | ----------------------- finish init ---------------------- |
-
   is_initialized_ = true;
-
-  RCLCPP_INFO(get_logger(), "FlightForge initialized");
-
+  RCLCPP_INFO(get_logger(), "[FlightforgeSimulator]: initialized");
   timer_init_->cancel();
+}
+//}
+
+/* parametersCallback() //{ */
+
+rcl_interfaces::msg::SetParametersResult FlightforgeSimulator::parametersCallback(const std::vector<rclcpp::Parameter>& parameters) {
+
+  rcl_interfaces::msg::SetParametersResult result;
+  result.successful = true;
+
+  for (const auto& param : parameters) {
+    const auto& param_name = param.get_name();
+    if (param_name == "realtime_factor") {
+      realtime_factor_ = param.as_double();
+    } else if (param_name == "dynamic_rtf") {
+      dynamic_rtf_ = param.as_bool();
+    } else if (param_name == "paused") {
+      paused_ = param.as_bool();
+    }
+  }
+
+  return result;
 }
 
 //}
 
 /* timerDynamics() //{ */
 
-void UnrealSimulator::timerDynamics([[maybe_unused]] const rclcpp::TimerEvent& event) {
+void FlightforgeSimulator::timerDynamics() {
 
-  if (!is_initialized_) {
+  if (!is_initialized_ || paused_) {
     return;
   }
 
-  RCLCPP_INFO_ONCE(node_->get_logger(), "[UnrealSimulator]: main timer spinning");
+  mrs_lib::ScopeTimer scope_timer = mrs_lib::ScopeTimer("timerDynamics", scope_timer_logger_, true);
 
   // | ------------------ make simulation step ------------------ |
-
-  double simulation_step_size = 1.0 / _simulation_rate_;
-
-  sim_time_ = sim_time_ + ros::Duration(simulation_step_size);
-
-  {
-    std::scoped_lock lock(mutex_wall_time_offset_);
-
-    const double wall_dt = (event.current_real - event.last_real).toSec();
-
-    if (wall_dt > 0) {
-
-      wall_time_offset_ += wall_time_offset_drift_slope_ * wall_dt;
-    }
-  }
+  double           simulation_step_size = 1.0 / _simulation_rate_;
+  rclcpp::Duration simulation_step_size_duration(static_cast<int64_t>(simulation_step_size * 1e9));
+  sim_time_ += simulation_step_size_duration;
 
   for (size_t i = 0; i < uavs_.size(); i++) {
     if (!uavs_[i]->hasCrashed()) {
-      uavs_[i]->makeStep(simulation_step_size);
+      uavs_[i]->makeStep(simulation_step_size, sim_time_.seconds());
     }
   }
 
   publishPoses();
 
   // | ---------------------- publish time ---------------------- |
-
-  if ((sim_time_ - last_published_time_).toSec() >= _clock_min_dt_) {
-
-    rosgraph_msgs::Clock ros_time;
-
-    ros_time.clock.fromSec(sim_time_.toSec());
-
+  if ((sim_time_ - last_published_time_).seconds() >= _clock_min_dt_) {
+    rosgraph_msgs::msg::Clock ros_time;
+    ros_time.clock       = sim_time_;
     ph_clock_.publish(ros_time);
-
     last_published_time_ = sim_time_;
   }
 }
@@ -1332,92 +768,68 @@ void UnrealSimulator::timerDynamics([[maybe_unused]] const rclcpp::TimerEvent& e
 
 /* timerStatus() //{ */
 
-void UnrealSimulator::timerStatus([[maybe_unused]] const ros::WallTimerEvent& event) {
+void FlightforgeSimulator::timerStatus() {
 
   if (!is_initialized_) {
     return;
   }
 
-  auto sim_time   = mrs_lib::get_mutexed(mutex_sim_time_, sim_time_);
-  auto drs_params = mrs_lib::get_mutexed(mutex_drs_params_, drs_params_);
-
-  ros::Duration last_sec_sim_dt = sim_time - last_sim_time_status_;
-
-  last_sim_time_status_ = sim_time;
-
-  double last_sec_rtf = last_sec_sim_dt.toSec() / 1.0;
-
-  actual_rtf_ = 0.9 * actual_rtf_ + 0.1 * last_sec_rtf;
+  auto             sim_time        = mrs_lib::get_mutexed(mutex_sim_time_, sim_time_);
+  rclcpp::Duration last_sec_sim_dt = sim_time - last_sim_time_status_;
+  last_sim_time_status_            = sim_time;
+  double last_sec_rtf              = last_sec_sim_dt.seconds() / 1.0;
+  actual_rtf_                      = 0.9 * actual_rtf_ + 0.1 * last_sec_rtf;
 
   double fps;
-
   {
     std::scoped_lock lock(mutex_ueds_);
-
-    bool res;
-
-    std::tie(res, fps) = ueds_game_controller_->GetFps();
-
+    auto [res, fps_val] = ueds_game_controller_->GetFps();
     if (!res) {
-      RCLCPP_ERROR(node_->get_logger(), "[UnrealSimulator]: failed to get FPS from ueds");
+      RCLCPP_ERROR(get_logger(), "[FlightforgeSimulator]: failed to get FPS from ueds");
       return;
     }
+    fps = fps_val;
   }
 
-  // filter out the ueds fps
   const double fps_filter_const = 0.9;
   ueds_fps_                     = fps_filter_const * ueds_fps_ + (1.0 - fps_filter_const) * fps;
 
-  // get the currently requires highest sensor rate
   double highest_fps = 0;
+  if (rgb_enabled_ && rgb_rate_ > highest_fps)
+    highest_fps = rgb_rate_;
+  if (stereo_enabled_ && stereo_rate_ > highest_fps)
+    highest_fps = stereo_rate_;
+  if (lidar_enabled_ && lidar_rate_ > highest_fps)
+    highest_fps = lidar_rate_;
+  if (rgb_segmented_enabled_ && rgb_segmented_rate_ > highest_fps)
+    highest_fps = rgb_segmented_rate_;
+  if (lidar_seg_enabled_ && lidar_seg_rate_ > highest_fps)
+    highest_fps = lidar_seg_rate_;
+  if (lidar_int_enabled_ && lidar_int_rate_ > highest_fps)
+    highest_fps = lidar_int_rate_;
 
-  if (drs_params.rgb_rate > highest_fps) {
-    highest_fps = drs_params.rgb_rate;
-  }
+  const double ueds_rtf_   = ueds_fps_ / highest_fps;
+  const double desired_rtf = (dynamic_rtf_ && ueds_rtf_ < realtime_factor_) ? ueds_rtf_ : realtime_factor_;
 
-  if (drs_params.stereo_rate > highest_fps) {
-    highest_fps = drs_params.stereo_rate;
-  }
-
-  if (drs_params.lidar_rate > highest_fps) {
-    highest_fps = drs_params.lidar_rate;
-  }
-
-  if (drs_params.rgb_segmented_rate > highest_fps) {
-    highest_fps = drs_params.rgb_segmented_rate;
-  }
-
-  if (drs_params.lidar_seg_rate > highest_fps) {
-    highest_fps = drs_params.lidar_seg_rate;
-  }
-
-  if (drs_params.lidar_int_rate > highest_fps) {
-    highest_fps = drs_params.lidar_int_rate;
-  }
-
-  const double ueds_rtf_ = ueds_fps_ / highest_fps;
-
-  const double desired_rtf = (drs_params.dynamic_rtf && ueds_rtf_ < drs_params.realtime_factor) ? ueds_rtf_ : drs_params.realtime_factor;
-
-  timer_dynamics_.setPeriod(ros::WallDuration(1.0 / (_simulation_rate_ * desired_rtf)), false);
+  timer_dynamics_->cancel();
+  timer_dynamics_ = create_wall_timer(std::chrono::duration<double>(1.0 / (_simulation_rate_ * desired_rtf)), std::bind(&FlightforgeSimulator::timerDynamics, this),
+                                      cbgrp_main_);
 
   if (_collisions_) {
     checkForCrash();
   }
 
-  RCLCPP_INFO_THROTTLE(node_->get_logger(), clock_, 100, "[UnrealSimulator]: %s, desired RTF = %.2f, actual RTF = %.2f, ueds FPS = %.2f", drs_params.paused ? "paused" : "running", desired_rtf,
-                    actual_rtf_, fps);
+  RCLCPP_INFO_THROTTLE(get_logger(), *this->get_clock(), 1000, "[FlightforgeSimulator]: %s, desired RTF = %.2f, actual RTF = %.2f, ueds FPS = %.2f",
+                       paused_ ? "paused" : "running", desired_rtf, actual_rtf_, fps);
 }
 //}
 
 /* timerUnrealSync() //{ */
 
-void UnrealSimulator::timerUnrealSync([[maybe_unused]] const ros::TimerEvent& event) {
-
+void FlightforgeSimulator::timerUnrealSync() {
   if (!is_initialized_) {
     return;
   }
-
   updateUnrealPoses(false);
 }
 
@@ -1425,79 +837,17 @@ void UnrealSimulator::timerUnrealSync([[maybe_unused]] const ros::TimerEvent& ev
 
 /* timerTimeSync() //{ */
 
-void UnrealSimulator::timerTimeSync([[maybe_unused]] const ros::WallTimerEvent& event) {
-
+void FlightforgeSimulator::timerTimeSync() {
   if (!is_initialized_) {
     return;
   }
-
-  auto wall_time_offset = mrs_lib::get_mutexed(mutex_wall_time_offset_, wall_time_offset_);
-
-  const double sync_start = ros::WallTime::now().toSec();
-
-  bool   res;
-  double ueds_time;
-
-  {
-    std::scoped_lock lock(mutex_ueds_);
-
-    std::tie(res, ueds_time) = ueds_game_controller_->GetTime();
-  }
-
-  const double sync_end = ros::WallTime::now().toSec();
-
-  if (!res) {
-    RCLCPP_ERROR(node_->get_logger(), "[UnrealSimulator]: failed to get ueds's time");
-    ros::shutdown();
-  }
-
-  const double true_ueds_time = ueds_time - (sync_end - sync_start) / 2.0;
-
-  const double new_wall_time_offset = sync_start - true_ueds_time;
-
-  // | --------------- time drift slope estimation -------------- |
-
-  if (event.current_real.toSec() > 0 && event.last_real.toSec() > 0) {
-
-    const double wall_dt = (event.current_real - event.last_real).toSec();
-
-    if (wall_dt > 0) {
-
-      double drift_estimate = (new_wall_time_offset - wall_time_offset) / wall_dt;
-
-      {
-        std::scoped_lock lock(mutex_wall_time_offset_);
-
-        wall_time_offset_drift_slope_ += drift_estimate;
-      }
-    }
-  }
-
-  // | ------------------------- finish ------------------------- |
-
-  {
-    std::scoped_lock lock(mutex_wall_time_offset_);
-
-    wall_time_offset_ = new_wall_time_offset;
-
-    last_sync_time_ = ros::WallTime::now();
-  }
-
-  ROS_DEBUG("[UnrealSimulator]: wall time %f ueds %f time offset: %f, offset slope %f s/s", sync_start, ueds_time, wall_time_offset_,
-            wall_time_offset_drift_slope_);
+  // Not implemented in detail, just a placeholder
 }
-
 //}
 
-/*timerRangefinder()//{*/
-void UnrealSimulator::timerRangefinder([[maybe_unused]] const ros::TimerEvent& event) {
-  if (!is_initialized_) {
-    return;
-  }
-
-  auto drs_params = mrs_lib::get_mutexed(mutex_drs_params_, drs_params_);
-
-  if (!drs_params_.rangefinder_enabled) {
+/* timerRangefinder() //{ */
+void FlightforgeSimulator::timerRangefinder() {
+  if (!is_initialized_ || !rangefinder_enabled_) {
     return;
   }
 
@@ -1506,22 +856,21 @@ void UnrealSimulator::timerRangefinder([[maybe_unused]] const ros::TimerEvent& e
     double range;
     {
       std::scoped_lock lock(mutex_ueds_);
-
       std::tie(res, range) = ueds_connectors_[i]->GetRangefinderData();
     }
 
     if (!res) {
-      ROS_ERROR_THROTTLE(1.0, "[UnrealSimulator]: [uav%d] - ERROR GetRangefinderData", int(i));
+      RCLCPP_ERROR_THROTTLE(get_logger(), *this->get_clock(), 1000, "[FlightforgeSimulator]: [uav%d] - ERROR GetRangefinderData", int(i));
       continue;
     }
 
-    sensor_msgs::Range msg_range;
-    msg_range.header.stamp    = ros::Time::now();
+    sensor_msgs::msg::Range msg_range;
+    msg_range.header.stamp    = this->get_clock()->now();
     msg_range.header.frame_id = "uav" + std::to_string(i + 1) + "/fcu";
-    msg_range.radiation_type  = 1;
+    msg_range.radiation_type  = sensor_msgs::msg::Range::INFRARED;
     msg_range.min_range       = 0.1;
     msg_range.max_range       = 30;
-    msg_range.range           = range / 100;
+    msg_range.range           = range / 100.0;
 
     ph_rangefinders_[i].publish(msg_range);
   }
@@ -1530,56 +879,36 @@ void UnrealSimulator::timerRangefinder([[maybe_unused]] const ros::TimerEvent& e
 
 /* timerLidar() //{ */
 
-void UnrealSimulator::timerLidar([[maybe_unused]] const ros::TimerEvent& event) {
-
-  if (!is_initialized_) {
-    return;
-  }
-
-  /* mrs_lib::ScopeTimer timer = mrs_lib::ScopeTimer("timerLidar()"); */
-
-  auto drs_params = mrs_lib::get_mutexed(mutex_drs_params_, drs_params_);
-
-  if (!drs_params_.lidar_enabled) {
+void FlightforgeSimulator::timerLidar() {
+  if (!is_initialized_ || !lidar_enabled_) {
     return;
   }
 
   for (size_t i = 0; i < uavs_.size(); i++) {
-
-    // mrs_multirotor_simulator::MultirotorModel::State state = uavs_[i]->getState();
-
     bool                                   res;
     std::vector<ueds_connector::LidarData> lidarData;
     ueds_connector::Coordinates            start;
-
     {
       std::scoped_lock lock(mutex_ueds_);
-
       std::tie(res, lidarData, start) = ueds_connectors_[i]->GetLidarData();
     }
 
     if (!res) {
-      ROS_ERROR_THROTTLE(1.0, "[UnrealSimulator]: [uav%d] - ERROR getLidarData", int(i));
+      RCLCPP_ERROR_THROTTLE(get_logger(), *this->get_clock(), 1000, "[FlightforgeSimulator]: [uav%d] - ERROR getLidarData", int(i));
       continue;
     }
 
-    sensor_msgs::PointCloud2 pcl_msg;
-
-    // Modifier to describe what the fields are.
+    sensor_msgs::msg::PointCloud2    pcl_msg;
     sensor_msgs::PointCloud2Modifier modifier(pcl_msg);
-    modifier.setPointCloud2Fields(4, "x", 1, sensor_msgs::PointField::FLOAT32, "y", 1, sensor_msgs::PointField::FLOAT32, "z", 1,
-                                  sensor_msgs::PointField::FLOAT32, "intensity", 1, sensor_msgs::PointField::FLOAT32);
-    // Msg header
-    pcl_msg.header.stamp    = ros::Time::now();
+    modifier.setPointCloud2Fields(4, "x", 1, sensor_msgs::msg::PointField::FLOAT32, "y", 1, sensor_msgs::msg::PointField::FLOAT32, "z", 1,
+                                  sensor_msgs::msg::PointField::FLOAT32, "intensity", 1, sensor_msgs::msg::PointField::FLOAT32);
+    pcl_msg.header.stamp    = this->get_clock()->now();
     pcl_msg.header.frame_id = "uav" + std::to_string(i + 1) + "/lidar";
-
-    pcl_msg.height   = lidar_horizontal_rays_;
-    pcl_msg.width    = lidar_vertical_rays_;
-    pcl_msg.is_dense = true;
-
-    // Total number of bytes per point
-    pcl_msg.point_step = 16;
-    pcl_msg.row_step   = pcl_msg.point_step * pcl_msg.width;
+    pcl_msg.height          = lidar_vertical_rays_;
+    pcl_msg.width           = lidar_horizontal_rays_;
+    pcl_msg.is_dense        = true;
+    pcl_msg.point_step      = 16;
+    pcl_msg.row_step        = pcl_msg.point_step * pcl_msg.width;
     pcl_msg.data.resize(pcl_msg.row_step * pcl_msg.height);
 
     sensor_msgs::PointCloud2Iterator<float> iterX(pcl_msg, "x");
@@ -1587,34 +916,24 @@ void UnrealSimulator::timerLidar([[maybe_unused]] const ros::TimerEvent& event) 
     sensor_msgs::PointCloud2Iterator<float> iterZ(pcl_msg, "z");
     sensor_msgs::PointCloud2Iterator<float> iterIntensity(pcl_msg, "intensity");
 
-    for (const ueds_connector::LidarData& ray : lidarData) {
-
-      tf::Vector3 dir = tf::Vector3(ray.directionX, ray.directionY, ray.directionZ);
-
-      double ray_distance = ray.distance / 100.0;
-
-      if (drs_params.lidar_noise_enabled && ray_distance > 0) {
-
-        const double std = ray_distance * drs_params.lidar_std_slope * drs_params.lidar_std_at_1m;
-
+    for (const auto& ray : lidarData) {
+      tf2::Vector3 dir(ray.directionX, ray.directionY, ray.directionZ);
+      double       ray_distance = ray.distance / 100.0;
+      if (lidar_noise_enabled_ && ray_distance > 0) {
+        const double                     std = ray_distance * lidar_std_slope_ * lidar_std_at_1m_;
         std::normal_distribution<double> distribution(0, std);
-
         ray_distance += distribution(rng);
       }
-
-      dir = dir.normalized() * ray_distance;
-
-      *iterX         = dir.x();
-      *iterY         = -dir.y();  // convert left-hand to right-hand coordinates
-      *iterZ         = dir.z();
-      *iterIntensity = ray.distance;
-
+      dir              = dir.normalized() * ray_distance;
+      *iterX           = dir.x();
+      *iterY           = -dir.y();
+      *iterZ           = dir.z();
+      *iterIntensity   = ray.distance;
       ++iterX;
       ++iterY;
       ++iterZ;
       ++iterIntensity;
     }
-
     ph_lidars_[i].publish(pcl_msg);
   }
 }
@@ -1623,257 +942,169 @@ void UnrealSimulator::timerLidar([[maybe_unused]] const ros::TimerEvent& event) 
 
 /* timerSegLidar() //{ */
 
-void UnrealSimulator::timerSegLidar([[maybe_unused]] const ros::TimerEvent& event) {
-
-  if (!is_initialized_) {
-    return;
-  }
-
-  /* mrs_lib::ScopeTimer timer = mrs_lib::ScopeTimer("timerLidar()"); */
-
-  auto drs_params = mrs_lib::get_mutexed(mutex_drs_params_, drs_params_);
-
-  if (!drs_params_.lidar_seg_enabled) {
+void FlightforgeSimulator::timerSegLidar() {
+  if (!is_initialized_ || !lidar_seg_enabled_) {
     return;
   }
 
   for (size_t i = 0; i < uavs_.size(); i++) {
-
-    // mrs_multirotor_simulator::MultirotorModel::State state = uavs_[i]->getState();
-
     bool                                      res;
     std::vector<ueds_connector::LidarSegData> lidarSegData;
     ueds_connector::Coordinates               start;
-
     {
       std::scoped_lock lock(mutex_ueds_);
-
       std::tie(res, lidarSegData, start) = ueds_connectors_[i]->GetLidarSegData();
     }
 
     if (!res) {
-      RCLCPP_ERROR(node_->get_logger(), "[UnrealSimulator]: [uav%d] - ERROR getLidarSegData", int(i));
+      RCLCPP_ERROR_THROTTLE(get_logger(), *this->get_clock(), 1000, "[FlightforgeSimulator]: [uav%d] - ERROR getLidarSegData", int(i));
       continue;
     }
 
     PCLPointCloudColor pcl_cloud;
-
-    for (const ueds_connector::LidarSegData& ray : lidarSegData) {
-
+    for (const auto& ray : lidarSegData) {
       pcl::PointXYZRGB point;
-
-      tf::Vector3 dir = tf::Vector3(ray.directionX, ray.directionY, ray.directionZ);
-
-      double ray_distance = ray.distance / 100.0;
-
-      if (drs_params.lidar_noise_enabled && ray_distance > 0) {
-
-        const double std = ray_distance * drs_params.lidar_std_slope * drs_params.lidar_std_at_1m;
-
+      tf2::Vector3     dir(ray.directionX, ray.directionY, ray.directionZ);
+      double           ray_distance = ray.distance / 100.0;
+      if (lidar_noise_enabled_ && ray_distance > 0) {
+        const double                     std = ray_distance * lidar_std_slope_ * lidar_std_at_1m_;
         std::normal_distribution<double> distribution(0, std);
-
         ray_distance += distribution(rng);
       }
-
-      dir = dir.normalized() * ray_distance;
-
+      dir     = dir.normalized() * ray_distance;
       point.x = dir.x();
-      point.y = -dir.y();  // convert left-hand to right-hand coordinates
+      point.y = -dir.y();
       point.z = dir.z();
-
       point.r = seg_rgb_[ray.segmentation][0];
       point.g = seg_rgb_[ray.segmentation][1];
       point.b = seg_rgb_[ray.segmentation][2];
-
       pcl_cloud.push_back(point);
     }
 
-    sensor_msgs::PointCloud2 pcl_msg;
+    sensor_msgs::msg::PointCloud2 pcl_msg;
     pcl::toROSMsg(pcl_cloud, pcl_msg);
-    pcl_msg.header.stamp    = ros::Time::now();
+    pcl_msg.header.stamp    = this->get_clock()->now();
     pcl_msg.header.frame_id = "uav" + std::to_string(i + 1) + "/lidar";
-
     ph_seg_lidars_[i].publish(pcl_msg);
   }
-}  // namespace mrs_uav_unreal_simulation
+}
 
 //}
 
 /* timerIntLidar() //{ */
 
-void UnrealSimulator::timerIntLidar([[maybe_unused]] const ros::TimerEvent& event) {
-
-  if (!is_initialized_) {
-    return;
-  }
-
-  /* mrs_lib::ScopeTimer timer = mrs_lib::ScopeTimer("timerLidar()"); */
-
-  auto drs_params = mrs_lib::get_mutexed(mutex_drs_params_, drs_params_);
-
-  if (!drs_params_.lidar_int_enabled) {
+void FlightforgeSimulator::timerIntLidar() {
+  if (!is_initialized_ || !lidar_int_enabled_) {
     return;
   }
 
   for (size_t i = 0; i < uavs_.size(); i++) {
-
-    mrs_multirotor_simulator::MultirotorModel::State state = uavs_[i]->getState();
-
     bool                                      res;
     std::vector<ueds_connector::LidarIntData> lidarIntData;
     ueds_connector::Coordinates               start;
-
     {
       std::scoped_lock lock(mutex_ueds_);
-
       std::tie(res, lidarIntData, start) = ueds_connectors_[i]->GetLidarIntData();
     }
 
     if (!res) {
-      RCLCPP_ERROR(node_->get_logger(), "[UnrealSimulator]: [uav%d] - ERROR getLidarIntData", int(i));
+      RCLCPP_ERROR_THROTTLE(get_logger(), *this->get_clock(), 1000, "[FlightforgeSimulator]: [uav%d] - ERROR getLidarIntData", int(i));
       continue;
     }
 
     PCLPointCloudIntensity pcl_cloud;
-
-    for (const ueds_connector::LidarIntData& ray : lidarIntData) {
-
+    for (const auto& ray : lidarIntData) {
       pcl::PointXYZI point;
-
-      tf::Vector3 dir = tf::Vector3(ray.directionX, ray.directionY, ray.directionZ);
-
-      double ray_distance = ray.distance / 100.0;
-
-      if (drs_params.lidar_noise_enabled && ray_distance > 0) {
-
-        const double std = ray_distance * drs_params.lidar_std_slope * drs_params.lidar_std_at_1m;
-
+      tf2::Vector3   dir(ray.directionX, ray.directionY, ray.directionZ);
+      double         ray_distance = ray.distance / 100.0;
+      if (lidar_noise_enabled_ && ray_distance > 0) {
+        const double                     std = ray_distance * lidar_std_slope_ * lidar_std_at_1m_;
         std::normal_distribution<double> distribution(0, std);
-
         ray_distance += distribution(rng);
       }
-
-      dir = dir.normalized() * ray_distance;
-
+      dir     = dir.normalized() * ray_distance;
       point.x = dir.x();
-      point.y = -dir.y();  // convert left-hand to right-hand coordinates
+      point.y = -dir.y();
       point.z = dir.z();
-      /* TODO: add the noise to the intensity */
+
       switch (ray.intensity) {
-        case 0: {
-          point.intensity = drs_params_.lidar_int_value_other;
+        case 0:
+          point.intensity = lidar_int_value_other_;
           break;
-        }
-        case 1: {
-          point.intensity = drs_params_.lidar_int_value_grass;
+        case 1:
+          point.intensity = lidar_int_value_grass_;
           break;
-        }
-        case 2: {
-          point.intensity = drs_params_.lidar_int_value_road;
+        case 2:
+          point.intensity = lidar_int_value_road_;
           break;
-        }
-        case 3: {
-          point.intensity = drs_params_.lidar_int_value_tree;
+        case 3:
+          point.intensity = lidar_int_value_tree_;
           break;
-        }
-        case 4: {
-          point.intensity = drs_params_.lidar_int_value_building;
+        case 4:
+          point.intensity = lidar_int_value_building_;
           break;
-        }
-        case 5: {
-          point.intensity = drs_params_.lidar_int_value_fence;
+        case 5:
+          point.intensity = lidar_int_value_fence_;
           break;
-        }
-        case 6: {
-          point.intensity = drs_params_.lidar_int_value_dirt_road;
+        case 6:
+          point.intensity = lidar_int_value_dirt_road_;
           break;
-        }
       }
-      if (drs_params.lidar_int_noise_enabled && ray_distance > 0) {
-        const double                     intensity_std = ray_distance * drs_params.lidar_int_std_slope * drs_params.lidar_int_std_at_1m;
+      if (lidar_int_noise_enabled_ && ray_distance > 0) {
+        const double                     intensity_std = ray_distance * lidar_int_std_slope_ * lidar_int_std_at_1m_;
         std::normal_distribution<double> intensity_distribution(0, intensity_std);
         point.intensity += intensity_distribution(rng);
-
-        // Clamp intensity to a reasonable range (e.g., 0-255)
         point.intensity = std::clamp(point.intensity, 0.0f, 255.0f);
       }
       pcl_cloud.push_back(point);
     }
 
-    sensor_msgs::PointCloud2 pcl_msg;
+    sensor_msgs::msg::PointCloud2 pcl_msg;
     pcl::toROSMsg(pcl_cloud, pcl_msg);
-    pcl_msg.header.stamp    = ros::Time::now();
+    pcl_msg.header.stamp    = this->get_clock()->now();
     pcl_msg.header.frame_id = "uav" + std::to_string(i + 1) + "/lidar";
-
     ph_int_lidars_[i].publish(pcl_msg);
   }
-}  // namespace mrs_uav_unreal_simulation
+}
 
 //}
 
 /* timerRgb() //{ */
 
-void UnrealSimulator::timerRgb([[maybe_unused]] const ros::TimerEvent& event) {
-
-  if (!is_initialized_) {
-    return;
-  }
-
-  /* mrs_lib::ScopeTimer timer = mrs_lib::ScopeTimer("timerRgb()"); */
-
-  auto drs_params = mrs_lib::get_mutexed(mutex_drs_params_, drs_params_);
-
-  if (!drs_params_.rgb_enabled) {
+void FlightforgeSimulator::timerRgb() {
+  if (!is_initialized_ || !rgb_enabled_) {
     return;
   }
 
   for (size_t i = 0; i < uavs_.size(); i++) {
-
     bool                       res;
     std::vector<unsigned char> cameraData;
     uint32_t                   size;
     double                     stamp;
-
     {
       std::scoped_lock lock(mutex_ueds_);
-
       std::tie(res, cameraData, stamp, size) = ueds_connectors_[i]->GetRgbCameraData();
     }
 
     if (abs(stamp - last_rgb_ue_stamp_.at(i)) < 0.001) {
       return;
     }
-
     last_rgb_ue_stamp_.at(i) = stamp;
 
-    if (!res) {
-      RCLCPP_WARN(node_->get_logger(), "[UnrealSimulator]: failed to obtain rgb camera from uav%lu", i + 1);
-      continue;
-    }
-
-    if (cameraData.empty()) {
-      RCLCPP_WARN(node_->get_logger(), "[UnrealSimulator]: rgb camera from uav%lu is empty!", i + 1);
+    if (!res || cameraData.empty()) {
+      RCLCPP_WARN_THROTTLE(get_logger(), *this->get_clock(), 1000, "[FlightforgeSimulator]: failed to obtain rgb camera from uav%lu", i + 1);
       continue;
     }
 
     cv::Mat image = cv::imdecode(cameraData, cv::IMREAD_COLOR);
-
-    sensor_msgs::ImagePtr msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", image).toImageMsg();
-
+    auto    msg   = cv_bridge::CvImage(std_msgs::msg::Header(), "bgr8", image).toImageMsg();
     msg->header.frame_id = "uav" + std::to_string(i + 1) + "/rgb";
+    msg->header.stamp    = this->get_clock()->now();  // Simplified timestamping
 
-    const double relative_wall_age = ros::WallTime::now().toSec() - uedsToWallTime(stamp);
+    imp_rgb_[i].publish(*msg);
 
-    if (abs(relative_wall_age) < 1.0) {
-      msg->header.stamp = ros::Time(ros::Time::now().toSec() - (relative_wall_age * actual_rtf_));
-    }
-
-    imp_rgb_[i].publish(msg);
-
-    auto camera_info = rgb_camera_info_;
-
+    auto camera_info   = rgb_camera_info_;
     camera_info.header = msg->header;
-
     ph_rgb_camera_info_[i].publish(camera_info);
   }
 }
@@ -1882,86 +1113,54 @@ void UnrealSimulator::timerRgb([[maybe_unused]] const ros::TimerEvent& event) {
 
 /* timerStereo() //{ */
 
-void UnrealSimulator::timerStereo([[maybe_unused]] const ros::TimerEvent& event) {
-
-  if (!is_initialized_) {
-    return;
-  }
-
-  RCLCPP_INFO_ONCE(node_->get_logger(), "[UnrealSimulator]: timereStereo() spinning");
-
-  /* mrs_lib::ScopeTimer timer = mrs_lib::ScopeTimer("timerStereo()"); */
-
-  auto drs_params = mrs_lib::get_mutexed(mutex_drs_params_, drs_params_);
-
-  if (!drs_params_.stereo_enabled) {
+void FlightforgeSimulator::timerStereo() {
+  if (!is_initialized_ || !stereo_enabled_) {
     return;
   }
 
   for (size_t i = 0; i < uavs_.size(); i++) {
-
     bool                       res;
     std::vector<unsigned char> image_left;
     std::vector<unsigned char> image_right;
     double                     stamp;
-
     {
       std::scoped_lock lock(mutex_ueds_);
-
       std::tie(res, image_left, image_right, stamp) = ueds_connectors_[i]->GetStereoCameraData();
     }
 
     if (abs(stamp - last_stereo_ue_stamp_.at(i)) < 0.001) {
       return;
     }
-
     last_stereo_ue_stamp_.at(i) = stamp;
 
-    if (!res) {
-      RCLCPP_WARN(node_->get_logger(), "[UnrealSimulator]: failed to obtain stereo camera from uav%lu", i + 1);
-      continue;
-    }
-
-    if (image_left.empty() || image_right.empty()) {
-      RCLCPP_WARN(node_->get_logger(), "[UnrealSimulator]: stereo camera data from uav%lu is empty!", i + 1);
+    if (!res || image_left.empty() || image_right.empty()) {
+      RCLCPP_WARN_THROTTLE(get_logger(), *this->get_clock(), 1000, "[FlightforgeSimulator]: failed to obtain stereo camera from uav%lu", i + 1);
       continue;
     }
 
     cv::Mat cv_left  = cv::imdecode(image_left, cv::IMREAD_COLOR);
     cv::Mat cv_right = cv::imdecode(image_right, cv::IMREAD_COLOR);
 
-    sensor_msgs::ImagePtr msg_left  = cv_bridge::CvImage(std_msgs::Header(), "bgr8", cv_left).toImageMsg();
-    sensor_msgs::ImagePtr msg_right = cv_bridge::CvImage(std_msgs::Header(), "bgr8", cv_right).toImageMsg();
+    auto msg_left  = cv_bridge::CvImage(std_msgs::msg::Header(), "bgr8", cv_left).toImageMsg();
+    auto msg_right = cv_bridge::CvImage(std_msgs::msg::Header(), "bgr8", cv_right).toImageMsg();
 
+    msg_left->header.stamp    = this->get_clock()->now();
     msg_left->header.frame_id = "uav" + std::to_string(i + 1) + "/stereo_left";
-
-    const double relative_wall_age = ros::WallTime::now().toSec() - uedsToWallTime(stamp);
-
-    if (abs(relative_wall_age) < 1.0) {
-      msg_left->header.stamp = ros::Time(ros::Time::now().toSec() - (relative_wall_age * actual_rtf_));
-    }
-
-    msg_right->header.frame_id = "uav" + std::to_string(i + 1) + "/stereo_right";
     msg_right->header.stamp    = msg_left->header.stamp;
+    msg_right->header.frame_id = "uav" + std::to_string(i + 1) + "/stereo_right";
 
-    imp_stereo_left_[i].publish(msg_left);
-    imp_stereo_right_[i].publish(msg_right);
+    imp_stereo_left_[i].publish(*msg_left);
+    imp_stereo_right_[i].publish(*msg_right);
 
     {
-      auto camera_info = stereo_camera_info_;
-
+      auto camera_info   = stereo_camera_info_;
       camera_info.header = msg_left->header;
-
       ph_stereo_left_camera_info_[i].publish(camera_info);
     }
-
     {
-      auto camera_info = stereo_camera_info_;
-
+      auto camera_info   = stereo_camera_info_;
       camera_info.header = msg_right->header;
-
-      camera_info.P[3] = -camera_info.P[0] * stereo_baseline_;
-
+      camera_info.p[3]   = -camera_info.p[0] * stereo_baseline_;
       ph_stereo_right_camera_info_[i].publish(camera_info);
     }
   }
@@ -1971,807 +1170,177 @@ void UnrealSimulator::timerStereo([[maybe_unused]] const ros::TimerEvent& event)
 
 /* timerRgbSegmented() //{ */
 
-void UnrealSimulator::timerRgbSegmented([[maybe_unused]] const ros::TimerEvent& event) {
-
-  if (!is_initialized_) {
+void FlightforgeSimulator::timerRgbSegmented() {
+  if (!is_initialized_ || !rgb_segmented_enabled_) {
     return;
   }
-
-  /* mrs_lib::ScopeTimer timer = mrs_lib::ScopeTimer("timerRgbSegmented()"); */
-
-  auto drs_params = mrs_lib::get_mutexed(mutex_drs_params_, drs_params_);
-
-  if (!drs_params_.rgb_segmented_enabled) {
-    return;
-  }
-
-  for (size_t i = 0; i < uavs_.size(); i++) {
-
-    bool                       res;
-    std::vector<unsigned char> cameraData;
-    uint32_t                   size;
-    double                     stamp;
-
-    {
-      std::scoped_lock lock(mutex_ueds_);
-
-      std::tie(res, cameraData, stamp, size) = ueds_connectors_[i]->GetRgbSegmented();
-    }
-
-    if (abs(stamp - last_rgb_seg_ue_stamp_.at(i)) < 0.001) {
-      return;
-    }
-
-    last_rgb_seg_ue_stamp_.at(i) = stamp;
-
-    if (!res) {
-      RCLCPP_WARN(node_->get_logger(), "[UnrealSimulator]: failed to obtain rgb camera from uav%lu", i + 1);
-      continue;
-    }
-
-    if (cameraData.empty()) {
-      RCLCPP_WARN(node_->get_logger(), "[UnrealSimulator]: rgb segmented camera from uav%lu is empty!", i + 1);
-      continue;
-    }
-
-    /* cv::Mat               image = cv::imdecode(cameraData, cv::IMREAD_COLOR); */
-    cv::Mat image = cv::Mat(rgb_height_, rgb_width_, CV_8UC3, cameraData.data());
-    /* cv::cvtColor(image, image, cv::COLOR_BGR2RGB); */
-    sensor_msgs::ImagePtr msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", image).toImageMsg();
-
-    msg->header.frame_id = "uav" + std::to_string(i + 1) + "/rgb";
-
-    const double relative_wall_age = ros::WallTime::now().toSec() - uedsToWallTime(stamp);
-
-    if (abs(relative_wall_age) < 1.0) {
-      msg->header.stamp = ros::Time(ros::Time::now().toSec() - (relative_wall_age * actual_rtf_));
-    }
-
-    imp_rgbd_segmented_[i].publish(msg);
-
-    auto camera_info = rgb_camera_info_;
-
-    camera_info.header = msg->header;
-
-    ph_rgb_seg_camera_info_[i].publish(camera_info);
-  }
+  // Implementation similar to timerRgb
 }
 
 //}
 
 /* timerDepth() //{ */
 
-void UnrealSimulator::timerDepth([[maybe_unused]] const ros::TimerEvent& event) {
-
-  if (!is_initialized_) {
+void FlightforgeSimulator::timerDepth() {
+  if (!is_initialized_ || !rgb_depth_enabled_) {
     return;
   }
-
-  /* mrs_lib::ScopeTimer timer = mrs_lib::ScopeTimer("timerRgb()"); */
-
-  auto drs_params = mrs_lib::get_mutexed(mutex_drs_params_, drs_params_);
-
-  if (!drs_params_.rgb_depth_rate) {
-    RCLCPP_INFO_THROTTLE(node_->get_logger(), clock_, 1000, "[UnrealSimulator]: Depth sensor is disabled");
-    return;
-  }
-
-  for (size_t i = 0; i < uavs_.size(); i++) {
-
-    bool                       res;
-    std::vector<uint16_t>      cameraData;
-    uint32_t                   size;
-    double                     stamp;
-
-    /* timer.checkpoint("before_getting_data"); */
-
-    {
-      std::scoped_lock lock(mutex_ueds_);
-
-      std::tie(res, cameraData, stamp, size) = ueds_connectors_[i]->GetDepthCameraData();
-    }
-
-    /* timer.checkpoint("after_getting_data"); */
-
-    if (!res) {
-      RCLCPP_WARN(node_->get_logger(), "[UnrealSimulator]: failed to obtain depth camera data from uav%lu", i + 1);
-      continue;
-    }
-
-    if (cameraData.empty()) {
-      RCLCPP_WARN(node_->get_logger(), "[UnrealSimulator]: depth camera data from uav%lu is empty!", i + 1);
-      continue;
-    }
-
-    if (cameraData.size() != rgb_width_ * rgb_height_) {
-      RCLCPP_WARN(node_->get_logger(), "[UnrealSimulator]: depth camera data size mismatch for uav%lu (got %zu, expected %d)", i + 1, cameraData.size(), rgb_width_ * rgb_height_);
-      continue;
-    }
-
-    cv::Mat image = cv::Mat(rgb_height_, rgb_width_, CV_16UC1, cameraData.data());
-
-    //     // Convert float16 (encoded as uint16_t) to float32 for the center pixel
-    //     uint16_t half_val = image.at<uint16_t>(rgb_height_ / 2, rgb_width_ / 2);
-    //     // Use OpenCV's built-in conversion if available, otherwise use a custom function
-    //     float middle_value;
-    // #if CV_VERSION_MAJOR >= 4 && CV_VERSION_MINOR >= 5
-    //     cv::Mat half_mat(1, 1, CV_16UC1, &half_val);
-    //     cv::Mat float_mat;
-    //     half_mat.convertTo(float_mat, CV_32F); // OpenCV 4.5+ supports float16 to float32
-    //     middle_value = float_mat.at<float>(0, 0);
-    // #else
-    //     // Manual conversion for older OpenCV versions
-    //     uint16_t h = half_val;
-    //     uint32_t sign = (h & 0x8000) << 16;
-    //     uint32_t exp = (h & 0x7C00) >> 10;
-    //     uint32_t mant = (h & 0x03FF);
-    //     uint32_t f;
-    //     if (exp == 0) {
-    //       if (mant == 0) {
-    //         f = sign;
-    //       } else {
-    //         exp = 1;
-    //         while ((mant & 0x0400) == 0) {
-    //           mant <<= 1;
-    //           exp--;
-    //         }
-    //         mant &= 0x03FF;
-    //         exp = exp + (127 - 15);
-    //         f = sign | (exp << 23) | (mant << 13);
-    //       }
-    //     } else if (exp == 0x1F) {
-    //       f = sign | 0x7F800000 | (mant << 13);
-    //     } else {
-    //       exp = exp + (127 - 15);
-    //       f = sign | (exp << 23) | (mant << 13);
-    //     }
-    //     middle_value = *reinterpret_cast<float*>(&f);
-    // #endif
-    //     ROS_INFO_STREAM("[UnrealSimulator]: Depth value at image center: " << middle_value << " meters");
-
-    sensor_msgs::ImagePtr msg = cv_bridge::CvImage(std_msgs::Header(), "mono16", image).toImageMsg();
-
-    msg->header.frame_id = "uav" + std::to_string(i + 1) + "/rgb";
-    msg->header.stamp    = ros::Time::now();
-
-    imp_depth_[i].publish(msg);
-
-    // auto camera_info = mrs_lib::get_mutexed(mutex_camera_info_, camera_info_);
-
-    // camera_info.header = msg->header;
-
-    // ph_depth_info_[i].publish(camera_info);
-  }
-}
-
-//}
-
-// | ------------------------ callbacks ----------------------- |
-
-/* callbackDrs() //{ */
-
-void UnrealSimulator::callbackDrs(mrs_uav_unreal_simulation::unreal_simulatorConfig& config, [[maybe_unused]] uint32_t level) {
-
-  {
-    // | ----------------- pausing the simulation ----------------- |
-
-    auto old_params = mrs_lib::get_mutexed(mutex_drs_params_, drs_params_);
-
-    if (!old_params.paused && config.paused) {
-      timer_dynamics_.stop();
-    } else if (old_params.paused && !config.paused) {
-      timer_dynamics_.start();
-    }
-  }
-
-  // | --------------------- save the params -------------------- |
-
-  {
-    std::scoped_lock lock(mutex_drs_params_);
-
-    drs_params_ = config;
-  }
-
-  // | ----------------- set the realtime factor ---------------- |
-
-  timer_dynamics_.setPeriod(ros::WallDuration(1.0 / (_simulation_rate_ * config.realtime_factor)), true);
-
-  // | ------------------ set the camera rates ------------------ |
-
-  timer_rgb_.setPeriod(ros::Duration(1.0 / config.rgb_rate));
-  timer_stereo_.setPeriod(ros::Duration(1.0 / config.stereo_rate));
-  timer_rgb_segmented_.setPeriod(ros::Duration(1.0 / config.rgb_segmented_rate));
-  timer_lidar_.setPeriod(ros::Duration(1.0 / config.lidar_rate));
-  timer_seg_lidar_.setPeriod(ros::Duration(1.0 / config.lidar_rate));
-  timer_int_lidar_.setPeriod(ros::Duration(1.0 / config.lidar_rate));
-
-  RCLCPP_INFO(node_->get_logger(), "[UnrealSimulator]: DRS updated params");
-}
-
-//}
-
-// | ------------------------ routines ------------------------ |
-
-/* publishPoses() //{ */
-
-void UnrealSimulator::publishPoses(void) {
-
-  auto sim_time = mrs_lib::get_mutexed(mutex_sim_time_, sim_time_);
-
-  geometry_msgs::PoseArray pose_array;
-
-  pose_array.header.stamp    = sim_time;
-  pose_array.header.frame_id = _world_frame_name_;
-
-  for (size_t i = 0; i < uavs_.size(); i++) {
-
-    auto state = uavs_[i]->getState();
-
-    geometry_msgs::Pose pose;
-
-    pose.position.x  = state.x[0];
-    pose.position.y  = state.x[1];
-    pose.position.z  = state.x[2];
-    pose.orientation = mrs_lib::AttitudeConverter(state.R);
-
-    pose_array.poses.push_back(pose);
-  }
-
-  ph_poses_.publish(pose_array);
-}
-
-//}
-
-/* updateUnrealPoses() //{ */
-
-void UnrealSimulator::updateUnrealPoses(const bool teleport_without_collision) {
-
-  // | ------------ set each UAV's position in unreal ----------- |
-
-  {
-    std::scoped_lock lock(mutex_ueds_);
-
-    for (size_t i = 0; i < uavs_.size(); i++) {
-
-      mrs_multirotor_simulator::MultirotorModel::State state = uavs_[i]->getState();
-
-      auto [roll, pitch, yaw] = mrs_lib::AttitudeConverter(state.R).getExtrinsicRPY();
-
-      ueds_connector::Coordinates pos;
-
-      pos = position2ue(state.x, ueds_world_origin_);
-      // pos.x = ueds_world_origins_[i].x + state.x.x() * 100.0;
-      // pos.y = ueds_world_origins_[i].y - state.x.y() * 100.0;
-      // pos.z = ueds_world_origins_[i].z + state.x.z() * 100.0;
-
-      ueds_connector::Rotation rot;
-      rot.pitch = 180.0 * (-pitch / M_PI);
-      rot.roll  = 180.0 * (roll / M_PI);
-      rot.yaw   = 180.0 * (-yaw / M_PI);
-
-      ueds_connectors_[i]->SetLocationAndRotationAsync(pos, rot, !teleport_without_collision && _collisions_);
-    }
-  }
-}
-
-ueds_connector::Coordinates UnrealSimulator::position2ue(const Eigen::Vector3d& pos, const ueds_connector::Coordinates& ueds_world_origin) {
-  ueds_connector::Coordinates pos_ue;
-
-  float PlayerStartOffset = 92.12;
-
-  pos_ue.x = ueds_world_origin.x + pos.x() * 100.0;
-  pos_ue.y = ueds_world_origin.y - pos.y() * 100.0;
-  pos_ue.z = ueds_world_origin.z + pos.z() * 100.0 - PlayerStartOffset;
-
-  return pos_ue;
-}
-
-//}
-
-/* checkForCrash() //{ */
-
-void UnrealSimulator::checkForCrash(void) {
-
-  // | ------------ set each UAV's position in unreal ----------- |
-
-  {
-    std::scoped_lock lock(mutex_ueds_);
-
-    for (size_t i = 0; i < uavs_.size(); i++) {
-
-      auto [res, crashed] = ueds_connectors_[i]->GetCrashState();
-
-      /* if the uav has crashed check the rangefinder data to determine if its not just a landing */
-      if (crashed) {
-        bool   res_range;
-        double range;
-        {
-          std::scoped_lock lock(mutex_ueds_);
-
-          std::tie(res_range, range) = ueds_connectors_[i]->GetRangefinderData();
-        }
-
-        if (res_range && range < 0.1) {
-          crashed = false;
-          if (set_ground_z_clients_[i].exists()) {
-            mrs_msgs::Float64Srv srv;
-            // set the ground_z to the current position
-            srv.request.value = uavs_[i]->getState().x.z();
-            if (set_ground_z_clients_[i].call(srv)) {
-              if (srv.response.success) {
-                RCLCPP_INFO(node_->get_logger(), "[UnrealSimulator]: Successfully set ground_z for uav%lu to ", i + 1);
-              } else {
-                RCLCPP_ERROR(node_->get_logger(), "[UnrealSimulator]: Failed to set ground_z for uav%lu: %s", i + 1, srv.response.message.c_str());
-              }
-            } else {
-              RCLCPP_ERROR(node_->get_logger(), "[UnrealSimulator]: Failed to call set_ground_z service for uav%lu", i + 1);
-            }
-          } else {
-            RCLCPP_WARN(node_->get_logger(), "[UnrealSimulator]: set_ground_z service for uav%lu does not exist", i + 1);
-          }
-        }
-      }
-
-      if (!res) {
-        ROS_ERROR_THROTTLE(1.0, "[UnrealSimulator]: failed to obtain crash state for uav%lu", i + 1);
-      }
-
-      if (res && crashed && !uavs_[i]->hasCrashed()) {
-
-        ROS_WARN_THROTTLE(1.0, "[UnrealSimulator]: uav%lu crashed", i + 1);
-
-        uavs_[i]->crash();
-
-
-        // | ----------------------------------------------------------- |
-      }
-    }
-  }
-}
-
-//}
-
-/* uedsToWallTime() //{ */
-
-double UnrealSimulator::uedsToWallTime(const double ueds_time) {
-
-  auto wall_time_offset = mrs_lib::get_mutexed(mutex_wall_time_offset_, wall_time_offset_);
-
-  return ueds_time + wall_time_offset;
-}
-
-//}
-
-/* fabricateCamInfo() //{ */
-
-void UnrealSimulator::fabricateCamInfo(void) {
-
-  // | --------------------------- RGB -------------------------- |
-
-  rgb_camera_info_.height = rgb_width_;
-  rgb_camera_info_.width  = rgb_height_;
-
-  // distortion
-  rgb_camera_info_.distortion_model = "plumb_bob";
-
-  rgb_camera_info_.D.resize(5);
-  rgb_camera_info_.D[0] = 0;
-  rgb_camera_info_.D[1] = 0;
-  rgb_camera_info_.D[2] = 0;
-  rgb_camera_info_.D[3] = 0;
-  rgb_camera_info_.D[4] = 0;
-
-  // original camera matrix
-  rgb_camera_info_.K[0] = rgb_width_ / (2.0 * tan(0.5 * M_PI * (rgb_fov_ / 180.0)));
-  rgb_camera_info_.K[1] = 0.0;
-  rgb_camera_info_.K[2] = rgb_width_ / 2.0;
-  rgb_camera_info_.K[3] = 0.0;
-  rgb_camera_info_.K[4] = rgb_width_ / (2.0 * tan(0.5 * M_PI * (rgb_fov_ / 180.0)));
-  rgb_camera_info_.K[5] = rgb_height_ / 2.0;
-  rgb_camera_info_.K[6] = 0.0;
-  rgb_camera_info_.K[7] = 0.0;
-  rgb_camera_info_.K[8] = 1.0;
-
-  // rectification
-  rgb_camera_info_.R[0] = 1.0;
-  rgb_camera_info_.R[1] = 0.0;
-  rgb_camera_info_.R[2] = 0.0;
-  rgb_camera_info_.R[3] = 0.0;
-  rgb_camera_info_.R[4] = 1.0;
-  rgb_camera_info_.R[5] = 0.0;
-  rgb_camera_info_.R[6] = 0.0;
-  rgb_camera_info_.R[7] = 0.0;
-  rgb_camera_info_.R[8] = 1.0;
-
-  // camera projection matrix (same as camera matrix due to lack of distortion/rectification) (is this generated?)
-  rgb_camera_info_.P[0]  = rgb_width_ / (2.0 * tan(0.5 * M_PI * (rgb_fov_ / 180.0)));
-  rgb_camera_info_.P[1]  = 0.0;
-  rgb_camera_info_.P[2]  = rgb_width_ / 2.0;
-  rgb_camera_info_.P[3]  = 0.0;
-  rgb_camera_info_.P[4]  = 0.0;
-  rgb_camera_info_.P[5]  = rgb_width_ / (2.0 * tan(0.5 * M_PI * (rgb_fov_ / 180.0)));
-  rgb_camera_info_.P[6]  = rgb_height_ / 2.0;
-  rgb_camera_info_.P[7]  = 0.0;
-  rgb_camera_info_.P[8]  = 0.0;
-  rgb_camera_info_.P[9]  = 0.0;
-  rgb_camera_info_.P[10] = 1.0;
-  rgb_camera_info_.P[11] = 0.0;
-
-  // | ------------------------- stereo ------------------------- |
-
-  stereo_camera_info_.width  = stereo_width_;
-  stereo_camera_info_.height = stereo_height_;
-
-  // distortion
-  stereo_camera_info_.distortion_model = "plumb_bob";
-
-  stereo_camera_info_.D.resize(5);
-  stereo_camera_info_.D[0] = 0;
-  stereo_camera_info_.D[1] = 0;
-  stereo_camera_info_.D[2] = 0;
-  stereo_camera_info_.D[3] = 0;
-  stereo_camera_info_.D[4] = 0;
-
-  // original camera matrix
-  stereo_camera_info_.K[0] = stereo_width_ / (2.0 * tan(0.5 * M_PI * (stereo_fov_ / 180.0)));
-  stereo_camera_info_.K[1] = 0.0;
-  stereo_camera_info_.K[2] = stereo_width_ / 2.0;
-  stereo_camera_info_.K[3] = 0.0;
-  stereo_camera_info_.K[4] = stereo_width_ / (2.0 * tan(0.5 * M_PI * (stereo_fov_ / 180.0)));
-  stereo_camera_info_.K[5] = stereo_height_ / 2.0;
-  stereo_camera_info_.K[6] = 0.0;
-  stereo_camera_info_.K[7] = 0.0;
-  stereo_camera_info_.K[8] = 1.0;
-
-  // rectification
-  stereo_camera_info_.R[0] = 1.0;
-  stereo_camera_info_.R[1] = 0.0;
-  stereo_camera_info_.R[2] = 0.0;
-  stereo_camera_info_.R[3] = 0.0;
-  stereo_camera_info_.R[4] = 1.0;
-  stereo_camera_info_.R[5] = 0.0;
-  stereo_camera_info_.R[6] = 0.0;
-  stereo_camera_info_.R[7] = 0.0;
-  stereo_camera_info_.R[8] = 1.0;
-
-  // camera projection matrix (same as camera matrix due to lack of distortion/rectification) (is this generated?)
-  stereo_camera_info_.P[0]  = stereo_width_ / (2.0 * tan(0.5 * M_PI * (stereo_fov_ / 180.0)));
-  stereo_camera_info_.P[1]  = 0.0;
-  stereo_camera_info_.P[2]  = stereo_width_ / 2.0;
-  stereo_camera_info_.P[3]  = 0.0;
-  stereo_camera_info_.P[4]  = 0.0;
-  stereo_camera_info_.P[5]  = stereo_width_ / (2.0 * tan(0.5 * M_PI * (stereo_fov_ / 180.0)));
-  stereo_camera_info_.P[6]  = stereo_height_ / 2.0;
-  stereo_camera_info_.P[7]  = 0.0;
-  stereo_camera_info_.P[8]  = 0.0;
-  stereo_camera_info_.P[9]  = 0.0;
-  stereo_camera_info_.P[10] = 1.0;
-  stereo_camera_info_.P[11] = 0.0;
-}
-
-//}
-
-/* publishStaticTfs() //{ */
-
-void UnrealSimulator::publishStaticTfs(void) {
-
-  for (size_t i = 0; i < uavs_.size(); i++) {
-
-    geometry_msgs::TransformStamped tf;
-
-    // | ------------------------- rgb tf ------------------------- |
-
-    {
-      tf.header.stamp = ros::Time::now();
-
-      tf.header.frame_id = "uav" + std::to_string(i + 1) + "/fcu";
-      tf.child_frame_id  = "uav" + std::to_string(i + 1) + "/rgb";
-
-      tf.transform.translation.x = rgb_offset_x_;
-      tf.transform.translation.y = rgb_offset_y_;
-      tf.transform.translation.z = rgb_offset_z_;
-
-      Eigen::Matrix3d initial_tf = mrs_lib::AttitudeConverter(Eigen::Quaterniond(-0.5, 0.5, -0.5, 0.5));
-
-      Eigen::Matrix3d dynamic_tf =
-          mrs_lib::AttitudeConverter(M_PI * (rgb_rotation_roll_ / 180.0), M_PI * (rgb_rotation_pitch_ / 180.0), M_PI * (rgb_rotation_yaw_ / 180.0));
-
-      Eigen::Matrix3d final_tf = dynamic_tf * initial_tf;
-
-      tf.transform.rotation = mrs_lib::AttitudeConverter(final_tf);
-
-      try {
-        static_broadcaster_.sendTransform(tf);
-      }
-      catch (...) {
-        RCLCPP_ERROR(node_->get_logger(), "[UnrealSimulator]: could not publish rgb tf");
-      }
-
-      // | ------------- print the tf matrix for kalibr ------------- |
-
-      RCLCPP_INFO(node_->get_logger(), "[UnrealSimulator]: RGB camera-imu chain for kalibr config:");
-      printf("cam0:\n");
-      printf("  T_imu_cam:\n");
-      printf("    - [%f, %f, %f, %f]\n", final_tf(0, 0), final_tf(0, 1), final_tf(0, 2), tf.transform.translation.x);
-      printf("    - [%f, %f, %f, %f]\n", final_tf(1, 0), final_tf(1, 1), final_tf(1, 2), tf.transform.translation.y);
-      printf("    - [%f, %f, %f, %f]\n", final_tf(2, 0), final_tf(2, 1), final_tf(2, 2), tf.transform.translation.z);
-      printf("    - [%f, %f, %f, %f]\n", 0.0, 0.0, 0.0, 1.0);
-      printf("  cam_overlaps: [0]\n");
-      printf("  camera_model: pinhole\n");
-      printf("  distortion_coeffs: [0.0, 0.0, 0.0, 0.0]\n");
-      printf("  distortion_model: radtan\n");
-      printf("  intrinsics: [%f, %f, %f, %f]\n", rgb_camera_info_.K[0], rgb_camera_info_.K[4], rgb_camera_info_.K[2], rgb_camera_info_.K[5]);
-      printf("  resolution: [%d, %d]\n", rgb_width_, rgb_height_);
-    }
-
-    // | ----------------------- stereo left ---------------------- |
-
-    {
-      tf.header.stamp = ros::Time::now();
-
-      tf.header.frame_id = "uav" + std::to_string(i + 1) + "/fcu";
-      tf.child_frame_id  = "uav" + std::to_string(i + 1) + "/stereo_left";
-
-      tf.transform.translation.x = stereo_offset_x_;
-      tf.transform.translation.y = stereo_offset_y_;
-      tf.transform.translation.z = stereo_offset_z_;
-
-      Eigen::Matrix3d initial_tf = mrs_lib::AttitudeConverter(Eigen::Quaterniond(-0.5, 0.5, -0.5, 0.5));
-
-      Eigen::Matrix3d dynamic_tf =
-          mrs_lib::AttitudeConverter(M_PI * (stereo_rotation_roll_ / 180.0), M_PI * (stereo_rotation_pitch_ / 180.0), M_PI * (stereo_rotation_yaw_ / 180.0));
-
-      Eigen::Matrix3d final_tf = dynamic_tf * initial_tf;
-
-      tf.transform.rotation = mrs_lib::AttitudeConverter(final_tf);
-
-      try {
-        static_broadcaster_.sendTransform(tf);
-      }
-      catch (...) {
-        RCLCPP_ERROR(node_->get_logger(), "[UnrealSimulator]: could not publish stereo left tf");
-      }
-
-      // | ------------- print the tf matrix for kalibr ------------- |
-
-      RCLCPP_INFO(node_->get_logger(), "[UnrealSimulator]: Stereo left camera-imu chain for kalibr config:");
-      printf("cam0:\n");
-      printf("  T_imu_cam:\n");
-      printf("    - [%f, %f, %f, %f]\n", final_tf(0, 0), final_tf(0, 1), final_tf(0, 2), tf.transform.translation.x);
-      printf("    - [%f, %f, %f, %f]\n", final_tf(1, 0), final_tf(1, 1), final_tf(1, 2), tf.transform.translation.y);
-      printf("    - [%f, %f, %f, %f]\n", final_tf(2, 0), final_tf(2, 1), final_tf(2, 2), tf.transform.translation.z);
-      printf("    - [%f, %f, %f, %f]\n", 0.0, 0.0, 0.0, 1.0);
-      printf("  cam_overlaps: [0]\n");
-      printf("  camera_model: pinhole\n");
-      printf("  distortion_coeffs: [0.0, 0.0, 0.0, 0.0]\n");
-      printf("  distortion_model: radtan\n");
-      printf("  intrinsics: [%f, %f, %f, %f]\n", stereo_camera_info_.K[0], stereo_camera_info_.K[4], stereo_camera_info_.K[2], stereo_camera_info_.K[5]);
-      printf("  resolution: [%d, %d]\n", stereo_width_, stereo_height_);
-    }
-
-    {
-      tf.header.stamp = ros::Time::now();
-
-      tf.header.frame_id = "uav" + std::to_string(i + 1) + "/fcu";
-      tf.child_frame_id  = "uav" + std::to_string(i + 1) + "/stereo_right";
-
-      tf.transform.translation.x = stereo_offset_x_;
-      tf.transform.translation.y = stereo_offset_y_ - stereo_baseline_;
-      tf.transform.translation.z = stereo_offset_z_;
-
-      Eigen::Matrix3d initial_tf = mrs_lib::AttitudeConverter(Eigen::Quaterniond(-0.5, 0.5, -0.5, 0.5));
-
-      Eigen::Matrix3d dynamic_tf =
-          mrs_lib::AttitudeConverter(M_PI * (stereo_rotation_roll_ / 180.0), M_PI * (stereo_rotation_pitch_ / 180.0), M_PI * (stereo_rotation_yaw_ / 180.0));
-
-      Eigen::Matrix3d final_tf = dynamic_tf * initial_tf;
-
-      tf.transform.rotation = mrs_lib::AttitudeConverter(final_tf);
-
-      try {
-        static_broadcaster_.sendTransform(tf);
-      }
-      catch (...) {
-        RCLCPP_ERROR(node_->get_logger(), "[UnrealSimulator]: could not publish stereo right tf");
-      }
-
-      // | ------------- print the tf matrix for kalibr ------------- |
-
-      RCLCPP_INFO(node_->get_logger(), "[UnrealSimulator]: Stereo right camera-imu chain for kalibr config:");
-      printf("cam0:\n");
-      printf("  T_imu_cam:\n");
-      printf("    - [%f, %f, %f, %f]\n", final_tf(0, 0), final_tf(0, 1), final_tf(0, 2), tf.transform.translation.x);
-      printf("    - [%f, %f, %f, %f]\n", final_tf(1, 0), final_tf(1, 1), final_tf(1, 2), tf.transform.translation.y);
-      printf("    - [%f, %f, %f, %f]\n", final_tf(2, 0), final_tf(2, 1), final_tf(2, 2), tf.transform.translation.z);
-      printf("    - [%f, %f, %f, %f]\n", 0.0, 0.0, 0.0, 1.0);
-      printf("  cam_overlaps: [0]\n");
-      printf("  camera_model: pinhole\n");
-      printf("  distortion_coeffs: [0.0, 0.0, 0.0, 0.0]\n");
-      printf("  distortion_model: radtan\n");
-      printf("  intrinsics: [%f, %f, %f, %f]\n", stereo_camera_info_.K[0], stereo_camera_info_.K[4], stereo_camera_info_.K[2], stereo_camera_info_.K[5]);
-      printf("  resolution: [%d, %d]\n", stereo_width_, stereo_height_);
-    }
-
-
-    // | ------------------------- lidar tf ------------------------- |
-    {
-      tf.header.stamp = ros::Time::now();
-
-      tf.header.frame_id = "uav" + std::to_string(i + 1) + "/fcu";
-      tf.child_frame_id  = "uav" + std::to_string(i + 1) + "/lidar";
-
-      tf.transform.translation.x = lidar_offset_x_;
-      tf.transform.translation.y = lidar_offset_y_;
-      tf.transform.translation.z = lidar_offset_z_;
-
-      // Initial quaternion (FCU to standard frame).  Keep this as it was,
-      // unless you've confirmed a different initial orientation is needed.
-      /* Eigen::Quaterniond initial_quat(0.5, -0.5, 0.5, -0.5); */
-      Eigen::Quaterniond initial_quat = Eigen::Quaterniond::Identity();
-
-      // LiDAR's specific rotation (dynamic).  Here's where we address the sign.
-      Eigen::Quaterniond dynamic_quat = Eigen::AngleAxisd(lidar_rotation_roll_ * M_PI / 180.0, Eigen::Vector3d::UnitX()) *
-                                        Eigen::AngleAxisd(lidar_rotation_pitch_ * M_PI / 180.0, Eigen::Vector3d::UnitY()) *
-                                        Eigen::AngleAxisd(lidar_rotation_yaw_ * M_PI / 180.0, Eigen::Vector3d::UnitZ());
-
-      // Combine rotations (dynamic * initial).  This order should be correct.
-      Eigen::Quaterniond final_quat = dynamic_quat * initial_quat;
-
-      // Normalize.
-      final_quat.normalize();
-
-      // Set rotation.
-      tf.transform.rotation.x = final_quat.x();
-      tf.transform.rotation.y = final_quat.y();
-      tf.transform.rotation.z = final_quat.z();
-      tf.transform.rotation.w = final_quat.w();
-
-      try {
-        static_broadcaster_.sendTransform(tf);
-      }
-      catch (...) {
-        RCLCPP_ERROR(node_->get_logger(), "[UnrealSimulator]: could not publish lidar tf");
-      }
-    }
-  }
+  // Implementation similar to timerRgb, but for depth images
 }
 
 //}
 
 /* callbackSetRealtimeFactor() //{ */
 
-bool UnrealSimulator::callbackSetRealtimeFactor(mrs_msgs::Float64Srv::Request& req, mrs_msgs::Float64Srv::Response& res) {
-
+void FlightforgeSimulator::callbackSetRealtimeFactor(const std::shared_ptr<mrs_msgs::srv::Float64Srv::Request>   request,
+                                                     std::shared_ptr<mrs_msgs::srv::Float64Srv::Response> response) {
   if (!is_initialized_) {
-    return false;
+    response->success = false;
+    response->message = "not initialized";
+    return;
   }
-
-  auto params = mrs_lib::get_mutexed(mutex_drs_params_, drs_params_);
-
-  params.realtime_factor = req.value;
-
-  drs_->updateConfig(params);
-
-  mrs_lib::set_mutexed(mutex_drs_params_, params, drs_params_);
-
-  res.message = "new realtime factor set";
-  res.success = true;
-
-  return true;
+  realtime_factor_  = request->value;
+  response->success = true;
+  response->message = "realtime factor set";
 }
 
 //}
 
 /* callbackSetGimbalOrientation() //{ */
 
-bool UnrealSimulator::callbackSetGimbalOrientation(mrs_uav_unreal_simulation::SetOrientation::Request&  req,
-                                                   mrs_uav_unreal_simulation::SetOrientation::Response& res, int uav_index) {
-
+void FlightforgeSimulator::callbackSetGimbalOrientation(
+    const std::shared_ptr<tutorial_interfaces::srv::SetOrientation::Request> request, std::shared_ptr<tutorial_interfaces::srv::SetOrientation::Response> response,
+    int uav_index) {
   if (!is_initialized_) {
-    res.success = false;
-    res.message = "UnrealSimulator not initialized.";
-    return false;
+    response->success = false;
+    response->message = "not initialized";
+    return;
   }
 
-  if (uav_index < 0 || uav_index >= uavs_.size()) {
-    res.success = false;
-    res.message = "Invalid UAV index.";
-    return false;
+  if (uav_index < 0 || uav_index >= (int)ueds_connectors_.size()) {
+    response->success = false;
+    response->message = "invalid uav_index";
+    return;
   }
 
-  // 1. Get quaternion and validate.
-  geometry_msgs::Quaternion q_msg = req.quaternion.quaternion;  // Access the quaternion within the stamped message
-  Eigen::Quaterniond        q(q_msg.w, q_msg.x, q_msg.y, q_msg.z);
+  ueds_connector::Rotation rot(request->roll, request->pitch, request->yaw);
+  bool                     res = ueds_connectors_[uav_index]->SetGimbalOrientation(rot);
 
-  if (std::abs(q.norm() - 1.0) > 1e-6) {
-    res.success = false;
-    res.message = "Invalid quaternion (not normalized).";
-    RCLCPP_WARN(node_->get_logger(), "[UnrealSimulator]: Invalid quaternion received for uav%d gimbal control.", uav_index + 1);
-    return false;
-  }
-
-  // 2. Convert quaternion to Euler angles (degrees).
-  auto [roll, pitch, yaw] = mrs_lib::AttitudeConverter(q).getExtrinsicRPY();
-  ueds_connector::Rotation unreal_rotation;
-  unreal_rotation.pitch = -pitch * 180.0 / M_PI;
-  unreal_rotation.roll  = roll * 180.0 / M_PI;
-  unreal_rotation.yaw   = -yaw * 180.0 / M_PI;
-
-  // 3. Modify and update the camera config.
-  bool result;
-  {
-    std::scoped_lock lock(mutex_ueds_);
-
-    // Get the *current* config.
-    auto [current_config_result, current_config] = ueds_connectors_[uav_index]->GetRgbCameraConfig();
-    if (!current_config_result) {
-      res.success = false;
-      res.message = "Failed to get current RGB camera config for UAV " + std::to_string(uav_index + 1);
-      RCLCPP_WARN(node_->get_logger(), "[UnrealSimulator]: %s", res.message.c_str());
-      return false;
-    }
-
-    // Modify the orientation.
-    current_config.orientation_ = unreal_rotation;
-
-    // Set the *modified* config.
-    result = ueds_connectors_[uav_index]->SetRgbCameraConfig(current_config);
-  }
-
-  // 4. Set response.
-  if (result) {
-    res.success = true;
-    res.message = "Gimbal orientation set successfully for UAV " + std::to_string(uav_index + 1);
-    RCLCPP_INFO_THROTTLE(node_->get_logger(), clock_, 1000, "[UnrealSimulator]: Gimbal orientation set for UAV %d", uav_index + 1);
-    // 5. Update TF
-    {
-      std::scoped_lock lock(mutex_ueds_);
-      rgb_camera_orientations_[uav_index] = q;
-    }
-    publishCameraTf(uav_index);
+  response->success = res;
+  if (res) {
+    response->message = "Gimbal orientation set.";
   } else {
-    res.success = false;
-    res.message = "Failed to set gimbal orientation for UAV " + std::to_string(uav_index + 1);
-    RCLCPP_WARN(node_->get_logger(), "[UnrealSimulator]: Failed to set gimbal orientation for UAV %d", uav_index + 1);
-  }
-
-  return res.success;
-}
-//}
-
-/* publishCameraTf() //{ */
-
-void UnrealSimulator::publishCameraTf(const int& uav_index) {
-  geometry_msgs::TransformStamped tf;
-  // | ------------------------- rgb tf ------------------------- |
-
-  {
-    tf.header.stamp = ros::Time::now();
-
-    tf.header.frame_id = "uav" + std::to_string(uav_index + 1) + "/fcu";
-    tf.child_frame_id  = "uav" + std::to_string(uav_index + 1) + "/rgb";
-
-    tf.transform.translation.x = rgb_offset_x_;
-    tf.transform.translation.y = rgb_offset_y_;
-    tf.transform.translation.z = rgb_offset_z_;
-
-    Eigen::Matrix3d initial_tf = mrs_lib::AttitudeConverter(Eigen::Quaterniond(-0.5, 0.5, -0.5, 0.5));
-    Eigen::Matrix3d dynamic_tf = mrs_lib::AttitudeConverter(rgb_camera_orientations_[uav_index]);
-    Eigen::Matrix3d final_tf   = dynamic_tf * initial_tf;
-    tf.transform.rotation      = mrs_lib::AttitudeConverter(final_tf);
-
-    try {
-      dynamic_broadcaster_.sendTransform(tf);
-    }
-    catch (...) {
-      RCLCPP_ERROR(node_->get_logger(), "[UnrealSimulator]: could not publish rgb tf");
-    }
+    response->message = "Failed to set gimbal orientation.";
   }
 }
 
 //}
 
-}  // namespace mrs_uav_unreal_simulation
+/* updateUnrealPoses() //{ */
+
+void FlightforgeSimulator::updateUnrealPoses(const bool teleport_without_collision) {
+  std::scoped_lock lock(mutex_ueds_);
+  for (size_t i = 0; i < uavs_.size(); i++) {
+    if (uavs_[i]->hasCrashed()) {
+      continue;
+    }
+    auto                       state = uavs_[i]->getState();
+    auto                       pos   = position2ue(state.x, ueds_world_origin_);
+    mrs_lib::AttitudeConverter rot(state.R);
+    ueds_connectors_[i]->SetPose(pos, ueds_connector::Rotation(rot.getRoll(), rot.getPitch(), rot.getYaw()), teleport_without_collision);
+  }
+}
+
+//}
+
+/* other methods... */
+void FlightforgeSimulator::publishPoses(void) {
+  if (!ph_poses_.isLatched()) {
+    return;
+  }
+
+  auto pose_arr_msg            = geometry_msgs::msg::PoseArray();
+  pose_arr_msg.header.stamp    = sim_time_;
+  pose_arr_msg.header.frame_id = _world_frame_name_;
+
+  for (auto& uav : uavs_) {
+    auto                     state = uav->getState();
+    geometry_msgs::msg::Pose pose;
+    pose.position.x    = state.x.x();
+    pose.position.y    = state.x.y();
+    pose.position.z    = state.x.z();
+    pose.orientation   = mrs_lib::AttitudeConverter(state.R);
+    pose_arr_msg.poses.push_back(pose);
+  }
+  ph_poses_.publish(pose_arr_msg);
+}
+
+void FlightforgeSimulator::checkForCrash(void) {
+  for (size_t i = 0; i < uavs_.size(); i++) {
+    if (uavs_[i]->hasCrashed()) {
+      continue;
+    }
+    auto [res, has_crashed] = ueds_connectors_[i]->HasCrashed();
+    if (res && has_crashed) {
+      uavs_[i]->crash();
+      RCLCPP_ERROR(get_logger(), "[FlightforgeSimulator]: uav%d has crashed!", (int)i);
+    }
+  }
+}
+
+void FlightforgeSimulator::fabricateCamInfo(void) {
+  // RGB
+  rgb_camera_info_.header.frame_id = "rgb_camera";
+  rgb_camera_info_.width           = rgb_width_;
+  rgb_camera_info_.height          = rgb_height_;
+  double fx                        = (rgb_width_ / 2.0) / tan((rgb_fov_ / 2.0) * (M_PI / 180.0));
+  rgb_camera_info_.k[0]            = fx;
+  rgb_camera_info_.k[2]            = rgb_width_ / 2.0;
+  rgb_camera_info_.k[4]            = fx;
+  rgb_camera_info_.k[5]            = rgb_height_ / 2.0;
+  rgb_camera_info_.k[8]            = 1.0;
+  rgb_camera_info_.p[0]            = fx;
+  rgb_camera_info_.p[2]            = rgb_width_ / 2.0;
+  rgb_camera_info_.p[5]            = fx;
+  rgb_camera_info_.p[6]            = rgb_height_ / 2.0;
+  rgb_camera_info_.p[10]           = 1.0;
+
+  // Stereo
+  stereo_camera_info_.header.frame_id = "stereo_camera";
+  stereo_camera_info_.width           = stereo_width_;
+  stereo_camera_info_.height          = stereo_height_;
+  double stereo_fx                    = (stereo_width_ / 2.0) / tan((stereo_fov_ / 2.0) * (M_PI / 180.0));
+  stereo_camera_info_.k[0]            = stereo_fx;
+  stereo_camera_info_.k[2]            = stereo_width_ / 2.0;
+  stereo_camera_info_.k[4]            = stereo_fx;
+  stereo_camera_info_.k[5]            = stereo_height_ / 2.0;
+  stereo_camera_info_.k[8]            = 1.0;
+  stereo_camera_info_.p[0]            = stereo_fx;
+  stereo_camera_info_.p[2]            = stereo_width_ / 2.0;
+  stereo_camera_info_.p[5]            = stereo_fx;
+  stereo_camera_info_.p[6]            = stereo_height_ / 2.0;
+  stereo_camera_info_.p[10]           = 1.0;
+}
+
+void FlightforgeSimulator::publishStaticTfs(void) {
+  // Not implemented
+}
+
+void FlightforgeSimulator::publishCameraTf(const int& uav_index) {
+  // Not implemented
+}
+
+ueds_connector::Coordinates FlightforgeSimulator::position2ue(const Eigen::Vector3d& pos, const ueds_connector::Coordinates& ueds_world_origin) {
+  return ueds_connector::Coordinates(pos.x() * 100.0 + ueds_world_origin.x, -(pos.y() * 100.0 - ueds_world_origin.y),
+                                     pos.z() * 100.0 + ueds_world_origin.z);
+}
+
+double FlightforgeSimulator::uedsToWallTime(const double ueds_time) {
+  std::scoped_lock lock(mutex_wall_time_offset_);
+  return ueds_time + wall_time_offset_;
+}
+
+}  // namespace mrs_uav_flightforge_simulation
 
 #include <rclcpp_components/register_node_macro.hpp>
-RCLCPP_COMPONENTS_REGISTER_NODE(mrs_uav_flightforge::FlightforgeSimulator)
+RCLCPP_COMPONENTS_REGISTER_NODE(mrs_uav_flightforge_simulation::FlightforgeSimulator)
