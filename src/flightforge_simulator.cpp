@@ -204,7 +204,8 @@ private:
   
   void checkForCrash(void);
 
-  double FlightforgeToWallTime(const double flightforge_time);
+  double flightforgeToWallTime(const double flightforge_time);
+  
   // how much to add to unreal time to get to our wall time
   double        wall_time_offset_             = 0;
   double        wall_time_offset_drift_slope_ = 0;
@@ -266,7 +267,7 @@ private:
     double lidar_int_std_slope    = 0.0;
 
     bool   rgb_enabled        = true;
-    double rgb_rate           = 0.0;
+    double rgb_rate           = 10.0;
     bool   rgb_enable_hdr = false;
     bool   rgb_enable_temporal_aa = false;
     bool   rgb_enable_raytracing = false;
@@ -605,6 +606,20 @@ private:
   bool   rgb_enable_motion_blur_ = true;
   double rgb_motion_blur_amount_ = 0.5;
   double rgb_motion_blur_distortion_ = 50.0;
+    
+  double stereo_baseline_ = 0.1;
+  int    stereo_width_ = 640;
+  int    stereo_height_ = 480;
+  double stereo_fov_ = 90.0;
+  double stereo_offset_x_ = 0.14;
+  double stereo_offset_y_ = 0.0;
+  double stereo_offset_z_ = 0.0;
+  double stereo_rotation_pitch_ = 20.0;
+  double stereo_rotation_yaw_ = 0.0;
+  double stereo_rotation_roll_ = 0.0;
+  bool   stereo_enable_hdr_ = true;
+  bool   stereo_enable_temporal_aa_ = true;
+  bool   stereo_enable_raytracing_ = true;
 };
 
 //}
@@ -674,7 +689,7 @@ FlightforgeSimulator::FlightforgeSimulator(rclcpp::NodeOptions options) : Node("
 
 // | ------------------------- timers ------------------------- |
 
-/* timerInit() //{ */
+/* timerInit() //{ *//*//{*/
 
 void FlightforgeSimulator::timerInit() {
 
@@ -752,6 +767,8 @@ void FlightforgeSimulator::timerInit() {
   tf_broadcaster_ = std::make_shared<mrs_lib::TransformBroadcaster>(node_);
   static_broadcaster_ = std::make_shared<mrs_lib::TransformBroadcaster>(node_);
   dynamic_broadcaster_ = std::make_shared<mrs_lib::TransformBroadcaster>(node_);
+
+  it_                  = std::make_shared<image_transport::ImageTransport>(node_);
 
   std::vector<std::string> uav_names;
 
@@ -997,6 +1014,38 @@ void FlightforgeSimulator::timerInit() {
         RCLCPP_INFO(get_logger(), "lidar config set for uav%lu", i + 1);
       }
     }
+
+    // | ------------------ set RGB camera config ----------------- |
+
+    {
+      ueds_connector::RgbCameraConfig cameraConfig{};
+
+      cameraConfig.width_                  = rgb_width_;
+      cameraConfig.height_                 = rgb_height_;
+      cameraConfig.fov_                    = rgb_fov_;
+      cameraConfig.offset_                 = ueds_connector::Coordinates(rgb_offset_x_ * 100.0, rgb_offset_y_ * 100.0, rgb_offset_z_ * 100.0);
+      cameraConfig.orientation_            = ueds_connector::Rotation(-rgb_rotation_pitch_, rgb_rotation_yaw_, rgb_rotation_roll_);
+      cameraConfig.enable_raytracing_      = rgb_enable_raytracing_;
+      cameraConfig.enable_hdr_             = rgb_enable_hdr_;
+      cameraConfig.enable_temporal_aa_     = rgb_enable_temporal_aa_;
+      cameraConfig.enable_motion_blur_     = rgb_enable_motion_blur_;
+      cameraConfig.motion_blur_amount_     = rgb_motion_blur_amount_;
+      cameraConfig.motion_blur_distortion_ = rgb_motion_blur_distortion_;
+
+      const auto res = ueds_connectors_[i]->SetRgbCameraConfig(cameraConfig);
+
+      last_rgb_ue_stamp_.push_back(0.0);
+      last_rgb_seg_ue_stamp_.push_back(0.0);
+
+      if (!res) {
+        RCLCPP_ERROR(get_logger(), "failed to set camera config for uav %lu", i + 1);
+      } else {
+        RCLCPP_INFO(get_logger(), "camera config set for uav%lu", i + 1);
+      }
+    }
+
+
+
   }
 
 
@@ -1028,9 +1077,34 @@ void FlightforgeSimulator::timerInit() {
 
   timer_status_ = create_wall_timer(std::chrono::duration<double>(1.0), std::bind(&FlightforgeSimulator::timerStatus, this), cbgrp_status_);
     
+  if (drs_params_.rangefinder_rate > 0) {
+    timer_rangefinder_ = create_wall_timer(std::chrono::duration<double>(1.0 / drs_params_.rangefinder_rate), std::bind(&FlightforgeSimulator::timerRangefinder, this), cbgrp_sensors_);
+  }
   if (drs_params_.lidar_rate > 0) {
     timer_lidar_ = create_wall_timer(std::chrono::duration<double>(1.0 / drs_params_.lidar_rate), std::bind(&FlightforgeSimulator::timerLidar, this), cbgrp_sensors_);
   }
+  if (drs_params_.lidar_seg_rate > 0) {
+    timer_seg_lidar_ = create_wall_timer(std::chrono::duration<double>(1.0 / drs_params_.lidar_seg_rate), std::bind(&FlightforgeSimulator::timerSegLidar, this), cbgrp_sensors_);
+  }
+  if (drs_params_.lidar_int_rate > 0) {
+    timer_int_lidar_ = create_wall_timer(std::chrono::duration<double>(1.0 / drs_params_.lidar_int_rate), std::bind(&FlightforgeSimulator::timerIntLidar, this), cbgrp_sensors_);
+  }
+  if (drs_params_.rgb_rate > 0) {
+    timer_rgb_ = create_wall_timer(std::chrono::duration<double>(1.0 / drs_params_.rgb_rate), std::bind(&FlightforgeSimulator::timerRgb, this), cbgrp_sensors_);
+  }
+  if (drs_params_.stereo_rate > 0) {
+    timer_stereo_ = create_wall_timer(std::chrono::duration<double>(1.0 / drs_params_.stereo_rate), std::bind(&FlightforgeSimulator::timerStereo, this), cbgrp_sensors_);
+  }
+  if (drs_params_.rgb_segmented_rate > 0) {
+    timer_rgb_segmented_ = create_wall_timer(std::chrono::duration<double>(1.0 / drs_params_.rgb_segmented_rate), std::bind(&FlightforgeSimulator::timerRgbSegmented, this), cbgrp_sensors_);
+  }
+  if (drs_params_.rgb_depth_rate > 0) {
+    timer_depth_ = create_wall_timer(std::chrono::duration<double>(1.0 / drs_params_.rgb_depth_rate), std::bind(&FlightforgeSimulator::timerDepth, this), cbgrp_sensors_);
+  
+  }
+
+
+
 
   // | ----------------------- scope timer ---------------------- |
 
@@ -1038,7 +1112,7 @@ void FlightforgeSimulator::timerInit() {
 
   // | -------------------- finishing methods ------------------- |
 
-  /* fabricateCamInfo(); */
+  fabricateCamInfo();
 
   publishStaticTfs();
   // | ----------------------- finish init ---------------------- |
@@ -1050,7 +1124,7 @@ void FlightforgeSimulator::timerInit() {
   timer_init_->cancel();
 }
 
-//}
+//}//}
 
 /* timerMain() //{ */
 
@@ -1191,6 +1265,45 @@ void FlightforgeSimulator::timerUnrealSync() {
 
 //}
 
+/*timerRangefinder()//{*/
+void FlightforgeSimulator::timerRangefinder() {
+  if (!is_initialized_) {
+    return;
+  }
+
+  auto drs_params = mrs_lib::get_mutexed(mutex_drs_params_, drs_params_);
+
+  if (!drs_params_.rangefinder_enabled) {
+    return;
+  }
+
+  for (size_t i = 0; i < uavs_.size(); i++) {
+    bool   res;
+    double range;
+    {
+      std::scoped_lock lock(mutex_flightforge_);
+
+      std::tie(res, range) = ueds_connectors_[i]->GetRangefinderData();
+    }
+
+    if (!res) {
+      RCLCPP_ERROR_THROTTLE(get_logger(), *node_->get_clock(), 1e9, "[uav%d] - ERROR GetRangefinderData", int(i) + 1);
+      continue;
+    }
+
+    sensor_msgs::msg::Range msg_range;
+    msg_range.header.stamp    = clock_->now();
+    msg_range.header.frame_id = "uav" + std::to_string(i + 1) + "/fcu";
+    msg_range.radiation_type  = 1;
+    msg_range.min_range       = 0.1;
+    msg_range.max_range       = 30;
+    msg_range.range           = range / 100;
+
+    ph_rangefinders_[i].publish(msg_range);
+  }
+}
+/*//}*/
+
 /* timerLidar() //{ */
 
 void FlightforgeSimulator::timerLidar() {
@@ -1200,6 +1313,171 @@ void FlightforgeSimulator::timerLidar() {
   }
 
   /* mrs_lib::ScopeTimer timer = mrs_lib::ScopeTimer("timerLidar()"); */
+
+  auto drs_params = mrs_lib::get_mutexed(mutex_drs_params_, drs_params_);
+
+  if (!drs_params_.lidar_enabled) {
+    return;
+  }
+
+  for (size_t i = 0; i < uavs_.size(); i++) {
+
+    // mrs_multirotor_simulator::MultirotorModel::State state = uavs_[i]->getState();
+
+    bool                                   res;
+    std::vector<ueds_connector::LidarData> lidarData;
+    ueds_connector::Coordinates            start;
+
+    {
+      std::scoped_lock lock(mutex_flightforge_);
+
+      std::tie(res, lidarData, start) = ueds_connectors_[i]->GetLidarData();
+    }
+
+    if (!res) {
+      RCLCPP_ERROR_THROTTLE(get_logger(), *node_->get_clock(), 1e9, "[uav%d] - ERROR getLidarData", int(i) + 1);
+      continue;
+    }
+
+    sensor_msgs::msg::PointCloud2 pcl_msg;
+
+    // Modifier to describe what the fields are.
+    sensor_msgs::PointCloud2Modifier modifier(pcl_msg);
+    modifier.setPointCloud2Fields(4, "x", 1, sensor_msgs::msg::PointField::FLOAT32, "y", 1, sensor_msgs::msg::PointField::FLOAT32, "z", 1,
+                                  sensor_msgs::msg::PointField::FLOAT32, "intensity", 1, sensor_msgs::msg::PointField::FLOAT32);
+    // Msg header
+    pcl_msg.header.stamp    = clock_->now();
+    pcl_msg.header.frame_id = "uav" + std::to_string(i + 1) + "/lidar";
+    pcl_msg.height   = lidar_vertical_rays_;
+    pcl_msg.width    = lidar_horizontal_rays_;
+    pcl_msg.is_dense = true;
+
+    // Total number of bytes per point
+    pcl_msg.point_step = 16;
+    pcl_msg.row_step   = pcl_msg.point_step * pcl_msg.width;
+    pcl_msg.data.resize(pcl_msg.row_step * pcl_msg.height);
+
+    sensor_msgs::PointCloud2Iterator<float> iterX(pcl_msg, "x");
+    sensor_msgs::PointCloud2Iterator<float> iterY(pcl_msg, "y");
+    sensor_msgs::PointCloud2Iterator<float> iterZ(pcl_msg, "z");
+    sensor_msgs::PointCloud2Iterator<float> iterIntensity(pcl_msg, "intensity");
+
+    for (const ueds_connector::LidarData& ray : lidarData) {
+
+      tf2::Vector3 dir = tf2::Vector3(ray.directionX, ray.directionY, ray.directionZ);
+
+      double ray_distance = ray.distance / 100.0;
+
+      if (drs_params.lidar_noise_enabled && ray_distance > 0) {
+
+        const double std = ray_distance * drs_params.lidar_std_slope * drs_params.lidar_std_at_1m;
+
+        std::normal_distribution<double> distribution(0, std);
+
+        ray_distance += distribution(rng);
+      }
+
+      dir = dir.normalized() * ray_distance;
+
+      *iterX         = dir.x();
+      *iterY         = -dir.y();  // convert left-hand to right-hand coordinates
+      *iterZ         = dir.z();
+      *iterIntensity = ray.distance;
+
+      ++iterX;
+      ++iterY;
+      ++iterZ;
+      ++iterIntensity;
+    }
+
+    ph_lidars_[i].publish(pcl_msg);
+  }
+}
+
+//}
+
+/* timerSegLidar() //{ */
+
+void FlightforgeSimulator::timerSegLidar() {
+
+  if (!is_initialized_) {
+    return;
+  }
+
+  /* mrs_lib::ScopeTimer timer = mrs_lib::ScopeTimer("timerSegLidar()"); */
+
+  auto drs_params = mrs_lib::get_mutexed(mutex_drs_params_, drs_params_);
+
+  if (!drs_params_.lidar_seg_enabled) {
+    return;
+  }
+
+  for (size_t i = 0; i < uavs_.size(); i++) {
+
+    // mrs_multirotor_simulator::MultirotorModel::State state = uavs_[i]->getState();
+
+    bool                                   res;
+    std::vector<ueds_connector::LidarSegData> lidarSegData;
+    ueds_connector::Coordinates            start;
+
+    {
+      std::scoped_lock lock(mutex_flightforge_);
+
+      std::tie(res, lidarSegData, start) = ueds_connectors_[i]->GetLidarSegData();
+    }
+
+    if (!res) {
+      RCLCPP_ERROR_THROTTLE(get_logger(), *node_->get_clock(), 1e9, "[uav%d] - ERROR getLidarSegData", int(i) + 1);
+      continue;
+    }
+    
+    PCLPointCloudColor pcl_cloud;
+
+    for (const ueds_connector::LidarSegData& ray : lidarSegData) {
+
+      pcl::PointXYZRGB point;
+      tf2::Vector3 dir = tf2::Vector3(ray.directionX, ray.directionY, ray.directionZ);
+
+      double ray_distance = ray.distance / 100.0;
+
+      if (drs_params.lidar_noise_enabled && ray_distance > 0) {
+
+        const double std = ray_distance * drs_params.lidar_std_slope * drs_params.lidar_std_at_1m;
+
+        std::normal_distribution<double> distribution(0, std);
+
+        ray_distance += distribution(rng);
+      }
+
+      dir = dir.normalized() * ray_distance;
+      point.x = dir.x();
+      point.y = -dir.y();
+      point.z = dir.z();
+      point.r = seg_rgb_[ray.segmentation][0];
+      point.g = seg_rgb_[ray.segmentation][1];
+      point.b = seg_rgb_[ray.segmentation][2];
+      pcl_cloud.push_back(point);
+    }
+
+    sensor_msgs::msg::PointCloud2 pcl_msg;
+    pcl::toROSMsg(pcl_cloud, pcl_msg);
+    pcl_msg.header.stamp    = this->get_clock()->now();
+    pcl_msg.header.frame_id = "uav" + std::to_string(i + 1) + "/lidar";
+    ph_seg_lidars_[i].publish(pcl_msg);
+  }
+}
+
+//}
+
+/* timerIntLidar() //{ */
+
+void FlightforgeSimulator::timerIntLidar() {
+
+  if (!is_initialized_) {
+    return;
+  }
+
+  /* mrs_lib::ScopeTimer timer = mrs_lib::ScopeTimer("timerIntLidar()"); */
 
   auto drs_params = mrs_lib::get_mutexed(mutex_drs_params_, drs_params_);
 
@@ -1334,11 +1612,13 @@ void FlightforgeSimulator::timerRgb() {
 
     msg->header.frame_id = "uav" + std::to_string(i + 1) + "/rgb";
 
-    const double relative_wall_age = ros::WallTime::now().toSec() - uedsToWallTime(stamp);
+    /* const double relative_wall_age = ros::WallTime::now().toSec() - uedsToWallTime(stamp); */
 
-    if (abs(relative_wall_age) < 1.0) {
-      msg->header.stamp = ros::Time(ros::Time::now().toSec() - (relative_wall_age * actual_rtf_));
-    }
+    /* if (abs(relative_wall_age) < 1.0) { */
+    /*   msg->header.stamp = ros::Time(ros::Time::now().toSec() - (relative_wall_age * actual_rtf_)); */
+    /* } */
+
+    msg->header.stamp = clock_->now();
 
     imp_rgb_[i].publish(msg);
 
@@ -1347,6 +1627,167 @@ void FlightforgeSimulator::timerRgb() {
     camera_info.header = msg->header;
 
     ph_rgb_camera_info_[i].publish(camera_info);
+  }
+}
+
+//}
+
+/* timerStereo() //{ */
+
+void FlightforgeSimulator::timerStereo() {
+
+  if (!is_initialized_) {
+    return;
+  }
+
+  /* mrs_lib::ScopeTimer timer = mrs_lib::ScopeTimer("timerStereo()"); */
+
+  auto drs_params = mrs_lib::get_mutexed(mutex_drs_params_, drs_params_);
+
+  if (!drs_params_.rgb_enabled) {
+    return;
+  }
+
+  for (size_t i = 0; i < uavs_.size(); i++) {
+
+    bool                       res;
+    std::vector<unsigned char> image_left;
+    std::vector<unsigned char> image_right;
+    double                     stamp;
+
+    {
+      std::scoped_lock lock(mutex_flightforge_);
+
+      std::tie(res, image_left, image_right, stamp) = ueds_connectors_[i]->GetStereoCameraData();
+    }
+
+    if (abs(stamp - last_rgb_ue_stamp_.at(i)) < 0.001) {
+      return;
+    }
+
+    last_rgb_ue_stamp_.at(i) = stamp;
+
+    if (!res) {
+      RCLCPP_WARN(get_logger(), "failed to obtain stereo camera from uav%lu", i + 1);
+      continue;
+    }
+
+    if (image_left.empty() || image_right.empty()) {
+      RCLCPP_WARN(get_logger(), "stereo camera from uav%lu is empty!", i + 1);
+      continue;
+    }
+
+    cv::Mat cv_left  = cv::imdecode(image_left, cv::IMREAD_COLOR);
+    cv::Mat cv_right = cv::imdecode(image_right, cv::IMREAD_COLOR);
+
+    auto msg_left = cv_bridge::CvImage(std_msgs::msg::Header(), "bgr8", cv_left).toImageMsg();
+    auto msg_right = cv_bridge::CvImage(std_msgs::msg::Header(), "bgr8", cv_right).toImageMsg();
+
+    msg_left->header.frame_id = "uav" + std::to_string(i + 1) + "/stereo_left";
+    msg_left->header.stamp = clock_->now();
+
+    msg_right->header.frame_id = "uav" + std::to_string(i + 1) + "/stereo_right";
+    msg_right->header.stamp    = msg_left->header.stamp;
+
+    /* const double relative_wall_age = ros::WallTime::now().toSec() - uedsToWallTime(stamp); */
+
+    /* if (abs(relative_wall_age) < 1.0) { */
+    /*   msg->header.stamp = ros::Time(ros::Time::now().toSec() - (relative_wall_age * actual_rtf_)); */
+    /* } */
+
+
+    imp_stereo_left_[i].publish(msg_left);
+    imp_stereo_right_[i].publish(msg_right);
+
+
+    {
+      auto camera_info = stereo_camera_info_;
+
+      camera_info.header = msg_left->header;
+
+      ph_stereo_left_camera_info_[i].publish(camera_info);
+    }
+
+    {
+      auto camera_info = stereo_camera_info_;
+
+      camera_info.header = msg_right->header;
+
+      camera_info.p[3] = -camera_info.p[0] * stereo_baseline_;
+
+      ph_stereo_right_camera_info_[i].publish(camera_info);
+    }
+  }
+}
+
+//}
+
+/* timerRgbSegmented() //{ */
+
+void FlightforgeSimulator::timerRgbSegmented() {
+
+  if (!is_initialized_) {
+    return;
+  }
+
+  /* mrs_lib::ScopeTimer timer = mrs_lib::ScopeTimer("timerRgbSegmented()"); */
+
+  auto drs_params = mrs_lib::get_mutexed(mutex_drs_params_, drs_params_);
+
+  if (!drs_params_.rgb_segmented_enabled) {
+    return;
+  }
+
+  for (size_t i = 0; i < uavs_.size(); i++) {
+
+    bool                       res;
+    std::vector<unsigned char> cameraData;
+    uint32_t                   size;
+    double                     stamp;
+
+    {
+      std::scoped_lock lock(mutex_flightforge_);
+
+      std::tie(res, cameraData, stamp, size) = ueds_connectors_[i]->GetRgbSegmented();
+    }
+
+    if (abs(stamp - last_rgb_ue_stamp_.at(i)) < 0.001) {
+      return;
+    }
+
+    last_rgb_ue_stamp_.at(i) = stamp;
+
+    if (!res) {
+      RCLCPP_WARN(get_logger(), "failed to obtain segmented camera from uav%lu", i + 1);
+      continue;
+    }
+
+    if (cameraData.empty()) {
+      RCLCPP_WARN(get_logger(), "segmented camera from uav%lu is empty!", i + 1);
+      continue;
+    }
+
+    cv::Mat image = cv::Mat(rgb_height_, rgb_width_, CV_8UC3, cameraData.data());
+
+    auto msg = cv_bridge::CvImage(std_msgs::msg::Header(), "bgr8", image).toImageMsg();
+
+    msg->header.frame_id = "uav" + std::to_string(i + 1) + "/rgb";
+
+    /* const double relative_wall_age = ros::WallTime::now().toSec() - uedsToWallTime(stamp); */
+
+    /* if (abs(relative_wall_age) < 1.0) { */
+    /*   msg->header.stamp = ros::Time(ros::Time::now().toSec() - (relative_wall_age * actual_rtf_)); */
+    /* } */
+
+    msg->header.stamp = clock_->now();
+
+    imp_rgbd_segmented_[i].publish(msg);
+
+    auto camera_info = rgb_camera_info_;
+
+    camera_info.header = msg->header;
+
+    ph_rgb_seg_camera_info_[i].publish(camera_info);
   }
 }
 
@@ -1685,7 +2126,7 @@ void FlightforgeSimulator::publishStaticTfs(void) {
       printf("  camera_model: pinhole\n");
       printf("  distortion_coeffs: [0.0, 0.0, 0.0, 0.0]\n");
       printf("  distortion_model: radtan\n");
-      printf("  intrinsics: [%f, %f, %f, %f]\n", rgb_camera_info_.K[0], rgb_camera_info_.K[4], rgb_camera_info_.K[2], rgb_camera_info_.K[5]);
+      printf("  intrinsics: [%f, %f, %f, %f]\n", rgb_camera_info_.k[0], rgb_camera_info_.k[4], rgb_camera_info_.k[2], rgb_camera_info_.k[5]);
       printf("  resolution: [%d, %d]\n", rgb_width_, rgb_height_);
     }
 
@@ -1822,6 +2263,17 @@ void FlightforgeSimulator::publishStaticTfs(void) {
 
 //}
 
+/* flightforgeToWallTime() //{ */
+
+double FlightforgeSimulator::flightforgeToWallTime(const double ueds_time) {
+
+  auto wall_time_offset = mrs_lib::get_mutexed(mutex_wall_time_offset_, wall_time_offset_);
+
+  return ueds_time + wall_time_offset;
+}
+
+//}
+
 // | ------------------------ camera routines ------------------------ |
 
 /* fabricateCamInfo() //{ */
@@ -1836,48 +2288,48 @@ void FlightforgeSimulator::fabricateCamInfo(void) {
   // distortion
   rgb_camera_info_.distortion_model = "plumb_bob";
 
-  rgb_camera_info_.D.resize(5);
-  rgb_camera_info_.D[0] = 0;
-  rgb_camera_info_.D[1] = 0;
-  rgb_camera_info_.D[2] = 0;
-  rgb_camera_info_.D[3] = 0;
-  rgb_camera_info_.D[4] = 0;
+  rgb_camera_info_.d.resize(5);
+  rgb_camera_info_.d[0] = 0;
+  rgb_camera_info_.d[1] = 0;
+  rgb_camera_info_.d[2] = 0;
+  rgb_camera_info_.d[3] = 0;
+  rgb_camera_info_.d[4] = 0;
 
   // original camera matrix
-  rgb_camera_info_.K[0] = rgb_width_ / (2.0 * tan(0.5 * M_PI * (rgb_fov_ / 180.0)));
-  rgb_camera_info_.K[1] = 0.0;
-  rgb_camera_info_.K[2] = rgb_width_ / 2.0;
-  rgb_camera_info_.K[3] = 0.0;
-  rgb_camera_info_.K[4] = rgb_width_ / (2.0 * tan(0.5 * M_PI * (rgb_fov_ / 180.0)));
-  rgb_camera_info_.K[5] = rgb_height_ / 2.0;
-  rgb_camera_info_.K[6] = 0.0;
-  rgb_camera_info_.K[7] = 0.0;
-  rgb_camera_info_.K[8] = 1.0;
+  rgb_camera_info_.k[0] = rgb_width_ / (2.0 * tan(0.5 * M_PI * (rgb_fov_ / 180.0)));
+  rgb_camera_info_.k[1] = 0.0;
+  rgb_camera_info_.k[2] = rgb_width_ / 2.0;
+  rgb_camera_info_.k[3] = 0.0;
+  rgb_camera_info_.k[4] = rgb_width_ / (2.0 * tan(0.5 * M_PI * (rgb_fov_ / 180.0)));
+  rgb_camera_info_.k[5] = rgb_height_ / 2.0;
+  rgb_camera_info_.k[6] = 0.0;
+  rgb_camera_info_.k[7] = 0.0;
+  rgb_camera_info_.k[8] = 1.0;
 
   // rectification
-  rgb_camera_info_.R[0] = 1.0;
-  rgb_camera_info_.R[1] = 0.0;
-  rgb_camera_info_.R[2] = 0.0;
-  rgb_camera_info_.R[3] = 0.0;
-  rgb_camera_info_.R[4] = 1.0;
-  rgb_camera_info_.R[5] = 0.0;
-  rgb_camera_info_.R[6] = 0.0;
-  rgb_camera_info_.R[7] = 0.0;
-  rgb_camera_info_.R[8] = 1.0;
+  rgb_camera_info_.r[0] = 1.0;
+  rgb_camera_info_.r[1] = 0.0;
+  rgb_camera_info_.r[2] = 0.0;
+  rgb_camera_info_.r[3] = 0.0;
+  rgb_camera_info_.r[4] = 1.0;
+  rgb_camera_info_.r[5] = 0.0;
+  rgb_camera_info_.r[6] = 0.0;
+  rgb_camera_info_.r[7] = 0.0;
+  rgb_camera_info_.r[8] = 1.0;
 
   // camera projection matrix (same as camera matrix due to lack of distortion/rectification) (is this generated?)
-  rgb_camera_info_.P[0]  = rgb_width_ / (2.0 * tan(0.5 * M_PI * (rgb_fov_ / 180.0)));
-  rgb_camera_info_.P[1]  = 0.0;
-  rgb_camera_info_.P[2]  = rgb_width_ / 2.0;
-  rgb_camera_info_.P[3]  = 0.0;
-  rgb_camera_info_.P[4]  = 0.0;
-  rgb_camera_info_.P[5]  = rgb_width_ / (2.0 * tan(0.5 * M_PI * (rgb_fov_ / 180.0)));
-  rgb_camera_info_.P[6]  = rgb_height_ / 2.0;
-  rgb_camera_info_.P[7]  = 0.0;
-  rgb_camera_info_.P[8]  = 0.0;
-  rgb_camera_info_.P[9]  = 0.0;
-  rgb_camera_info_.P[10] = 1.0;
-  rgb_camera_info_.P[11] = 0.0;
+  rgb_camera_info_.p[0]  = rgb_width_ / (2.0 * tan(0.5 * M_PI * (rgb_fov_ / 180.0)));
+  rgb_camera_info_.p[1]  = 0.0;
+  rgb_camera_info_.p[2]  = rgb_width_ / 2.0;
+  rgb_camera_info_.p[3]  = 0.0;
+  rgb_camera_info_.p[4]  = 0.0;
+  rgb_camera_info_.p[5]  = rgb_width_ / (2.0 * tan(0.5 * M_PI * (rgb_fov_ / 180.0)));
+  rgb_camera_info_.p[6]  = rgb_height_ / 2.0;
+  rgb_camera_info_.p[7]  = 0.0;
+  rgb_camera_info_.p[8]  = 0.0;
+  rgb_camera_info_.p[9]  = 0.0;
+  rgb_camera_info_.p[10] = 1.0;
+  rgb_camera_info_.p[11] = 0.0;
 
   // | ------------------------- stereo ------------------------- |
 
@@ -1887,48 +2339,48 @@ void FlightforgeSimulator::fabricateCamInfo(void) {
   // distortion
   stereo_camera_info_.distortion_model = "plumb_bob";
 
-  stereo_camera_info_.D.resize(5);
-  stereo_camera_info_.D[0] = 0;
-  stereo_camera_info_.D[1] = 0;
-  stereo_camera_info_.D[2] = 0;
-  stereo_camera_info_.D[3] = 0;
-  stereo_camera_info_.D[4] = 0;
+  stereo_camera_info_.d.resize(5);
+  stereo_camera_info_.d[0] = 0;
+  stereo_camera_info_.d[1] = 0;
+  stereo_camera_info_.d[2] = 0;
+  stereo_camera_info_.d[3] = 0;
+  stereo_camera_info_.d[4] = 0;
 
   // original camera matrix
-  stereo_camera_info_.K[0] = stereo_width_ / (2.0 * tan(0.5 * M_PI * (stereo_fov_ / 180.0)));
-  stereo_camera_info_.K[1] = 0.0;
-  stereo_camera_info_.K[2] = stereo_width_ / 2.0;
-  stereo_camera_info_.K[3] = 0.0;
-  stereo_camera_info_.K[4] = stereo_width_ / (2.0 * tan(0.5 * M_PI * (stereo_fov_ / 180.0)));
-  stereo_camera_info_.K[5] = stereo_height_ / 2.0;
-  stereo_camera_info_.K[6] = 0.0;
-  stereo_camera_info_.K[7] = 0.0;
-  stereo_camera_info_.K[8] = 1.0;
+  stereo_camera_info_.k[0] = stereo_width_ / (2.0 * tan(0.5 * M_PI * (stereo_fov_ / 180.0)));
+  stereo_camera_info_.k[1] = 0.0;
+  stereo_camera_info_.k[2] = stereo_width_ / 2.0;
+  stereo_camera_info_.k[3] = 0.0;
+  stereo_camera_info_.k[4] = stereo_width_ / (2.0 * tan(0.5 * M_PI * (stereo_fov_ / 180.0)));
+  stereo_camera_info_.k[5] = stereo_height_ / 2.0;
+  stereo_camera_info_.k[6] = 0.0;
+  stereo_camera_info_.k[7] = 0.0;
+  stereo_camera_info_.k[8] = 1.0;
 
   // rectification
-  stereo_camera_info_.R[0] = 1.0;
-  stereo_camera_info_.R[1] = 0.0;
-  stereo_camera_info_.R[2] = 0.0;
-  stereo_camera_info_.R[3] = 0.0;
-  stereo_camera_info_.R[4] = 1.0;
-  stereo_camera_info_.R[5] = 0.0;
-  stereo_camera_info_.R[6] = 0.0;
-  stereo_camera_info_.R[7] = 0.0;
-  stereo_camera_info_.R[8] = 1.0;
+  stereo_camera_info_.r[0] = 1.0;
+  stereo_camera_info_.r[1] = 0.0;
+  stereo_camera_info_.r[2] = 0.0;
+  stereo_camera_info_.r[3] = 0.0;
+  stereo_camera_info_.r[4] = 1.0;
+  stereo_camera_info_.r[5] = 0.0;
+  stereo_camera_info_.r[6] = 0.0;
+  stereo_camera_info_.r[7] = 0.0;
+  stereo_camera_info_.r[8] = 1.0;
 
   // camera projection matrix (same as camera matrix due to lack of distortion/rectification) (is this generated?)
-  stereo_camera_info_.P[0]  = stereo_width_ / (2.0 * tan(0.5 * M_PI * (stereo_fov_ / 180.0)));
-  stereo_camera_info_.P[1]  = 0.0;
-  stereo_camera_info_.P[2]  = stereo_width_ / 2.0;
-  stereo_camera_info_.P[3]  = 0.0;
-  stereo_camera_info_.P[4]  = 0.0;
-  stereo_camera_info_.P[5]  = stereo_width_ / (2.0 * tan(0.5 * M_PI * (stereo_fov_ / 180.0)));
-  stereo_camera_info_.P[6]  = stereo_height_ / 2.0;
-  stereo_camera_info_.P[7]  = 0.0;
-  stereo_camera_info_.P[8]  = 0.0;
-  stereo_camera_info_.P[9]  = 0.0;
-  stereo_camera_info_.P[10] = 1.0;
-  stereo_camera_info_.P[11] = 0.0;
+  stereo_camera_info_.p[0]  = stereo_width_ / (2.0 * tan(0.5 * M_PI * (stereo_fov_ / 180.0)));
+  stereo_camera_info_.p[1]  = 0.0;
+  stereo_camera_info_.p[2]  = stereo_width_ / 2.0;
+  stereo_camera_info_.p[3]  = 0.0;
+  stereo_camera_info_.p[4]  = 0.0;
+  stereo_camera_info_.p[5]  = stereo_width_ / (2.0 * tan(0.5 * M_PI * (stereo_fov_ / 180.0)));
+  stereo_camera_info_.p[6]  = stereo_height_ / 2.0;
+  stereo_camera_info_.p[7]  = 0.0;
+  stereo_camera_info_.p[8]  = 0.0;
+  stereo_camera_info_.p[9]  = 0.0;
+  stereo_camera_info_.p[10] = 1.0;
+  stereo_camera_info_.p[11] = 0.0;
 }
 
 //}
