@@ -690,7 +690,7 @@ FlightforgeSimulator::FlightforgeSimulator(rclcpp::NodeOptions options) : Node("
 
 // | ------------------------- timers ------------------------- |
 
-/* timerInit() //{ *//*//{*/
+/* timerInit() //{ */
 
 void FlightforgeSimulator::timerInit() {
 
