@@ -781,31 +781,117 @@ void FlightforgeSimulator::timerInit() {
   if (res) {
     RCLCPP_INFO(get_logger(), "Graphical Settings was set succesfully to '%s'", ueds_graphics_settings_enum_.c_str());
   } else {
-    ROS_ERROR("[UnrealSimulator]: );
     RCLCPP_ERROR(get_logger(), "Graphical Settings was not set succesfully to '%s'", ueds_graphics_settings_enum_.c_str());
   }
 
-  res = ueds_game_controller_->SetMutualDroneVisibility(uavs_mutual_visibility_); 
+  res = ueds_game_controller_->SetMutualDroneVisibility(true); 
   if (res) {
     RCLCPP_INFO(get_logger(), "Mutual Drone Visibility was succesfully set to %i.", uavs_mutual_visibility_);
   } else {
-    ROS_ERROR("[UnrealSimulator]: Set Mutual Drone Visibility was NOT succesfull.");
+    RCLCPP_ERROR(get_logger(), "Set Mutual Drone Visibility was NOT succesfull.");
+    
   }
 
-  res = ueds_game_controller_->SetWeather(ueds_connector::WeatherType::Type2Id().at(weather_type_));
-  if (res) {
-    ROS_INFO("[UnrealSimulator]: SetWeather successful.");
-  } else {
-    ROS_ERROR("[UnrealSimulator]: SetWeather error");
-  }
+  /* res = ueds_game_controller_->SetWeather(ueds_connector::WeatherType::Type2Id().at(weather_type_)); */
+  /* if (res) { */
+  /*   RCLCPP_INFO(get_logger(), "SetWeather successful."); */
+  /* } else { */
+  /*   RCLCPP_ERROR(get_logger(), "SetWeather error"); */
+  /* } */
 
-  res = ueds_game_controller_->SetDatetime(daytime_.hour, daytime_.minute);
+  res = ueds_game_controller_->SetDatetime(12, 0);
   if (res) {
-    ROS_INFO("[UnrealSimulator]: SetDatetime successful.");
+    RCLCPP_INFO(get_logger(), "SetDatetime successful.");
   } else {
-    ROS_ERROR("[UnrealSimulator]: SetDatetime error");
+    RCLCPP_ERROR(get_logger(), "SetDatetime error");
   }
   
+  
+  /* // | --------------------- These graphical settings influence only Forest Game World --------------------- | */
+
+  /* res = ueds_game_controller_->SetForestDensity(ueds_forest_density_); */
+  /* if (res) { */
+  /*   ROS_INFO("[UnrealSimulator]: Forest Density was set succesfully to '%d'", ueds_forest_density_); */
+  /* } else { */
+  /*   ROS_ERROR("[UnrealSimulator]: Forest Density wasn't set succesfully to '%d'", ueds_forest_density_); */
+  /* } */
+
+  /* res = ueds_game_controller_->SetForestHillyLevel(ueds_forest_hilly_level_); */
+  /* if (res) { */
+  /*   ROS_INFO("[UnrealSimulator]: Forest Hilly Level was set succesfully to '%d'", ueds_forest_hilly_level_); */
+  /* } else { */
+  /*   ROS_ERROR("[UnrealSimulator]: Forest Hilly Level wasn't set succesfully to '%d'", ueds_forest_hilly_level_); */
+  /* } */
+
+  /* std::this_thread::sleep_for(std::chrono::seconds(1)); */
+  
+  // | --------------------- Spawn the UAVs in FlightForge --------------------- |
+
+  const auto [result, world_origin] = ueds_game_controller_->GetWorldOrigin();
+
+  if (!result) {
+    RCLCPP_ERROR(get_logger(), "getting world origin");
+    rclcpp::shutdown();
+  } else {
+    ueds_world_origin_ = world_origin;
+  }
+
+  for (size_t i = 0; i < uav_names.size(); i++) {
+
+    const std::string uav_name = uav_names[i];
+
+    mrs_multirotor_simulator::MultirotorModel::State uav_state = uavs_[i]->getState();
+
+    ueds_connector::Coordinates pos = position2ue(uav_state.x, ueds_world_origin_);
+
+    RCLCPP_INFO(get_logger(), "%s spawning at [%.2lf, %.2lf, %.2lf] ...", uav_name.c_str(), uav_state.x.x(), uav_state.x.y(), uav_state.x.z());
+
+    std::string uav_frame = "x500";
+    /* TODO: frame param */
+    /* param_loader.loadParam(uav_names[i] + "/frame", uav_frame); */
+
+    ROS_INFO("[UnrealSimulator]: Frame type to spawn is );
+    RCLCPP_INFO(get_logger(), "Frame type to spawn is %s", uav_frame.c_str());
+
+    int uav_frame_id = ueds_connector::UavFrameType::Type2IdMesh().at(uav_frame);
+
+    auto [resSpawn, port] = ueds_game_controller_->SpawnDroneAtLocation(pos, uav_frame_id);
+
+    if (!resSpawn) {
+      RCLCPP_ERROR(get_logger(), "failed to spawn %s", uav_names[i].c_str());
+      rclcpp::shutdown();
+    }
+
+    RCLCPP_INFO(get_logger(), "%s spawned", uav_name.c_str());
+
+    std::shared_ptr<ueds_connector::UedsConnector> ueds_connector = std::make_shared<ueds_connector::UedsConnector>(LOCALHOST, port);
+
+    ueds_connectors_.push_back(ueds_connector);
+
+
+    auto connect_result = ueds_connector->Connect();
+
+    if (connect_result != 1) {
+
+      RCLCPP_ERROR(get_logger(), "%s - Error connecting to drone controller, connect_result was %d", uav_name.c_str(), connect_result);
+      rclcpp::shutdown();
+
+    } else {
+      RCLCPP_INFO(get_logger(), "%s - Connection succeed: %d", uav_name.c_str(), connect_result);
+
+      // ROS_INFO("[UnrealSimulator]: wait until UAV fall on the ground ... && uptade their world origin");
+
+      // std::this_thread::sleep_for(std::chrono::seconds(3));
+
+      // const auto [res, location] = ueds_connector->GetLocation();
+
+      // if (!res) {
+      //   ROS_ERROR("[UnrealSimulator]: %s - DroneError: getting location", uav_name.c_str());
+      //   ros::shutdown();
+      // } else {
+      //   ueds_world_origins_.push_back(location);
+      // }
+    }
 
 
 
