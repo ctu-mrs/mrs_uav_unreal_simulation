@@ -168,6 +168,7 @@ private:
   std::vector<mrs_lib::PublisherHandler<sensor_msgs::msg::CameraInfo>> ph_rgb_seg_camera_info_;
   std::vector<mrs_lib::PublisherHandler<sensor_msgs::msg::CameraInfo>> ph_stereo_left_camera_info_;
   std::vector<mrs_lib::PublisherHandler<sensor_msgs::msg::CameraInfo>> ph_stereo_right_camera_info_;
+  std::vector<mrs_lib::PublisherHandler<sensor_msgs::msg::CameraInfo>> ph_depth_camera_info_;
 
   // | ------------------------- system ------------------------- |
 
@@ -250,8 +251,8 @@ private:
     double lidar_std_at_1m    = 0.0;
     double lidar_std_slope    = 0.0;
     
-    bool   lidar_seg_enabled  = false;
-    double lidar_seg_rate     = 0.0;
+    bool   lidar_seg_enabled  = true;
+    double lidar_seg_rate     = 10.0;
     
     bool   lidar_int_enabled  = false;
     double lidar_int_rate     = 0.0;
@@ -275,14 +276,14 @@ private:
     double rgb_motion_blur_amount = 0.0;
     double rgb_motion_blur_distortion = 0.0;
     
-    bool   rgb_segmented_enabled = false;
-    double rgb_segmented_rate = 0.0;
+    bool   rgb_segmented_enabled = true;
+    double rgb_segmented_rate = 10.0;
     
     bool   rgb_depth_enabled  = false;
     double rgb_depth_rate     = 0.0;
 
-    bool   stereo_enabled = false;
-    double stereo_rate    = 0.0;
+    bool   stereo_enabled = true;
+    double stereo_rate    = 10.0;
     bool   stereo_enable_hdr = false;
     bool   stereo_enable_temporal_aa = false;
     bool   stereo_enable_raytracing = false;
@@ -1098,10 +1099,9 @@ void FlightforgeSimulator::timerInit() {
   if (drs_params_.rgb_segmented_rate > 0) {
     timer_rgb_segmented_ = create_wall_timer(std::chrono::duration<double>(1.0 / drs_params_.rgb_segmented_rate), std::bind(&FlightforgeSimulator::timerRgbSegmented, this), cbgrp_sensors_);
   }
-  if (drs_params_.rgb_depth_rate > 0) {
-    timer_depth_ = create_wall_timer(std::chrono::duration<double>(1.0 / drs_params_.rgb_depth_rate), std::bind(&FlightforgeSimulator::timerDepth, this), cbgrp_sensors_);
-  
-  }
+  /* if (drs_params_.rgb_depth_rate > 0) { */
+  /*   timer_depth_ = create_wall_timer(std::chrono::duration<double>(1.0 / drs_params_.rgb_depth_rate), std::bind(&FlightforgeSimulator::timerDepth, this), cbgrp_sensors_); */
+  /* } */
 
 
 
@@ -1788,6 +1788,77 @@ void FlightforgeSimulator::timerRgbSegmented() {
     camera_info.header = msg->header;
 
     ph_rgb_seg_camera_info_[i].publish(camera_info);
+  }
+}
+
+//}
+
+/* timerDepth() //{ */
+
+void FlightforgeSimulator::timerDepth() {
+
+  if (!is_initialized_) {
+    return;
+  }
+
+  /* mrs_lib::ScopeTimer timer = mrs_lib::ScopeTimer("timerDepth()"); */
+
+  auto drs_params = mrs_lib::get_mutexed(mutex_drs_params_, drs_params_);
+
+  if (!drs_params_.rgb_depth_enabled) {
+    return;
+  }
+
+  for (size_t i = 0; i < uavs_.size(); i++) {
+
+    bool                       res;
+    std::vector<uint16_t>      cameraData;
+    uint32_t                   size;
+    double                     stamp;
+
+    {
+      std::scoped_lock lock(mutex_flightforge_);
+
+      std::tie(res, cameraData, stamp, size) = ueds_connectors_[i]->GetDepthCameraData();
+    }
+
+    if (abs(stamp - last_rgb_ue_stamp_.at(i)) < 0.001) {
+      return;
+    }
+
+    last_rgb_ue_stamp_.at(i) = stamp;
+
+    if (!res) {
+      RCLCPP_WARN(get_logger(), "failed to obtain depth camera from uav%lu", i + 1);
+      continue;
+    }
+
+    if (cameraData.empty()) {
+      RCLCPP_WARN(get_logger(), "depth camera from uav%lu is empty!", i + 1);
+      continue;
+    }
+
+    cv::Mat image = cv::Mat(rgb_height_, rgb_width_, CV_16UC1, cameraData.data());
+
+    auto msg = cv_bridge::CvImage(std_msgs::msg::Header(), "mono16", image).toImageMsg();
+
+    msg->header.frame_id = "uav" + std::to_string(i + 1) + "/rgb";
+
+    /* const double relative_wall_age = ros::WallTime::now().toSec() - uedsToWallTime(stamp); */
+
+    /* if (abs(relative_wall_age) < 1.0) { */
+    /*   msg->header.stamp = ros::Time(ros::Time::now().toSec() - (relative_wall_age * actual_rtf_)); */
+    /* } */
+
+    msg->header.stamp = clock_->now();
+
+    imp_rgb_[i].publish(msg);
+
+    auto camera_info = rgb_camera_info_;
+
+    camera_info.header = msg->header;
+
+    ph_depth_camera_info_[i].publish(camera_info);
   }
 }
 
