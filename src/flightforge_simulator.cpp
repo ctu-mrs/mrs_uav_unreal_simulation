@@ -151,7 +151,23 @@ private:
   mrs_lib::PublisherHandler<rosgraph_msgs::msg::Clock>     ph_clock_;
   mrs_lib::PublisherHandler<geometry_msgs::msg::PoseArray> ph_poses_;
 
+  std::vector<mrs_lib::PublisherHandler<sensor_msgs::msg::Range>> ph_rangefinders_;
   std::vector<mrs_lib::PublisherHandler<sensor_msgs::msg::PointCloud2>> ph_lidars_;
+  std::vector<mrs_lib::PublisherHandler<sensor_msgs::msg::PointCloud2>> ph_seg_lidars_;
+  std::vector<mrs_lib::PublisherHandler<sensor_msgs::msg::PointCloud2>> ph_int_lidars_;
+
+  std::vector<image_transport::Publisher> imp_rgb_;
+  std::vector<image_transport::Publisher> imp_stereo_left_;
+  std::vector<image_transport::Publisher> imp_stereo_right_;
+  std::vector<image_transport::Publisher> imp_rgbd_segmented_;
+  std::vector<image_transport::Publisher> imp_depth_;
+  
+
+
+  std::vector<mrs_lib::PublisherHandler<sensor_msgs::msg::CameraInfo>> ph_rgb_camera_info_;
+  std::vector<mrs_lib::PublisherHandler<sensor_msgs::msg::CameraInfo>> ph_rgb_seg_camera_info_;
+  std::vector<mrs_lib::PublisherHandler<sensor_msgs::msg::CameraInfo>> ph_stereo_left_camera_info_;
+  std::vector<mrs_lib::PublisherHandler<sensor_msgs::msg::CameraInfo>> ph_stereo_right_camera_info_;
 
   // | ------------------------- system ------------------------- |
 
@@ -163,7 +179,7 @@ private:
 
   void publishPoses(void);
   
-  // | ------------------------- Unreal methods ------------------------ |
+  // | ------------------------- FlightForge methods ------------------------ |
   
   std::unique_ptr<ueds_connector::GameModeController> ueds_game_controller_;
 
@@ -544,6 +560,9 @@ private:
 
   geometry_msgs::msg::TransformStamped rgb_camera_tf_;
   geometry_msgs::msg::TransformStamped stereo_camera_tf_;
+  
+  std::vector<double> last_rgb_ue_stamp_;
+  std::vector<double> last_rgb_seg_ue_stamp_;
 
   // | --------- store current camera orientation -------- |
   std::vector<Eigen::Quaterniond> rgb_camera_orientations_;
@@ -571,6 +590,21 @@ private:
   bool   lidar_livox_ = false;
 
 
+  int    rgb_width_ = 640;
+  int    rgb_height_ = 480;
+  double rgb_fov_ = 120.0;
+  double rgb_offset_x_ = 0.14;
+  double rgb_offset_y_ = 0.0;
+  double rgb_offset_z_ = 0.0;
+  double rgb_rotation_pitch_ = 0.0;
+  double rgb_rotation_yaw_ = 0.0;
+  double rgb_rotation_roll_ = 0.0;
+  bool   rgb_enable_hdr_ = false;
+  bool   rgb_enable_temporal_aa_ = true;
+  bool   rgb_enable_raytracing_ = true;
+  bool   rgb_enable_motion_blur_ = true;
+  double rgb_motion_blur_amount_ = 0.5;
+  double rgb_motion_blur_distortion_ = 50.0;
 };
 
 //}
@@ -919,7 +953,25 @@ void FlightforgeSimulator::timerInit() {
       // }
     }
 
+    ph_rangefinders_.push_back(mrs_lib::PublisherHandler<sensor_msgs::msg::Range>(node_, "/" + uav_name + "/rangefinder"));
     ph_lidars_.push_back(mrs_lib::PublisherHandler<sensor_msgs::msg::PointCloud2>(node_, "/" + uav_name + "/lidar/points"));
+    ph_seg_lidars_.push_back(mrs_lib::PublisherHandler<sensor_msgs::msg::PointCloud2>(node_, "/" + uav_name + "/lidar_segmented/points"));
+    ph_int_lidars_.push_back(mrs_lib::PublisherHandler<sensor_msgs::msg::PointCloud2>(node_, "/" + uav_name + "/lidar_intensity/points"));
+  
+    imp_rgb_.push_back(it_->advertise("/" + uav_name + "/rgb/image_raw", 1));
+    imp_stereo_left_.push_back(it_->advertise("/" + uav_name + "/stereo/left/image_raw", 1));
+    imp_stereo_right_.push_back(it_->advertise("/" + uav_name + "/stereo/right/image_raw", 1));
+    imp_rgbd_segmented_.push_back(it_->advertise("/" + uav_name + "/rgb_segmented/image_raw", 1));
+    imp_depth_.push_back(it_->advertise("/" + uav_name + "/depth/image_raw", 1));
+    
+
+
+    ph_rgb_camera_info_.push_back(mrs_lib::PublisherHandler<sensor_msgs::msg::CameraInfo>(node_, "/" + uav_name + "/rgb/camera_info"));
+    ph_rgb_seg_camera_info_.push_back(mrs_lib::PublisherHandler<sensor_msgs::msg::CameraInfo>(node_, "/" + uav_name + "/rgb_segmented/camera_info"));
+    ph_stereo_left_camera_info_.push_back(
+        mrs_lib::PublisherHandler<sensor_msgs::msg::CameraInfo>(node_, "/" + uav_name + "/stereo/left/camera_info"));
+    ph_stereo_right_camera_info_.push_back(
+        mrs_lib::PublisherHandler<sensor_msgs::msg::CameraInfo>(node_, "/" + uav_name + "/stereo/right/camera_info"));
 
     // | -------------------- set LiDAR config -------------------- |
     {
@@ -1255,7 +1307,7 @@ void FlightforgeSimulator::timerRgb() {
     double                     stamp;
 
     {
-      std::scoped_lock lock(mutex_ueds_);
+      std::scoped_lock lock(mutex_flightforge_);
 
       std::tie(res, cameraData, stamp, size) = ueds_connectors_[i]->GetRgbCameraData();
     }
@@ -1278,7 +1330,7 @@ void FlightforgeSimulator::timerRgb() {
 
     cv::Mat image = cv::imdecode(cameraData, cv::IMREAD_COLOR);
 
-    sensor_msgs::ImagePtr msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", image).toImageMsg();
+    auto msg = cv_bridge::CvImage(std_msgs::msg::Header(), "bgr8", image).toImageMsg();
 
     msg->header.frame_id = "uav" + std::to_string(i + 1) + "/rgb";
 
