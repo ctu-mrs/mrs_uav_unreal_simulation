@@ -2,7 +2,13 @@ uav_names: [
   "uav1",
 ]
 
+frames:
+  fcu:
+    publish_tf: false
+
 graphics_settings: "low"
+
+realtime_factor: 1.0 # [-]
 
 world_name: "warehouse" # works
 # world_name: "forest" # works

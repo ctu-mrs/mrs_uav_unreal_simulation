@@ -5,65 +5,63 @@ socket_name: mrs
 attach: false
 tmux_options: -f /etc/ctu-mrs/tmux.conf
 # you can modify these
-pre_window: export UAV_NAME=uav1; export RUN_TYPE=simulation; export UAV_TYPE=x500
-startup_window: goto
+startup_window: simulator 
+pre_window: export UAV_NAME=uav1; export USE_SIM_TIME="true"; export RMW_IMPLEMENTATION=rmw_zenoh_cpp
 windows:
-  - roscore:
+  - router:
       layout: tiled
       panes:
-        - roscore
+        - ros2 run rmw_zenoh_cpp rmw_zenohd
   - simulator:
       layout: tiled
       panes:
-        - waitForRos; roslaunch mrs_uav_unreal_simulation unreal_simulator.launch custom_config:=./config/simulator.yaml
+        - ros2 launch mrs_uav_flightforge_simulation flightforge_simulator.py custom_config:=./config/simulator.yaml
   - hw_api:
       layout: tiled
       panes:
-        - waitForTime; roslaunch mrs_uav_unreal_simulation hw_api.launch
-  - takeoff:
-      layout: tiled
-      panes:
-        - waitForHw; roslaunch mrs_uav_autostart automatic_start.launch
-        - waitForControl; rosservice call /$UAV_NAME/hw_api/arming 1; sleep 2; rosservice call /$UAV_NAME/hw_api/offboard
-        # - waitForControl; rosservice call /$UAV_NAME/hw_api/arming 1; rosservice call /$UAV_NAME/uav_manager/midair_activation
+        - ros2 launch mrs_uav_flightforge_simulation hw_api.py
+  # - takeoff:
+  #     layout: tiled
+  #     panes:
+  #       - ros2 launch mrs_uav_autostart automatic_start.launch.py
+  #       - ros2 service call /$UAV_NAME/hw_api/arming std_srvs/srv/SetBool "data: true"; sleep 2; ros2 service call /$UAV_NAME/hw_api/offboard std_srvs/srv/SetBool "data: true"
+  #       # - waitForControl; rosservice call /$UAV_NAME/hw_api/arming 1; rosservice call /$UAV_NAME/uav_manager/midair_activation
   - status:
       layout: tiled
       panes:
-        - waitForHw; roslaunch mrs_uav_status status.launch
+        - ros2 launch mrs_uav_status status.py
   - control:
       layout: tiled
       panes:
-        - waitForHw; sleep 5; roslaunch mrs_uav_core core.launch
-          platform_config:=`rospack find mrs_multirotor_simulator`/config/mrs_uav_system/$UAV_TYPE.yaml
-          custom_config:=./config/custom_config.yaml
-          world_config:=./config/world_config.yaml
+        - sleep 5; ros2 launch mrs_uav_core core.py \
+          platform_config:=$(ros2 pkg prefix mrs_multirotor_simulator)/share/mrs_multirotor_simulator/config/mrs_uav_system/$UAV_TYPE.yaml \
+          custom_config:=./config/custom_config.yaml \
+          world_config:=./config/world_config.yaml \
           network_config:=./config/network_config.yaml
-  - stereo:
-      layout: tiled
-      panes:
-        - waitForHw; roslaunch mrs_uav_unreal_simulation stereo_image_proc.launch
-  - mapping:
-      layout: tiled
-      panes:
-        - waitForHw; roslaunch mrs_uav_unreal_simulation mapplan.launch
-          config_octomap_server:=./config/octomap_server.yaml
-          config_octomap_planner:=./config/octomap_planner.yaml
+  # - stereo:
+  #     layout: tiled
+  #     panes:
+  #       - ros2 launch mrs_uav_unreal_simulation stereo_image_proc.launch.py
+  # - mapping:
+  #     layout: tiled
+  #     panes:
+  #       - ros2 launch mrs_uav_unreal_simulation mapplan.launch.py \
+  #         config_octomap_server:=./config/octomap_server.yaml \
+  #         config_octomap_planner:=./config/octomap_planner.yaml
   - goto:
       layout: tiled
       panes:
-        - 'history -s rosservice call /$UAV_NAME/octomap_planner/goto \"goal: \[0.0, 60.0, 2.0, 0.0\]\"'
+        - 'history -s ros2 service call /$UAV_NAME/octomap_planner/goto mrs_msgs/srv/Vec4 "goal: {x: 0.0, y: 60.0, z: 2.0, w: 0.0}"'
   - rviz:
       layout: tiled
       panes:
-        - waitForControl; rosrun rviz rviz -d ./rviz.rviz
-        - waitForControl; roslaunch mrs_rviz_plugins load_robot.launch
-        - waitForControl; roslaunch mrs_rviz_plugins rviz_interface.launch
-  - layout:
-      layout: tiled
-      panes:
-        - waitForControl; sleep 5; ~/.i3/layout_manager.sh ./layout.json
+        - ros2 run rviz2 rviz2 -d ./rviz.rviz
+  # - layout:
+  #     layout: tiled
+  #     panes:
+  #       - sleep 5; ~/.i3/layout_manager.sh ./layout.json
   
-  - rqrReconfigure:
-      layaut: tiled
-      panes:
-        - waitForRos; waitForControl; rosrun rqt_reconfigure rqt_reconfigure
+  # - rqrReconfigure:
+  #     layaut: tiled
+  #     panes:
+  #       - waitForControl; ros2 run rqt_reconfigure rqt_reconfigure
