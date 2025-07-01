@@ -249,7 +249,7 @@ private:
     double lidar_int_std_at_1m    = 0.0;
     double lidar_int_std_slope    = 0.0;
 
-    bool   rgb_enabled        = false;
+    bool   rgb_enabled        = true;
     double rgb_rate           = 0.0;
     bool   rgb_enable_hdr = false;
     bool   rgb_enable_temporal_aa = false;
@@ -940,15 +940,12 @@ void FlightforgeSimulator::timerInit() {
       const auto res = ueds_connectors_[i]->SetLidarConfig(lidarConfig);
 
       if (!res) {
-        ROS_ERROR("[UnrealSimulator]: failed to set lidar config for uav %lu", i + 1);
+        RCLCPP_ERROR(get_logger(), "failed to set lidar config for uav %lu", i + 1);
       } else {
-        ROS_INFO("[UnrealSimulator]: lidar config set for uav%lu", i + 1);
+        RCLCPP_INFO(get_logger(), "lidar config set for uav%lu", i + 1);
       }
     }
   }
-
-  }
-
 
 
   // | --------------- dynamic reconfigure server --------------- |
@@ -987,6 +984,11 @@ void FlightforgeSimulator::timerInit() {
 
   scope_timer_logger_ = std::make_shared<mrs_lib::ScopeTimerLogger>(node_, "", false);
 
+  // | -------------------- finishing methods ------------------- |
+
+  /* fabricateCamInfo(); */
+
+  publishStaticTfs();
   // | ----------------------- finish init ---------------------- |
 
   is_initialized_ = true;
@@ -1224,6 +1226,75 @@ void FlightforgeSimulator::timerLidar() {
     }
 
     ph_lidars_[i].publish(pcl_msg);
+  }
+}
+
+//}
+
+/* timerRgb() //{ */
+
+void FlightforgeSimulator::timerRgb() {
+
+  if (!is_initialized_) {
+    return;
+  }
+
+  /* mrs_lib::ScopeTimer timer = mrs_lib::ScopeTimer("timerRgb()"); */
+
+  auto drs_params = mrs_lib::get_mutexed(mutex_drs_params_, drs_params_);
+
+  if (!drs_params_.rgb_enabled) {
+    return;
+  }
+
+  for (size_t i = 0; i < uavs_.size(); i++) {
+
+    bool                       res;
+    std::vector<unsigned char> cameraData;
+    uint32_t                   size;
+    double                     stamp;
+
+    {
+      std::scoped_lock lock(mutex_ueds_);
+
+      std::tie(res, cameraData, stamp, size) = ueds_connectors_[i]->GetRgbCameraData();
+    }
+
+    if (abs(stamp - last_rgb_ue_stamp_.at(i)) < 0.001) {
+      return;
+    }
+
+    last_rgb_ue_stamp_.at(i) = stamp;
+
+    if (!res) {
+      RCLCPP_WARN(get_logger(), "failed to obtain rgb camera from uav%lu", i + 1);
+      continue;
+    }
+
+    if (cameraData.empty()) {
+      RCLCPP_WARN(get_logger(), "rgb camera from uav%lu is empty!", i + 1);
+      continue;
+    }
+
+    cv::Mat image = cv::imdecode(cameraData, cv::IMREAD_COLOR);
+
+    sensor_msgs::ImagePtr msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", image).toImageMsg();
+
+    msg->header.frame_id = "uav" + std::to_string(i + 1) + "/rgb";
+
+    const double relative_wall_age = ros::WallTime::now().toSec() - uedsToWallTime(stamp);
+
+    if (abs(relative_wall_age) < 1.0) {
+      msg->header.stamp = ros::Time(ros::Time::now().toSec() - (relative_wall_age * actual_rtf_));
+    }
+
+    imp_rgb_[i].publish(msg);
+
+    auto camera_info = rgb_camera_info_;
+
+    camera_info.header = msg->header;
+
+    ph_rgb_camera_info_[i].publish(camera_info);
   }
 }
 
@@ -1521,7 +1592,7 @@ void FlightforgeSimulator::publishStaticTfs(void) {
 
     geometry_msgs::msg::TransformStamped tf;
 
-    // | ------------------------- rgb tf ------------------------- |
+    /* // | ------------------------- rgb tf ------------------------- | */
 
     {
       tf.header.stamp = clock_->now(); 
@@ -1566,93 +1637,93 @@ void FlightforgeSimulator::publishStaticTfs(void) {
       printf("  resolution: [%d, %d]\n", rgb_width_, rgb_height_);
     }
 
-    // | ----------------------- stereo left ---------------------- |
+    /* // | ----------------------- stereo left ---------------------- | */
 
-    {
-      tf.header.stamp = clock_->now();
+    /* { */
+    /*   tf.header.stamp = clock_->now(); */
 
-      tf.header.frame_id = "uav" + std::to_string(i + 1) + "/fcu";
-      tf.child_frame_id  = "uav" + std::to_string(i + 1) + "/stereo_left";
+    /*   tf.header.frame_id = "uav" + std::to_string(i + 1) + "/fcu"; */
+    /*   tf.child_frame_id  = "uav" + std::to_string(i + 1) + "/stereo_left"; */
 
-      tf.transform.translation.x = stereo_offset_x_;
-      tf.transform.translation.y = stereo_offset_y_;
-      tf.transform.translation.z = stereo_offset_z_;
+    /*   tf.transform.translation.x = stereo_offset_x_; */
+    /*   tf.transform.translation.y = stereo_offset_y_; */
+    /*   tf.transform.translation.z = stereo_offset_z_; */
 
-      Eigen::Matrix3d initial_tf = mrs_lib::AttitudeConverter(Eigen::Quaterniond(-0.5, 0.5, -0.5, 0.5));
+    /*   Eigen::Matrix3d initial_tf = mrs_lib::AttitudeConverter(Eigen::Quaterniond(-0.5, 0.5, -0.5, 0.5)); */
 
-      Eigen::Matrix3d dynamic_tf =
-          mrs_lib::AttitudeConverter(M_PI * (stereo_rotation_roll_ / 180.0), M_PI * (stereo_rotation_pitch_ / 180.0), M_PI * (stereo_rotation_yaw_ / 180.0));
+    /*   Eigen::Matrix3d dynamic_tf = */
+    /*       mrs_lib::AttitudeConverter(M_PI * (stereo_rotation_roll_ / 180.0), M_PI * (stereo_rotation_pitch_ / 180.0), M_PI * (stereo_rotation_yaw_ / 180.0)); */
 
-      Eigen::Matrix3d final_tf = dynamic_tf * initial_tf;
+    /*   Eigen::Matrix3d final_tf = dynamic_tf * initial_tf; */
 
-      tf.transform.rotation = mrs_lib::AttitudeConverter(final_tf);
+    /*   tf.transform.rotation = mrs_lib::AttitudeConverter(final_tf); */
 
-      try {
-        static_broadcaster_->sendTransform(tf);
-      }
-      catch (...) {
-        RCLCPP_ERROR(node_->get_logger(), "Could not publish stereo left tf");
-      }
+    /*   try { */
+    /*     static_broadcaster_->sendTransform(tf); */
+    /*   } */
+    /*   catch (...) { */
+    /*     RCLCPP_ERROR(node_->get_logger(), "Could not publish stereo left tf"); */
+    /*   } */
 
-      // | ------------- print the tf matrix for kalibr ------------- |
+    /*   // | ------------- print the tf matrix for kalibr ------------- | */
 
-      RCLCPP_INFO(node_->get_logger(), "Stereo left camera-imu chain for kalibr config:");
-      printf("cam0:\n");
-      printf("  T_imu_cam:\n");
-      printf("    - [%f, %f, %f, %f]\n", final_tf(0, 0), final_tf(0, 1), final_tf(0, 2), tf.transform.translation.x);
-      printf("    - [%f, %f, %f, %f]\n", final_tf(1, 0), final_tf(1, 1), final_tf(1, 2), tf.transform.translation.y);
-      printf("    - [%f, %f, %f, %f]\n", final_tf(2, 0), final_tf(2, 1), final_tf(2, 2), tf.transform.translation.z);
-      printf("    - [%f, %f, %f, %f]\n", 0.0, 0.0, 0.0, 1.0);
-      printf("  cam_overlaps: [0]\n");
-      printf("  camera_model: pinhole\n");
-      printf("  distortion_coeffs: [0.0, 0.0, 0.0, 0.0]\n");
-      printf("  distortion_model: radtan\n");
-      printf("  intrinsics: [%f, %f, %f, %f]\n", stereo_camera_info_.K[0], stereo_camera_info_.K[4], stereo_camera_info_.K[2], stereo_camera_info_.K[5]);
-      printf("  resolution: [%d, %d]\n", stereo_width_, stereo_height_);
-    }
+    /*   RCLCPP_INFO(node_->get_logger(), "Stereo left camera-imu chain for kalibr config:"); */
+    /*   printf("cam0:\n"); */
+    /*   printf("  T_imu_cam:\n"); */
+    /*   printf("    - [%f, %f, %f, %f]\n", final_tf(0, 0), final_tf(0, 1), final_tf(0, 2), tf.transform.translation.x); */
+    /*   printf("    - [%f, %f, %f, %f]\n", final_tf(1, 0), final_tf(1, 1), final_tf(1, 2), tf.transform.translation.y); */
+    /*   printf("    - [%f, %f, %f, %f]\n", final_tf(2, 0), final_tf(2, 1), final_tf(2, 2), tf.transform.translation.z); */
+    /*   printf("    - [%f, %f, %f, %f]\n", 0.0, 0.0, 0.0, 1.0); */
+    /*   printf("  cam_overlaps: [0]\n"); */
+    /*   printf("  camera_model: pinhole\n"); */
+    /*   printf("  distortion_coeffs: [0.0, 0.0, 0.0, 0.0]\n"); */
+    /*   printf("  distortion_model: radtan\n"); */
+    /*   printf("  intrinsics: [%f, %f, %f, %f]\n", stereo_camera_info_.K[0], stereo_camera_info_.K[4], stereo_camera_info_.K[2], stereo_camera_info_.K[5]); */
+    /*   printf("  resolution: [%d, %d]\n", stereo_width_, stereo_height_); */
+    /* } */
 
-    {
-      tf.header.stamp = clock_->now();
+    /* { */
+    /*   tf.header.stamp = clock_->now(); */
 
-      tf.header.frame_id = "uav" + std::to_string(i + 1) + "/fcu";
-      tf.child_frame_id  = "uav" + std::to_string(i + 1) + "/stereo_right";
+    /*   tf.header.frame_id = "uav" + std::to_string(i + 1) + "/fcu"; */
+    /*   tf.child_frame_id  = "uav" + std::to_string(i + 1) + "/stereo_right"; */
 
-      tf.transform.translation.x = stereo_offset_x_;
-      tf.transform.translation.y = stereo_offset_y_ - stereo_baseline_;
-      tf.transform.translation.z = stereo_offset_z_;
+    /*   tf.transform.translation.x = stereo_offset_x_; */
+    /*   tf.transform.translation.y = stereo_offset_y_ - stereo_baseline_; */
+    /*   tf.transform.translation.z = stereo_offset_z_; */
 
-      Eigen::Matrix3d initial_tf = mrs_lib::AttitudeConverter(Eigen::Quaterniond(-0.5, 0.5, -0.5, 0.5));
+    /*   Eigen::Matrix3d initial_tf = mrs_lib::AttitudeConverter(Eigen::Quaterniond(-0.5, 0.5, -0.5, 0.5)); */
 
-      Eigen::Matrix3d dynamic_tf =
-          mrs_lib::AttitudeConverter(M_PI * (stereo_rotation_roll_ / 180.0), M_PI * (stereo_rotation_pitch_ / 180.0), M_PI * (stereo_rotation_yaw_ / 180.0));
+    /*   Eigen::Matrix3d dynamic_tf = */
+    /*       mrs_lib::AttitudeConverter(M_PI * (stereo_rotation_roll_ / 180.0), M_PI * (stereo_rotation_pitch_ / 180.0), M_PI * (stereo_rotation_yaw_ / 180.0)); */
 
-      Eigen::Matrix3d final_tf = dynamic_tf * initial_tf;
+    /*   Eigen::Matrix3d final_tf = dynamic_tf * initial_tf; */
 
-      tf.transform.rotation = mrs_lib::AttitudeConverter(final_tf);
+    /*   tf.transform.rotation = mrs_lib::AttitudeConverter(final_tf); */
 
-      try {
-        static_broadcaster_->sendTransform(tf);
-      }
-      catch (...) {
-        RCLCPP_ERROR(node_->get_logger(), "Could not publish stereo right tf");
-      }
+    /*   try { */
+    /*     static_broadcaster_->sendTransform(tf); */
+    /*   } */
+    /*   catch (...) { */
+    /*     RCLCPP_ERROR(node_->get_logger(), "Could not publish stereo right tf"); */
+    /*   } */
 
-      // | ------------- print the tf matrix for kalibr ------------- |
+    /*   // | ------------- print the tf matrix for kalibr ------------- | */
 
-      RCLCPP_INFO(node_->get_logger(), "Stereo right camera-imu chain for kalibr config:");
-      printf("cam0:\n");
-      printf("  T_imu_cam:\n");
-      printf("    - [%f, %f, %f, %f]\n", final_tf(0, 0), final_tf(0, 1), final_tf(0, 2), tf.transform.translation.x);
-      printf("    - [%f, %f, %f, %f]\n", final_tf(1, 0), final_tf(1, 1), final_tf(1, 2), tf.transform.translation.y);
-      printf("    - [%f, %f, %f, %f]\n", final_tf(2, 0), final_tf(2, 1), final_tf(2, 2), tf.transform.translation.z);
-      printf("    - [%f, %f, %f, %f]\n", 0.0, 0.0, 0.0, 1.0);
-      printf("  cam_overlaps: [0]\n");
-      printf("  camera_model: pinhole\n");
-      printf("  distortion_coeffs: [0.0, 0.0, 0.0, 0.0]\n");
-      printf("  distortion_model: radtan\n");
-      printf("  intrinsics: [%f, %f, %f, %f]\n", stereo_camera_info_.K[0], stereo_camera_info_.K[4], stereo_camera_info_.K[2], stereo_camera_info_.K[5]);
-      printf("  resolution: [%d, %d]\n", stereo_width_, stereo_height_);
-    }
+    /*   RCLCPP_INFO(node_->get_logger(), "Stereo right camera-imu chain for kalibr config:"); */
+    /*   printf("cam0:\n"); */
+    /*   printf("  T_imu_cam:\n"); */
+    /*   printf("    - [%f, %f, %f, %f]\n", final_tf(0, 0), final_tf(0, 1), final_tf(0, 2), tf.transform.translation.x); */
+    /*   printf("    - [%f, %f, %f, %f]\n", final_tf(1, 0), final_tf(1, 1), final_tf(1, 2), tf.transform.translation.y); */
+    /*   printf("    - [%f, %f, %f, %f]\n", final_tf(2, 0), final_tf(2, 1), final_tf(2, 2), tf.transform.translation.z); */
+    /*   printf("    - [%f, %f, %f, %f]\n", 0.0, 0.0, 0.0, 1.0); */
+    /*   printf("  cam_overlaps: [0]\n"); */
+    /*   printf("  camera_model: pinhole\n"); */
+    /*   printf("  distortion_coeffs: [0.0, 0.0, 0.0, 0.0]\n"); */
+    /*   printf("  distortion_model: radtan\n"); */
+    /*   printf("  intrinsics: [%f, %f, %f, %f]\n", stereo_camera_info_.K[0], stereo_camera_info_.K[4], stereo_camera_info_.K[2], stereo_camera_info_.K[5]); */
+    /*   printf("  resolution: [%d, %d]\n", stereo_width_, stereo_height_); */
+    /* } */
 
 
     // | ------------------------- lidar tf ------------------------- |
@@ -1703,110 +1774,110 @@ void FlightforgeSimulator::publishStaticTfs(void) {
 
 /* fabricateCamInfo() //{ */
 
-/* void FlightforgeSimulator::fabricateCamInfo(void) { */
+void FlightforgeSimulator::fabricateCamInfo(void) {
 
-/*   // | --------------------------- RGB -------------------------- | */
+  // | --------------------------- RGB -------------------------- |
 
-/*   rgb_camera_info_.height = rgb_width_; */
-/*   rgb_camera_info_.width  = rgb_height_; */
+  rgb_camera_info_.height = rgb_width_;
+  rgb_camera_info_.width  = rgb_height_;
 
-/*   // distortion */
-/*   rgb_camera_info_.distortion_model = "plumb_bob"; */
+  // distortion
+  rgb_camera_info_.distortion_model = "plumb_bob";
 
-/*   rgb_camera_info_.D.resize(5); */
-/*   rgb_camera_info_.D[0] = 0; */
-/*   rgb_camera_info_.D[1] = 0; */
-/*   rgb_camera_info_.D[2] = 0; */
-/*   rgb_camera_info_.D[3] = 0; */
-/*   rgb_camera_info_.D[4] = 0; */
+  rgb_camera_info_.D.resize(5);
+  rgb_camera_info_.D[0] = 0;
+  rgb_camera_info_.D[1] = 0;
+  rgb_camera_info_.D[2] = 0;
+  rgb_camera_info_.D[3] = 0;
+  rgb_camera_info_.D[4] = 0;
 
-/*   // original camera matrix */
-/*   rgb_camera_info_.K[0] = rgb_width_ / (2.0 * tan(0.5 * M_PI * (rgb_fov_ / 180.0))); */
-/*   rgb_camera_info_.K[1] = 0.0; */
-/*   rgb_camera_info_.K[2] = rgb_width_ / 2.0; */
-/*   rgb_camera_info_.K[3] = 0.0; */
-/*   rgb_camera_info_.K[4] = rgb_width_ / (2.0 * tan(0.5 * M_PI * (rgb_fov_ / 180.0))); */
-/*   rgb_camera_info_.K[5] = rgb_height_ / 2.0; */
-/*   rgb_camera_info_.K[6] = 0.0; */
-/*   rgb_camera_info_.K[7] = 0.0; */
-/*   rgb_camera_info_.K[8] = 1.0; */
+  // original camera matrix
+  rgb_camera_info_.K[0] = rgb_width_ / (2.0 * tan(0.5 * M_PI * (rgb_fov_ / 180.0)));
+  rgb_camera_info_.K[1] = 0.0;
+  rgb_camera_info_.K[2] = rgb_width_ / 2.0;
+  rgb_camera_info_.K[3] = 0.0;
+  rgb_camera_info_.K[4] = rgb_width_ / (2.0 * tan(0.5 * M_PI * (rgb_fov_ / 180.0)));
+  rgb_camera_info_.K[5] = rgb_height_ / 2.0;
+  rgb_camera_info_.K[6] = 0.0;
+  rgb_camera_info_.K[7] = 0.0;
+  rgb_camera_info_.K[8] = 1.0;
 
-/*   // rectification */
-/*   rgb_camera_info_.R[0] = 1.0; */
-/*   rgb_camera_info_.R[1] = 0.0; */
-/*   rgb_camera_info_.R[2] = 0.0; */
-/*   rgb_camera_info_.R[3] = 0.0; */
-/*   rgb_camera_info_.R[4] = 1.0; */
-/*   rgb_camera_info_.R[5] = 0.0; */
-/*   rgb_camera_info_.R[6] = 0.0; */
-/*   rgb_camera_info_.R[7] = 0.0; */
-/*   rgb_camera_info_.R[8] = 1.0; */
+  // rectification
+  rgb_camera_info_.R[0] = 1.0;
+  rgb_camera_info_.R[1] = 0.0;
+  rgb_camera_info_.R[2] = 0.0;
+  rgb_camera_info_.R[3] = 0.0;
+  rgb_camera_info_.R[4] = 1.0;
+  rgb_camera_info_.R[5] = 0.0;
+  rgb_camera_info_.R[6] = 0.0;
+  rgb_camera_info_.R[7] = 0.0;
+  rgb_camera_info_.R[8] = 1.0;
 
-/*   // camera projection matrix (same as camera matrix due to lack of distortion/rectification) (is this generated?) */
-/*   rgb_camera_info_.P[0]  = rgb_width_ / (2.0 * tan(0.5 * M_PI * (rgb_fov_ / 180.0))); */
-/*   rgb_camera_info_.P[1]  = 0.0; */
-/*   rgb_camera_info_.P[2]  = rgb_width_ / 2.0; */
-/*   rgb_camera_info_.P[3]  = 0.0; */
-/*   rgb_camera_info_.P[4]  = 0.0; */
-/*   rgb_camera_info_.P[5]  = rgb_width_ / (2.0 * tan(0.5 * M_PI * (rgb_fov_ / 180.0))); */
-/*   rgb_camera_info_.P[6]  = rgb_height_ / 2.0; */
-/*   rgb_camera_info_.P[7]  = 0.0; */
-/*   rgb_camera_info_.P[8]  = 0.0; */
-/*   rgb_camera_info_.P[9]  = 0.0; */
-/*   rgb_camera_info_.P[10] = 1.0; */
-/*   rgb_camera_info_.P[11] = 0.0; */
+  // camera projection matrix (same as camera matrix due to lack of distortion/rectification) (is this generated?)
+  rgb_camera_info_.P[0]  = rgb_width_ / (2.0 * tan(0.5 * M_PI * (rgb_fov_ / 180.0)));
+  rgb_camera_info_.P[1]  = 0.0;
+  rgb_camera_info_.P[2]  = rgb_width_ / 2.0;
+  rgb_camera_info_.P[3]  = 0.0;
+  rgb_camera_info_.P[4]  = 0.0;
+  rgb_camera_info_.P[5]  = rgb_width_ / (2.0 * tan(0.5 * M_PI * (rgb_fov_ / 180.0)));
+  rgb_camera_info_.P[6]  = rgb_height_ / 2.0;
+  rgb_camera_info_.P[7]  = 0.0;
+  rgb_camera_info_.P[8]  = 0.0;
+  rgb_camera_info_.P[9]  = 0.0;
+  rgb_camera_info_.P[10] = 1.0;
+  rgb_camera_info_.P[11] = 0.0;
 
-/*   // | ------------------------- stereo ------------------------- | */
+  // | ------------------------- stereo ------------------------- |
 
-/*   stereo_camera_info_.width  = stereo_width_; */
-/*   stereo_camera_info_.height = stereo_height_; */
+  stereo_camera_info_.width  = stereo_width_;
+  stereo_camera_info_.height = stereo_height_;
 
-/*   // distortion */
-/*   stereo_camera_info_.distortion_model = "plumb_bob"; */
+  // distortion
+  stereo_camera_info_.distortion_model = "plumb_bob";
 
-/*   stereo_camera_info_.D.resize(5); */
-/*   stereo_camera_info_.D[0] = 0; */
-/*   stereo_camera_info_.D[1] = 0; */
-/*   stereo_camera_info_.D[2] = 0; */
-/*   stereo_camera_info_.D[3] = 0; */
-/*   stereo_camera_info_.D[4] = 0; */
+  stereo_camera_info_.D.resize(5);
+  stereo_camera_info_.D[0] = 0;
+  stereo_camera_info_.D[1] = 0;
+  stereo_camera_info_.D[2] = 0;
+  stereo_camera_info_.D[3] = 0;
+  stereo_camera_info_.D[4] = 0;
 
-/*   // original camera matrix */
-/*   stereo_camera_info_.K[0] = stereo_width_ / (2.0 * tan(0.5 * M_PI * (stereo_fov_ / 180.0))); */
-/*   stereo_camera_info_.K[1] = 0.0; */
-/*   stereo_camera_info_.K[2] = stereo_width_ / 2.0; */
-/*   stereo_camera_info_.K[3] = 0.0; */
-/*   stereo_camera_info_.K[4] = stereo_width_ / (2.0 * tan(0.5 * M_PI * (stereo_fov_ / 180.0))); */
-/*   stereo_camera_info_.K[5] = stereo_height_ / 2.0; */
-/*   stereo_camera_info_.K[6] = 0.0; */
-/*   stereo_camera_info_.K[7] = 0.0; */
-/*   stereo_camera_info_.K[8] = 1.0; */
+  // original camera matrix
+  stereo_camera_info_.K[0] = stereo_width_ / (2.0 * tan(0.5 * M_PI * (stereo_fov_ / 180.0)));
+  stereo_camera_info_.K[1] = 0.0;
+  stereo_camera_info_.K[2] = stereo_width_ / 2.0;
+  stereo_camera_info_.K[3] = 0.0;
+  stereo_camera_info_.K[4] = stereo_width_ / (2.0 * tan(0.5 * M_PI * (stereo_fov_ / 180.0)));
+  stereo_camera_info_.K[5] = stereo_height_ / 2.0;
+  stereo_camera_info_.K[6] = 0.0;
+  stereo_camera_info_.K[7] = 0.0;
+  stereo_camera_info_.K[8] = 1.0;
 
-/*   // rectification */
-/*   stereo_camera_info_.R[0] = 1.0; */
-/*   stereo_camera_info_.R[1] = 0.0; */
-/*   stereo_camera_info_.R[2] = 0.0; */
-/*   stereo_camera_info_.R[3] = 0.0; */
-/*   stereo_camera_info_.R[4] = 1.0; */
-/*   stereo_camera_info_.R[5] = 0.0; */
-/*   stereo_camera_info_.R[6] = 0.0; */
-/*   stereo_camera_info_.R[7] = 0.0; */
-/*   stereo_camera_info_.R[8] = 1.0; */
+  // rectification
+  stereo_camera_info_.R[0] = 1.0;
+  stereo_camera_info_.R[1] = 0.0;
+  stereo_camera_info_.R[2] = 0.0;
+  stereo_camera_info_.R[3] = 0.0;
+  stereo_camera_info_.R[4] = 1.0;
+  stereo_camera_info_.R[5] = 0.0;
+  stereo_camera_info_.R[6] = 0.0;
+  stereo_camera_info_.R[7] = 0.0;
+  stereo_camera_info_.R[8] = 1.0;
 
-/*   // camera projection matrix (same as camera matrix due to lack of distortion/rectification) (is this generated?) */
-/*   stereo_camera_info_.P[0]  = stereo_width_ / (2.0 * tan(0.5 * M_PI * (stereo_fov_ / 180.0))); */
-/*   stereo_camera_info_.P[1]  = 0.0; */
-/*   stereo_camera_info_.P[2]  = stereo_width_ / 2.0; */
-/*   stereo_camera_info_.P[3]  = 0.0; */
-/*   stereo_camera_info_.P[4]  = 0.0; */
-/*   stereo_camera_info_.P[5]  = stereo_width_ / (2.0 * tan(0.5 * M_PI * (stereo_fov_ / 180.0))); */
-/*   stereo_camera_info_.P[6]  = stereo_height_ / 2.0; */
-/*   stereo_camera_info_.P[7]  = 0.0; */
-/*   stereo_camera_info_.P[8]  = 0.0; */
-/*   stereo_camera_info_.P[9]  = 0.0; */
-/*   stereo_camera_info_.P[10] = 1.0; */
-/*   stereo_camera_info_.P[11] = 0.0; */
-/* } */
+  // camera projection matrix (same as camera matrix due to lack of distortion/rectification) (is this generated?)
+  stereo_camera_info_.P[0]  = stereo_width_ / (2.0 * tan(0.5 * M_PI * (stereo_fov_ / 180.0)));
+  stereo_camera_info_.P[1]  = 0.0;
+  stereo_camera_info_.P[2]  = stereo_width_ / 2.0;
+  stereo_camera_info_.P[3]  = 0.0;
+  stereo_camera_info_.P[4]  = 0.0;
+  stereo_camera_info_.P[5]  = stereo_width_ / (2.0 * tan(0.5 * M_PI * (stereo_fov_ / 180.0)));
+  stereo_camera_info_.P[6]  = stereo_height_ / 2.0;
+  stereo_camera_info_.P[7]  = 0.0;
+  stereo_camera_info_.P[8]  = 0.0;
+  stereo_camera_info_.P[9]  = 0.0;
+  stereo_camera_info_.P[10] = 1.0;
+  stereo_camera_info_.P[11] = 0.0;
+}
 
 //}
 
