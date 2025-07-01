@@ -1044,7 +1044,32 @@ void FlightforgeSimulator::timerInit() {
         RCLCPP_INFO(get_logger(), "camera config set for uav%lu", i + 1);
       }
     }
+    
+    // | ---------------- set Stereo camera config ---------------- |
 
+    {
+      ueds_connector::StereoCameraConfig cameraConfig{};
+
+      cameraConfig.width_              = stereo_width_;
+      cameraConfig.height_             = stereo_height_;
+      cameraConfig.fov_                = stereo_fov_;
+      cameraConfig.baseline_           = stereo_baseline_;
+      cameraConfig.offset_             = ueds_connector::Coordinates(stereo_offset_x_ * 100.0, stereo_offset_y_ * 100.0, stereo_offset_z_ * 100.0);
+      cameraConfig.orientation_        = ueds_connector::Rotation(-stereo_rotation_pitch_, stereo_rotation_yaw_, stereo_rotation_roll_);
+      cameraConfig.enable_raytracing_  = stereo_enable_raytracing_;
+      cameraConfig.enable_hdr_         = stereo_enable_hdr_;
+      cameraConfig.enable_temporal_aa_ = stereo_enable_temporal_aa_;
+
+      const auto res = ueds_connectors_[i]->SetStereoCameraConfig(cameraConfig);
+
+      last_stereo_ue_stamp_.push_back(0.0);
+
+      if (!res) {
+        RCLCPP_ERROR(get_logger(), "failed to set camera config for uav %lu", i + 1);
+      } else {
+        RCLCPP_INFO(get_logger(), "camera config set for uav%lu", i + 1);
+      }
+    }
 
 
   }
@@ -2203,91 +2228,91 @@ void FlightforgeSimulator::publishStaticTfs(void) {
 
     /* // | ----------------------- stereo left ---------------------- | */
 
-    /* { */
-    /*   tf.header.stamp = clock_->now(); */
+    {
+      tf.header.stamp = clock_->now();
 
-    /*   tf.header.frame_id = "uav" + std::to_string(i + 1) + "/fcu"; */
-    /*   tf.child_frame_id  = "uav" + std::to_string(i + 1) + "/stereo_left"; */
+      tf.header.frame_id = "uav" + std::to_string(i + 1) + "/fcu";
+      tf.child_frame_id  = "uav" + std::to_string(i + 1) + "/stereo_left";
 
-    /*   tf.transform.translation.x = stereo_offset_x_; */
-    /*   tf.transform.translation.y = stereo_offset_y_; */
-    /*   tf.transform.translation.z = stereo_offset_z_; */
+      tf.transform.translation.x = stereo_offset_x_;
+      tf.transform.translation.y = stereo_offset_y_;
+      tf.transform.translation.z = stereo_offset_z_;
 
-    /*   Eigen::Matrix3d initial_tf = mrs_lib::AttitudeConverter(Eigen::Quaterniond(-0.5, 0.5, -0.5, 0.5)); */
+      Eigen::Matrix3d initial_tf = mrs_lib::AttitudeConverter(Eigen::Quaterniond(-0.5, 0.5, -0.5, 0.5));
 
-    /*   Eigen::Matrix3d dynamic_tf = */
-    /*       mrs_lib::AttitudeConverter(M_PI * (stereo_rotation_roll_ / 180.0), M_PI * (stereo_rotation_pitch_ / 180.0), M_PI * (stereo_rotation_yaw_ / 180.0)); */
+      Eigen::Matrix3d dynamic_tf =
+          mrs_lib::AttitudeConverter(M_PI * (stereo_rotation_roll_ / 180.0), M_PI * (stereo_rotation_pitch_ / 180.0), M_PI * (stereo_rotation_yaw_ / 180.0));
 
-    /*   Eigen::Matrix3d final_tf = dynamic_tf * initial_tf; */
+      Eigen::Matrix3d final_tf = dynamic_tf * initial_tf;
 
-    /*   tf.transform.rotation = mrs_lib::AttitudeConverter(final_tf); */
+      tf.transform.rotation = mrs_lib::AttitudeConverter(final_tf);
 
-    /*   try { */
-    /*     static_broadcaster_->sendTransform(tf); */
-    /*   } */
-    /*   catch (...) { */
-    /*     RCLCPP_ERROR(node_->get_logger(), "Could not publish stereo left tf"); */
-    /*   } */
+      try {
+        static_broadcaster_->sendTransform(tf);
+      }
+      catch (...) {
+        RCLCPP_ERROR(node_->get_logger(), "Could not publish stereo left tf");
+      }
 
-    /*   // | ------------- print the tf matrix for kalibr ------------- | */
+      // | ------------- print the tf matrix for kalibr ------------- |
 
-    /*   RCLCPP_INFO(node_->get_logger(), "Stereo left camera-imu chain for kalibr config:"); */
-    /*   printf("cam0:\n"); */
-    /*   printf("  T_imu_cam:\n"); */
-    /*   printf("    - [%f, %f, %f, %f]\n", final_tf(0, 0), final_tf(0, 1), final_tf(0, 2), tf.transform.translation.x); */
-    /*   printf("    - [%f, %f, %f, %f]\n", final_tf(1, 0), final_tf(1, 1), final_tf(1, 2), tf.transform.translation.y); */
-    /*   printf("    - [%f, %f, %f, %f]\n", final_tf(2, 0), final_tf(2, 1), final_tf(2, 2), tf.transform.translation.z); */
-    /*   printf("    - [%f, %f, %f, %f]\n", 0.0, 0.0, 0.0, 1.0); */
-    /*   printf("  cam_overlaps: [0]\n"); */
-    /*   printf("  camera_model: pinhole\n"); */
-    /*   printf("  distortion_coeffs: [0.0, 0.0, 0.0, 0.0]\n"); */
-    /*   printf("  distortion_model: radtan\n"); */
-    /*   printf("  intrinsics: [%f, %f, %f, %f]\n", stereo_camera_info_.K[0], stereo_camera_info_.K[4], stereo_camera_info_.K[2], stereo_camera_info_.K[5]); */
-    /*   printf("  resolution: [%d, %d]\n", stereo_width_, stereo_height_); */
-    /* } */
+      RCLCPP_INFO(node_->get_logger(), "Stereo left camera-imu chain for kalibr config:");
+      printf("cam0:\n");
+      printf("  T_imu_cam:\n");
+      printf("    - [%f, %f, %f, %f]\n", final_tf(0, 0), final_tf(0, 1), final_tf(0, 2), tf.transform.translation.x);
+      printf("    - [%f, %f, %f, %f]\n", final_tf(1, 0), final_tf(1, 1), final_tf(1, 2), tf.transform.translation.y);
+      printf("    - [%f, %f, %f, %f]\n", final_tf(2, 0), final_tf(2, 1), final_tf(2, 2), tf.transform.translation.z);
+      printf("    - [%f, %f, %f, %f]\n", 0.0, 0.0, 0.0, 1.0);
+      printf("  cam_overlaps: [0]\n");
+      printf("  camera_model: pinhole\n");
+      printf("  distortion_coeffs: [0.0, 0.0, 0.0, 0.0]\n");
+      printf("  distortion_model: radtan\n");
+      printf("  intrinsics: [%f, %f, %f, %f]\n", stereo_camera_info_.K[0], stereo_camera_info_.K[4], stereo_camera_info_.K[2], stereo_camera_info_.K[5]);
+      printf("  resolution: [%d, %d]\n", stereo_width_, stereo_height_);
+    }
 
-    /* { */
-    /*   tf.header.stamp = clock_->now(); */
+    {
+      tf.header.stamp = clock_->now();
 
-    /*   tf.header.frame_id = "uav" + std::to_string(i + 1) + "/fcu"; */
-    /*   tf.child_frame_id  = "uav" + std::to_string(i + 1) + "/stereo_right"; */
+      tf.header.frame_id = "uav" + std::to_string(i + 1) + "/fcu";
+      tf.child_frame_id  = "uav" + std::to_string(i + 1) + "/stereo_right";
 
-    /*   tf.transform.translation.x = stereo_offset_x_; */
-    /*   tf.transform.translation.y = stereo_offset_y_ - stereo_baseline_; */
-    /*   tf.transform.translation.z = stereo_offset_z_; */
+      tf.transform.translation.x = stereo_offset_x_;
+      tf.transform.translation.y = stereo_offset_y_ - stereo_baseline_;
+      tf.transform.translation.z = stereo_offset_z_;
 
-    /*   Eigen::Matrix3d initial_tf = mrs_lib::AttitudeConverter(Eigen::Quaterniond(-0.5, 0.5, -0.5, 0.5)); */
+      Eigen::Matrix3d initial_tf = mrs_lib::AttitudeConverter(Eigen::Quaterniond(-0.5, 0.5, -0.5, 0.5));
 
-    /*   Eigen::Matrix3d dynamic_tf = */
-    /*       mrs_lib::AttitudeConverter(M_PI * (stereo_rotation_roll_ / 180.0), M_PI * (stereo_rotation_pitch_ / 180.0), M_PI * (stereo_rotation_yaw_ / 180.0)); */
+      Eigen::Matrix3d dynamic_tf =
+          mrs_lib::AttitudeConverter(M_PI * (stereo_rotation_roll_ / 180.0), M_PI * (stereo_rotation_pitch_ / 180.0), M_PI * (stereo_rotation_yaw_ / 180.0));
 
-    /*   Eigen::Matrix3d final_tf = dynamic_tf * initial_tf; */
+      Eigen::Matrix3d final_tf = dynamic_tf * initial_tf;
 
-    /*   tf.transform.rotation = mrs_lib::AttitudeConverter(final_tf); */
+      tf.transform.rotation = mrs_lib::AttitudeConverter(final_tf);
 
-    /*   try { */
-    /*     static_broadcaster_->sendTransform(tf); */
-    /*   } */
-    /*   catch (...) { */
-    /*     RCLCPP_ERROR(node_->get_logger(), "Could not publish stereo right tf"); */
-    /*   } */
+      try {
+        static_broadcaster_->sendTransform(tf);
+      }
+      catch (...) {
+        RCLCPP_ERROR(node_->get_logger(), "Could not publish stereo right tf");
+      }
 
-    /*   // | ------------- print the tf matrix for kalibr ------------- | */
+      // | ------------- print the tf matrix for kalibr ------------- |
 
-    /*   RCLCPP_INFO(node_->get_logger(), "Stereo right camera-imu chain for kalibr config:"); */
-    /*   printf("cam0:\n"); */
-    /*   printf("  T_imu_cam:\n"); */
-    /*   printf("    - [%f, %f, %f, %f]\n", final_tf(0, 0), final_tf(0, 1), final_tf(0, 2), tf.transform.translation.x); */
-    /*   printf("    - [%f, %f, %f, %f]\n", final_tf(1, 0), final_tf(1, 1), final_tf(1, 2), tf.transform.translation.y); */
-    /*   printf("    - [%f, %f, %f, %f]\n", final_tf(2, 0), final_tf(2, 1), final_tf(2, 2), tf.transform.translation.z); */
-    /*   printf("    - [%f, %f, %f, %f]\n", 0.0, 0.0, 0.0, 1.0); */
-    /*   printf("  cam_overlaps: [0]\n"); */
-    /*   printf("  camera_model: pinhole\n"); */
-    /*   printf("  distortion_coeffs: [0.0, 0.0, 0.0, 0.0]\n"); */
-    /*   printf("  distortion_model: radtan\n"); */
-    /*   printf("  intrinsics: [%f, %f, %f, %f]\n", stereo_camera_info_.K[0], stereo_camera_info_.K[4], stereo_camera_info_.K[2], stereo_camera_info_.K[5]); */
-    /*   printf("  resolution: [%d, %d]\n", stereo_width_, stereo_height_); */
-    /* } */
+      RCLCPP_INFO(node_->get_logger(), "Stereo right camera-imu chain for kalibr config:");
+      printf("cam0:\n");
+      printf("  T_imu_cam:\n");
+      printf("    - [%f, %f, %f, %f]\n", final_tf(0, 0), final_tf(0, 1), final_tf(0, 2), tf.transform.translation.x);
+      printf("    - [%f, %f, %f, %f]\n", final_tf(1, 0), final_tf(1, 1), final_tf(1, 2), tf.transform.translation.y);
+      printf("    - [%f, %f, %f, %f]\n", final_tf(2, 0), final_tf(2, 1), final_tf(2, 2), tf.transform.translation.z);
+      printf("    - [%f, %f, %f, %f]\n", 0.0, 0.0, 0.0, 1.0);
+      printf("  cam_overlaps: [0]\n");
+      printf("  camera_model: pinhole\n");
+      printf("  distortion_coeffs: [0.0, 0.0, 0.0, 0.0]\n");
+      printf("  distortion_model: radtan\n");
+      printf("  intrinsics: [%f, %f, %f, %f]\n", stereo_camera_info_.K[0], stereo_camera_info_.K[4], stereo_camera_info_.K[2], stereo_camera_info_.K[5]);
+      printf("  resolution: [%d, %d]\n", stereo_width_, stereo_height_);
+    }
 
 
     // | ------------------------- lidar tf ------------------------- |
