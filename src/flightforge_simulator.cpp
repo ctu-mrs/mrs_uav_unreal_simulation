@@ -565,6 +565,7 @@ private:
   
   std::vector<double> last_rgb_ue_stamp_;
   std::vector<double> last_rgb_seg_ue_stamp_;
+  std::vector<double> last_stereo_ue_stamp_;
 
   // | --------- store current camera orientation -------- |
   std::vector<Eigen::Quaterniond> rgb_camera_orientations_;
@@ -1686,11 +1687,11 @@ void FlightforgeSimulator::timerStereo() {
       std::tie(res, image_left, image_right, stamp) = ueds_connectors_[i]->GetStereoCameraData();
     }
 
-    if (abs(stamp - last_rgb_ue_stamp_.at(i)) < 0.001) {
+    if (abs(stamp - last_stereo_ue_stamp_.at(i)) < 0.001) {
       return;
     }
 
-    last_rgb_ue_stamp_.at(i) = stamp;
+    last_stereo_ue_stamp_.at(i) = stamp;
 
     if (!res) {
       RCLCPP_WARN(get_logger(), "failed to obtain stereo camera from uav%lu", i + 1);
@@ -1776,11 +1777,11 @@ void FlightforgeSimulator::timerRgbSegmented() {
       std::tie(res, cameraData, stamp, size) = ueds_connectors_[i]->GetRgbSegmented();
     }
 
-    if (abs(stamp - last_rgb_ue_stamp_.at(i)) < 0.001) {
+    if (abs(stamp - last_rgb_seg_ue_stamp_.at(i)) < 0.001) {
       return;
     }
 
-    last_rgb_ue_stamp_.at(i) = stamp;
+    last_rgb_seg_ue_stamp_.at(i) = stamp;
 
     if (!res) {
       RCLCPP_WARN(get_logger(), "failed to obtain segmented camera from uav%lu", i + 1);
@@ -2267,7 +2268,7 @@ void FlightforgeSimulator::publishStaticTfs(void) {
       printf("  camera_model: pinhole\n");
       printf("  distortion_coeffs: [0.0, 0.0, 0.0, 0.0]\n");
       printf("  distortion_model: radtan\n");
-      printf("  intrinsics: [%f, %f, %f, %f]\n", stereo_camera_info_.K[0], stereo_camera_info_.K[4], stereo_camera_info_.K[2], stereo_camera_info_.K[5]);
+      printf("  intrinsics: [%f, %f, %f, %f]\n", stereo_camera_info_.k[0], stereo_camera_info_.k[4], stereo_camera_info_.k[2], stereo_camera_info_.k[5]);
       printf("  resolution: [%d, %d]\n", stereo_width_, stereo_height_);
     }
 
@@ -2310,7 +2311,7 @@ void FlightforgeSimulator::publishStaticTfs(void) {
       printf("  camera_model: pinhole\n");
       printf("  distortion_coeffs: [0.0, 0.0, 0.0, 0.0]\n");
       printf("  distortion_model: radtan\n");
-      printf("  intrinsics: [%f, %f, %f, %f]\n", stereo_camera_info_.K[0], stereo_camera_info_.K[4], stereo_camera_info_.K[2], stereo_camera_info_.K[5]);
+      printf("  intrinsics: [%f, %f, %f, %f]\n", stereo_camera_info_.k[0], stereo_camera_info_.k[4], stereo_camera_info_.k[2], stereo_camera_info_.k[5]);
       printf("  resolution: [%d, %d]\n", stereo_width_, stereo_height_);
     }
 
