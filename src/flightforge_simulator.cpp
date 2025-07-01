@@ -2326,27 +2326,9 @@ void FlightforgeSimulator::publishStaticTfs(void) {
       tf.transform.translation.y = lidar_offset_y_;
       tf.transform.translation.z = lidar_offset_z_;
 
-      // Initial quaternion (FCU to standard frame).  Keep this as it was,
-      // unless you've confirmed a different initial orientation is needed.
-      /* Eigen::Quaterniond initial_quat(0.5, -0.5, 0.5, -0.5); */
-      Eigen::Quaterniond initial_quat = Eigen::Quaterniond::Identity();
-
-      // LiDAR's specific rotation (dynamic).  Here's where we address the sign.
-      Eigen::Quaterniond dynamic_quat = Eigen::AngleAxisd(lidar_rotation_roll_ * M_PI / 180.0, Eigen::Vector3d::UnitX()) *
-                                        Eigen::AngleAxisd(lidar_rotation_pitch_ * M_PI / 180.0, Eigen::Vector3d::UnitY()) *
-                                        Eigen::AngleAxisd(lidar_rotation_yaw_ * M_PI / 180.0, Eigen::Vector3d::UnitZ());
-
-      // Combine rotations (dynamic * initial).  This order should be correct.
-      Eigen::Quaterniond final_quat = dynamic_quat * initial_quat;
-
-      // Normalize.
-      final_quat.normalize();
-
-      // Set rotation.
-      tf.transform.rotation.x = final_quat.x();
-      tf.transform.rotation.y = final_quat.y();
-      tf.transform.rotation.z = final_quat.z();
-      tf.transform.rotation.w = final_quat.w();
+      mrs_lib::AttitudeConverter ac(M_PI * (lidar_rotation_roll_ / 180.0), M_PI * (lidar_rotation_pitch_ / 180.0), M_PI * (lidar_rotation_yaw_ / 180.0));
+      tf.transform.rotation = ac;
+      static_broadcaster_->sendTransform(tf);
 
       try {
         static_broadcaster_->sendTransform(tf);
