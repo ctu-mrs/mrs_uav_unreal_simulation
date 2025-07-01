@@ -226,7 +226,7 @@ private:
 
 
   std::shared_ptr<mrs_lib::TransformBroadcaster> tf_broadcaster_;
-  std::shared_ptr<mrs_lib::TransformBroadcaster> static_broadcaster_;
+  std::shared_ptr<tf2_ros::StaticTransformBroadcaster> static_broadcaster_;
   std::shared_ptr<mrs_lib::TransformBroadcaster> dynamic_broadcaster_;
 
   OnSetParametersCallbackHandle::SharedPtr param_callback_handle_;
@@ -767,7 +767,7 @@ void FlightforgeSimulator::timerInit() {
   drs_params_.paused = false;
 
   tf_broadcaster_ = std::make_shared<mrs_lib::TransformBroadcaster>(node_);
-  static_broadcaster_ = std::make_shared<mrs_lib::TransformBroadcaster>(node_);
+  static_broadcaster_ = std::make_shared<tf2_ros::StaticTransformBroadcaster>(node_);
   dynamic_broadcaster_ = std::make_shared<mrs_lib::TransformBroadcaster>(node_);
 
   it_                  = std::make_shared<image_transport::ImageTransport>(node_);
@@ -1299,7 +1299,7 @@ void FlightforgeSimulator::timerRangefinder() {
 
   auto drs_params = mrs_lib::get_mutexed(mutex_drs_params_, drs_params_);
 
-  if (!drs_params_.rangefinder_enabled) {
+  if (!drs_params.rangefinder_enabled) {
     return;
   }
 
@@ -1599,7 +1599,7 @@ void FlightforgeSimulator::timerRgb() {
 
   auto drs_params = mrs_lib::get_mutexed(mutex_drs_params_, drs_params_);
 
-  if (!drs_params_.rgb_enabled) {
+  if (!drs_params.rgb_enabled) {
     return;
   }
 
@@ -1670,7 +1670,7 @@ void FlightforgeSimulator::timerStereo() {
 
   auto drs_params = mrs_lib::get_mutexed(mutex_drs_params_, drs_params_);
 
-  if (!drs_params_.rgb_enabled) {
+  if (!drs_params.rgb_enabled) {
     return;
   }
 
@@ -1760,7 +1760,7 @@ void FlightforgeSimulator::timerRgbSegmented() {
 
   auto drs_params = mrs_lib::get_mutexed(mutex_drs_params_, drs_params_);
 
-  if (!drs_params_.rgb_segmented_enabled) {
+  if (!drs_params.rgb_segmented_enabled) {
     return;
   }
 
@@ -1831,7 +1831,7 @@ void FlightforgeSimulator::timerDepth() {
 
   auto drs_params = mrs_lib::get_mutexed(mutex_drs_params_, drs_params_);
 
-  if (!drs_params_.rgb_depth_enabled) {
+  if (!drs_params.rgb_depth_enabled) {
     return;
   }
 
