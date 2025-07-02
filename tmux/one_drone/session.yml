@@ -20,24 +20,24 @@ windows:
       layout: tiled
       panes:
         - ros2 launch mrs_uav_flightforge_simulation hw_api.py
-  # - takeoff:
-  #     layout: tiled
-  #     panes:
-  #       - ros2 launch mrs_uav_autostart automatic_start.launch.py
-  #       - ros2 service call /$UAV_NAME/hw_api/arming std_srvs/srv/SetBool "data: true"; sleep 2; ros2 service call /$UAV_NAME/hw_api/offboard std_srvs/srv/SetBool "data: true"
-  #       # - waitForControl; rosservice call /$UAV_NAME/hw_api/arming 1; rosservice call /$UAV_NAME/uav_manager/midair_activation
   - status:
       layout: tiled
       panes:
         - ros2 launch mrs_uav_status status.py
-  - control:
+  - core:
       layout: tiled
       panes:
-        - sleep 5; ros2 launch mrs_uav_core core.py \
-          platform_config:=$(ros2 pkg prefix mrs_multirotor_simulator)/share/mrs_multirotor_simulator/config/mrs_uav_system/$UAV_TYPE.yaml \
-          custom_config:=./config/custom_config.yaml \
-          world_config:=./config/world_config.yaml \
-          network_config:=./config/network_config.yaml
+        - ros2 launch mrs_uav_core core.py platform_config:=./config/platform_config.yaml world_config:=./config/world_config.yaml custom_config:=./config/custom_config.yaml network_config:=./config/network_config.yaml
+  
+  - takeoff:
+      layout: tiled
+      panes:
+        - ros2 launch mrs_uav_autostart automatic_start.py custom_config:=./config/automatic_start.yaml
+  - commands:
+      layout: tiled
+      panes:
+        - 'history -s ./takeoff.sh'
+        - 'history -s ./midair.sh'
   # - stereo:
   #     layout: tiled
   #     panes:
@@ -56,12 +56,13 @@ windows:
       layout: tiled
       panes:
         - ros2 run rviz2 rviz2 -d ./rviz.rviz
+  
+  - rqrReconfigure:
+      layaut: tiled
+      panes:
+        - ros2 run rqt_reconfigure rqt_reconfigure
+  
   # - layout:
   #     layout: tiled
   #     panes:
   #       - sleep 5; ~/.i3/layout_manager.sh ./layout.json
-  
-  # - rqrReconfigure:
-  #     layaut: tiled
-  #     panes:
-  #       - waitForControl; ros2 run rqt_reconfigure rqt_reconfigure
