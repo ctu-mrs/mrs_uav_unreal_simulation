@@ -1291,8 +1291,7 @@ void FlightforgeSimulator::timerUnrealSync() {
   if (!is_initialized_) {
     return;
   }
-  /* updateUnrealPoses(false); */
-  updateUnrealPoses(true);
+  updateUnrealPoses(false);
 }
 
 //}
