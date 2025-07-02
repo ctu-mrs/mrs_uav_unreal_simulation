@@ -1448,7 +1448,8 @@ void FlightforgeSimulator::timerLidar() {
     modifier.setPointCloud2Fields(4, "x", 1, sensor_msgs::msg::PointField::FLOAT32, "y", 1, sensor_msgs::msg::PointField::FLOAT32, "z", 1,
                                   sensor_msgs::msg::PointField::FLOAT32, "intensity", 1, sensor_msgs::msg::PointField::FLOAT32);
     // Msg header
-    pcl_msg.header.stamp    = clock_->now();
+    auto sim_time = mrs_lib::get_mutexed(mutex_sim_time_, sim_time_);
+    pcl_msg.header.stamp    = sim_time;
     pcl_msg.header.frame_id = "uav" + std::to_string(i + 1) + "/lidar";
     pcl_msg.height   = lidar_vertical_rays_;
     pcl_msg.width    = lidar_horizontal_rays_;
@@ -1563,7 +1564,8 @@ void FlightforgeSimulator::timerSegLidar() {
 
     sensor_msgs::msg::PointCloud2 pcl_msg;
     pcl::toROSMsg(pcl_cloud, pcl_msg);
-    pcl_msg.header.stamp    = this->get_clock()->now();
+    auto sim_time = mrs_lib::get_mutexed(mutex_sim_time_, sim_time_);
+    pcl_msg.header.stamp    = sim_time;
     pcl_msg.header.frame_id = "uav" + std::to_string(i + 1) + "/lidar";
     ph_seg_lidars_[i].publish(pcl_msg);
   }
@@ -1613,7 +1615,8 @@ void FlightforgeSimulator::timerIntLidar() {
     modifier.setPointCloud2Fields(4, "x", 1, sensor_msgs::msg::PointField::FLOAT32, "y", 1, sensor_msgs::msg::PointField::FLOAT32, "z", 1,
                                   sensor_msgs::msg::PointField::FLOAT32, "intensity", 1, sensor_msgs::msg::PointField::FLOAT32);
     // Msg header
-    pcl_msg.header.stamp    = clock_->now();
+    auto sim_time = mrs_lib::get_mutexed(mutex_sim_time_, sim_time_);
+    pcl_msg.header.stamp    = sim_time;
     pcl_msg.header.frame_id = "uav" + std::to_string(i + 1) + "/lidar";
     pcl_msg.height   = lidar_vertical_rays_;
     pcl_msg.width    = lidar_horizontal_rays_;
@@ -1873,12 +1876,12 @@ void FlightforgeSimulator::timerRgbSegmented() {
 
     msg->header.frame_id = "uav" + std::to_string(i + 1) + "/rgb";
 
-    const double relative_wall_age = clock_->now().seconds() - flightforgeToWallTime(stamp);
+    /* const double relative_wall_age = clock_->now().seconds() - flightforgeToWallTime(stamp); */
 
-    if (abs(relative_wall_age) < 1.0) {
-      rclcpp::Time shifted_time_stamp = rclcpp::Time(clock_->now().seconds() - (relative_wall_age * actual_rtf_));
-      msg->header.stamp = shifted_time_stamp; 
-    }
+    /* if (abs(relative_wall_age) < 1.0) { */
+    /*   rclcpp::Time shifted_time_stamp = rclcpp::Time(clock_->now().seconds() - (relative_wall_age * actual_rtf_)); */
+    /*   msg->header.stamp = shifted_time_stamp; */ 
+    /* } */
 
     msg->header.stamp = clock_->now();
 
