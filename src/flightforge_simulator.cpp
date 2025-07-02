@@ -1298,7 +1298,7 @@ void FlightforgeSimulator::timerUnrealSync() {
 
 void FlightforgeSimulator::timerTimeSync() {
 
-  rclcpp::Time current_real = clock_->now()
+  rclcpp::Time current_real = clock_->now();
 
   if (!is_initialized_) {
     return;
@@ -1306,15 +1306,15 @@ void FlightforgeSimulator::timerTimeSync() {
 
   auto wall_time_offset = mrs_lib::get_mutexed(mutex_wall_time_offset_, wall_time_offset_);
 
-  const double sync_start = clock_->now();
+  const double sync_start = clock_->now().seconds();
 
   bool   res;
   double flightforge_time;
 
   {
-    std::scoped_lock lock(mutex_ueds_);
+    std::scoped_lock lock(mutex_flightforge_);
 
-    std::tie(res, ueds_time) = ueds_game_controller_->GetTime();
+    std::tie(res, flightforge_time) = ueds_game_controller_->GetTime();
   }
 
   const double sync_end = clock_->now().seconds();
@@ -1358,7 +1358,7 @@ void FlightforgeSimulator::timerTimeSync() {
   
   last_real_ = current_real;
 
-  RCLCPP_DEBUG(get_logger(), "wall time %f ueds %f time offset: %f, offset slope %f s/s", sync_start, fglightforge_time, wall_time_offset_,
+  RCLCPP_DEBUG(get_logger(), "wall time %f ueds %f time offset: %f, offset slope %f s/s", sync_start, flightforge_time, wall_time_offset_,
             wall_time_offset_drift_slope_);
 }
 
