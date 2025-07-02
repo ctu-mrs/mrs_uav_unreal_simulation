@@ -93,7 +93,7 @@ private:
 
   double _simulation_rate_;
   double _clock_rate_;
-  bool   _collisions_;
+  bool   _collisions_ = false;
 
   rclcpp::Time sim_time_;
   rclcpp::Time last_step_time_;
@@ -1106,6 +1106,8 @@ void FlightforgeSimulator::timerInit() {
   timer_status_ = create_wall_timer(std::chrono::duration<double>(1.0), std::bind(&FlightforgeSimulator::timerStatus, this), cbgrp_status_);
 
   timer_time_sync_ =  create_wall_timer(std::chrono::duration<double>(1.0), std::bind(&FlightforgeSimulator::timerTimeSync, this), cbgrp_status_);
+  
+  timer_unreal_sync_ =  create_wall_timer(std::chrono::duration<double>(1.0 / _clock_rate_), std::bind(&FlightforgeSimulator::timerUnrealSync, this), cbgrp_status_);
     
   if (drs_params_.rangefinder_rate > 0) {
     timer_rangefinder_ = create_wall_timer(std::chrono::duration<double>(1.0 / drs_params_.rangefinder_rate), std::bind(&FlightforgeSimulator::timerRangefinder, this), cbgrp_sensors_);
@@ -1289,7 +1291,8 @@ void FlightforgeSimulator::timerUnrealSync() {
   if (!is_initialized_) {
     return;
   }
-  updateUnrealPoses(false);
+  /* updateUnrealPoses(false); */
+  updateUnrealPoses(true);
 }
 
 //}
@@ -1358,7 +1361,7 @@ void FlightforgeSimulator::timerTimeSync() {
   
   last_real_ = current_real;
 
-  RCLCPP_DEBUG(get_logger(), "wall time %f ueds %f time offset: %f, offset slope %f s/s", sync_start, flightforge_time, wall_time_offset_,
+  RCLCPP_INFO(get_logger(), "wall time %f flightforge %f time offset: %f, offset slope %f s/s", sync_start, flightforge_time, wall_time_offset_,
             wall_time_offset_drift_slope_);
 }
 
@@ -1711,13 +1714,12 @@ void FlightforgeSimulator::timerRgb() {
 
     msg->header.frame_id = "uav" + std::to_string(i + 1) + "/rgb";
 
-    /* const double relative_wall_age = ros::WallTime::now().toSec() - uedsToWallTime(stamp); */
+    const double relative_wall_age = clock_->now().seconds() - flightforgeToWallTime(stamp);
 
-    /* if (abs(relative_wall_age) < 1.0) { */
-    /*   msg->header.stamp = ros::Time(ros::Time::now().toSec() - (relative_wall_age * actual_rtf_)); */
-    /* } */
-
-    msg->header.stamp = clock_->now();
+    if (abs(relative_wall_age) < 1.0) {
+      rclcpp::Time shifted_time_stamp = rclcpp::Time(clock_->now().seconds() - (relative_wall_age * actual_rtf_));
+      msg->header.stamp = shifted_time_stamp; 
+    }
 
     imp_rgb_[i].publish(msg);
 
@@ -1783,17 +1785,16 @@ void FlightforgeSimulator::timerStereo() {
     auto msg_right = cv_bridge::CvImage(std_msgs::msg::Header(), "bgr8", cv_right).toImageMsg();
 
     msg_left->header.frame_id = "uav" + std::to_string(i + 1) + "/stereo_left";
-    msg_left->header.stamp = clock_->now();
 
     msg_right->header.frame_id = "uav" + std::to_string(i + 1) + "/stereo_right";
-    msg_right->header.stamp    = msg_left->header.stamp;
 
-    /* const double relative_wall_age = ros::WallTime::now().toSec() - uedsToWallTime(stamp); */
+    const double relative_wall_age = clock_->now().seconds() - flightforgeToWallTime(stamp);
 
-    /* if (abs(relative_wall_age) < 1.0) { */
-    /*   msg->header.stamp = ros::Time(ros::Time::now().toSec() - (relative_wall_age * actual_rtf_)); */
-    /* } */
-
+    if (abs(relative_wall_age) < 1.0) {
+      rclcpp::Time shifted_time_stamp = rclcpp::Time(clock_->now().seconds() - (relative_wall_age * actual_rtf_));
+      msg_right->header.stamp = shifted_time_stamp; 
+    }
+    msg_left->header.stamp    = msg_right->header.stamp;
 
     imp_stereo_left_[i].publish(msg_left);
     imp_stereo_right_[i].publish(msg_right);
@@ -1872,11 +1873,12 @@ void FlightforgeSimulator::timerRgbSegmented() {
 
     msg->header.frame_id = "uav" + std::to_string(i + 1) + "/rgb";
 
-    /* const double relative_wall_age = ros::WallTime::now().toSec() - uedsToWallTime(stamp); */
+    const double relative_wall_age = clock_->now().seconds() - flightforgeToWallTime(stamp);
 
-    /* if (abs(relative_wall_age) < 1.0) { */
-    /*   msg->header.stamp = ros::Time(ros::Time::now().toSec() - (relative_wall_age * actual_rtf_)); */
-    /* } */
+    if (abs(relative_wall_age) < 1.0) {
+      rclcpp::Time shifted_time_stamp = rclcpp::Time(clock_->now().seconds() - (relative_wall_age * actual_rtf_));
+      msg->header.stamp = shifted_time_stamp; 
+    }
 
     msg->header.stamp = clock_->now();
 
@@ -1943,11 +1945,12 @@ void FlightforgeSimulator::timerDepth() {
 
     msg->header.frame_id = "uav" + std::to_string(i + 1) + "/rgb";
 
-    /* const double relative_wall_age = ros::WallTime::now().toSec() - uedsToWallTime(stamp); */
+    const double relative_wall_age = clock_->now().seconds() - flightforgeToWallTime(stamp);
 
-    /* if (abs(relative_wall_age) < 1.0) { */
-    /*   msg->header.stamp = ros::Time(ros::Time::now().toSec() - (relative_wall_age * actual_rtf_)); */
-    /* } */
+    if (abs(relative_wall_age) < 1.0) {
+      rclcpp::Time shifted_time_stamp = rclcpp::Time(clock_->now().seconds() - (relative_wall_age * actual_rtf_));
+      msg->header.stamp = shifted_time_stamp; 
+    }
 
     msg->header.stamp = clock_->now();
 
@@ -2417,11 +2420,11 @@ void FlightforgeSimulator::publishStaticTfs(void) {
 
 /* flightforgeToWallTime() //{ */
 
-double FlightforgeSimulator::flightforgeToWallTime(const double ueds_time) {
+double FlightforgeSimulator::flightforgeToWallTime(const double flightforge_time) {
 
   auto wall_time_offset = mrs_lib::get_mutexed(mutex_wall_time_offset_, wall_time_offset_);
 
-  return ueds_time + wall_time_offset;
+  return flightforge_time + wall_time_offset;
 }
 
 //}
