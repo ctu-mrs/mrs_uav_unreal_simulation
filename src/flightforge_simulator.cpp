@@ -212,6 +212,7 @@ private:
   double        wall_time_offset_drift_slope_ = 0;
   rclcpp::Time last_sync_time_;
   std::mutex    mutex_wall_time_offset_;
+  rclcpp::Time last_real_;
 
   double                  flightforge_fps_ = 0;
   std::string             flightforge_world_level_name_enum_;
@@ -1103,6 +1104,8 @@ void FlightforgeSimulator::timerInit() {
   timer_main_ = create_wall_timer(std::chrono::duration<double>(1.0 / (_clock_rate_ * drs_params_.realtime_factor)), std::bind(&FlightforgeSimulator::timerMain, this), cbgrp_main_);
 
   timer_status_ = create_wall_timer(std::chrono::duration<double>(1.0), std::bind(&FlightforgeSimulator::timerStatus, this), cbgrp_status_);
+
+  timer_time_sync_ =  create_wall_timer(std::chrono::duration<double>(1.0), std::bind(&FlightforgeSimulator::timerTimeSync, this), cbgrp_status_);
     
   if (drs_params_.rangefinder_rate > 0) {
     timer_rangefinder_ = create_wall_timer(std::chrono::duration<double>(1.0 / drs_params_.rangefinder_rate), std::bind(&FlightforgeSimulator::timerRangefinder, this), cbgrp_sensors_);
@@ -1287,6 +1290,76 @@ void FlightforgeSimulator::timerUnrealSync() {
     return;
   }
   updateUnrealPoses(false);
+}
+
+//}
+
+/* timerTimeSync() //{ */
+
+void FlightforgeSimulator::timerTimeSync() {
+
+  rclcpp::Time current_real = clock_->now()
+
+  if (!is_initialized_) {
+    return;
+  }
+
+  auto wall_time_offset = mrs_lib::get_mutexed(mutex_wall_time_offset_, wall_time_offset_);
+
+  const double sync_start = clock_->now();
+
+  bool   res;
+  double flightforge_time;
+
+  {
+    std::scoped_lock lock(mutex_ueds_);
+
+    std::tie(res, ueds_time) = ueds_game_controller_->GetTime();
+  }
+
+  const double sync_end = clock_->now().seconds();
+
+  if (!res) {
+    RCLCPP_ERROR(get_logger(), "Failed to get FlightForge's time");
+    rclcpp::shutdown();
+  }
+
+  const double true_flightforge_time = flightforge_time - (sync_end - sync_start) / 2.0;
+
+  const double new_wall_time_offset = sync_start - true_flightforge_time;
+
+  // | --------------- time drift slope estimation -------------- |
+
+  if (current_real.seconds() > 0 && last_real_.seconds() > 0) {
+
+    const double wall_dt = (current_real - last_real_).seconds();
+
+    if (wall_dt > 0) {
+
+      double drift_estimate = (new_wall_time_offset - wall_time_offset) / wall_dt;
+
+      {
+        std::scoped_lock lock(mutex_wall_time_offset_);
+
+        wall_time_offset_drift_slope_ += drift_estimate;
+      }
+    }
+  }
+
+  // | ------------------------- finish ------------------------- |
+
+  {
+    std::scoped_lock lock(mutex_wall_time_offset_);
+
+    wall_time_offset_ = new_wall_time_offset;
+
+    last_sync_time_ = clock_->now();
+  }
+  
+  last_real_ = current_real;
+
+  RCLCPP_DEBUG(get_logger(), "wall time %f ueds %f time offset: %f, offset slope %f s/s", sync_start, fglightforge_time, wall_time_offset_,
+            wall_time_offset_drift_slope_);
 }
 
 //}
