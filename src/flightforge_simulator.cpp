@@ -1360,7 +1360,7 @@ void FlightforgeSimulator::timerTimeSync() {
   
   last_real_ = current_real;
 
-  RCLCPP_INFO(get_logger(), "wall time %f flightforge %f time offset: %f, offset slope %f s/s", sync_start, flightforge_time, wall_time_offset_,
+  RCLCPP_DEBUG(get_logger(), "wall time %f flightforge %f time offset: %f, offset slope %f s/s", sync_start, flightforge_time, wall_time_offset_,
             wall_time_offset_drift_slope_);
 }
 
