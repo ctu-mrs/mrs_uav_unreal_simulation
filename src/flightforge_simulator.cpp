@@ -1393,7 +1393,8 @@ void FlightforgeSimulator::timerRangefinder() {
     }
 
     sensor_msgs::msg::Range msg_range;
-    msg_range.header.stamp    = clock_->now();
+    auto last_step_time = mrs_lib::get_mutexed(mutex_sim_time_, last_step_time_);
+    msg_range.header.stamp    = last_step_time;
     msg_range.header.frame_id = "uav" + std::to_string(i + 1) + "/fcu";
     msg_range.radiation_type  = 1;
     msg_range.min_range       = 0.1;
@@ -1448,7 +1449,8 @@ void FlightforgeSimulator::timerLidar() {
                                   sensor_msgs::msg::PointField::FLOAT32, "intensity", 1, sensor_msgs::msg::PointField::FLOAT32);
     // Msg header
     auto sim_time = mrs_lib::get_mutexed(mutex_sim_time_, sim_time_);
-    pcl_msg.header.stamp    = sim_time;
+    auto last_step_time = mrs_lib::get_mutexed(mutex_sim_time_, last_step_time_);
+    pcl_msg.header.stamp    = last_step_time;
     pcl_msg.header.frame_id = "uav" + std::to_string(i + 1) + "/lidar";
     pcl_msg.height   = lidar_vertical_rays_;
     pcl_msg.width    = lidar_horizontal_rays_;
@@ -1563,8 +1565,8 @@ void FlightforgeSimulator::timerSegLidar() {
 
     sensor_msgs::msg::PointCloud2 pcl_msg;
     pcl::toROSMsg(pcl_cloud, pcl_msg);
-    auto sim_time = mrs_lib::get_mutexed(mutex_sim_time_, sim_time_);
-    pcl_msg.header.stamp    = sim_time;
+    auto last_step_time = mrs_lib::get_mutexed(mutex_sim_time_, last_step_time_);
+    pcl_msg.header.stamp    = last_step_time;
     pcl_msg.header.frame_id = "uav" + std::to_string(i + 1) + "/lidar";
     ph_seg_lidars_[i].publish(pcl_msg);
   }
@@ -1614,8 +1616,8 @@ void FlightforgeSimulator::timerIntLidar() {
     modifier.setPointCloud2Fields(4, "x", 1, sensor_msgs::msg::PointField::FLOAT32, "y", 1, sensor_msgs::msg::PointField::FLOAT32, "z", 1,
                                   sensor_msgs::msg::PointField::FLOAT32, "intensity", 1, sensor_msgs::msg::PointField::FLOAT32);
     // Msg header
-    auto sim_time = mrs_lib::get_mutexed(mutex_sim_time_, sim_time_);
-    pcl_msg.header.stamp    = sim_time;
+    auto last_step_time = mrs_lib::get_mutexed(mutex_sim_time_, last_step_time_);
+    pcl_msg.header.stamp    = last_step_time;
     pcl_msg.header.frame_id = "uav" + std::to_string(i + 1) + "/lidar";
     pcl_msg.height   = lidar_vertical_rays_;
     pcl_msg.width    = lidar_horizontal_rays_;
