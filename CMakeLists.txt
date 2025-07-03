@@ -146,28 +146,29 @@ install(
 )
 
 install(
-  DIRECTORY include/
-  DESTINATION include
+  DIRECTORY include
+  DESTINATION .
 )
 
 install(
-    DIRECTORY launch
-    DESTINATION share/${PROJECT_NAME}/
+  DIRECTORY launch
+  DESTINATION share/${PROJECT_NAME}
 )
 
 install(
-    DIRECTORY config
-    DESTINATION share/${PROJECT_NAME}/
+  DIRECTORY config
+  DESTINATION share/${PROJECT_NAME}
 )
 
 install(
-    DIRECTORY tmux
-    DESTINATION share/${PROJECT_NAME}/
+  DIRECTORY tmux
+  USE_SOURCE_PERMISSIONS
+  DESTINATION share/${PROJECT_NAME}
 )
 
 install(
-    DIRECTORY srv
-    DESTINATION share/${PROJECT_NAME}/
+  DIRECTORY srv
+  DESTINATION share/${PROJECT_NAME}
 )
 
 ament_export_include_directories(
