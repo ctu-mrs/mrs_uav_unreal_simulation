@@ -5,7 +5,7 @@ socket_name: mrs
 attach: false
 tmux_options: -f /etc/ctu-mrs/tmux.conf
 # you can modify these
-startup_window: simulator 
+startup_window: simulator
 pre_window: export UAV_NAME=uav1; export USE_SIM_TIME="true"; export RMW_IMPLEMENTATION=rmw_zenoh_cpp
 windows:
   - router:
@@ -23,12 +23,11 @@ windows:
   - status:
       layout: tiled
       panes:
-        - ros2 launch mrs_uav_status status.py
+        - ros2 run mrs_uav_status status.sh
   - core:
       layout: tiled
       panes:
         - ros2 launch mrs_uav_core core.py platform_config:=./config/platform_config.yaml world_config:=./config/world_config.yaml custom_config:=./config/custom_config.yaml network_config:=./config/network_config.yaml
-  
   - takeoff:
       layout: tiled
       panes:
@@ -36,8 +35,7 @@ windows:
   - commands:
       layout: tiled
       panes:
-        - 'history -s ./takeoff.sh'
-        - 'history -s ./midair.sh'
+        - waitForCore; ./takeoff.sh
   # - stereo:
   #     layout: tiled
   #     panes:
@@ -56,12 +54,10 @@ windows:
       layout: tiled
       panes:
         - ros2 run rviz2 rviz2 -d ./rviz.rviz
-  
-  - rqrReconfigure:
-      layaut: tiled
-      panes:
-        - ros2 run rqt_reconfigure rqt_reconfigure
-  
+  # - rqrReconfigure:
+  #     layaut: tiled
+  #     panes:
+  #       - ros2 run rqt_reconfigure rqt_reconfigure
   # - layout:
   #     layout: tiled
   #     panes:
