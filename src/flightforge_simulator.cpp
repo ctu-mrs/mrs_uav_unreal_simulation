@@ -824,7 +824,12 @@ void FlightforgeSimulator::timerInit() {
     rclcpp::shutdown();
   }
 
-  res = ueds_game_controller_->SwitchWorldLevel(ueds_connector::WorldName::Name2Id().at("forest"));
+  std::string world_name;
+
+  param_loader.loadParam("world_name", world_name);
+
+  res = ueds_game_controller_->SwitchWorldLevel(ueds_connector::WorldName::Name2Id().at(world_name));
+
   if (res) {
     RCLCPP_INFO(node_->get_logger(), "World was switched succesfully.");
   } else {
