@@ -902,7 +902,8 @@ void FlightforgeSimulator::timerInit() {
 
   // | ----------- initialize the FlightForge connector ---------- |
 
-  ueds_game_controller_ = std::make_shared<ueds_connector::GameModeController>("100.127.88.27", 8551);
+  /* ueds_game_controller_ = std::make_shared<ueds_connector::GameModeController>("100.127.88.27", 8551); */
+  ueds_game_controller_ = std::make_shared<ueds_connector::GameModeController>(LOCALHOST, 8551);
 
   while (rclcpp::ok()) {
 
@@ -1059,7 +1060,8 @@ void FlightforgeSimulator::timerInit() {
 
     RCLCPP_INFO(node_->get_logger(), "%s spawned", uav_name.c_str());
 
-    std::shared_ptr<ueds_connector::UedsConnector> ueds_connector = std::make_shared<ueds_connector::UedsConnector>("100.127.88.27", port);
+    /* std::shared_ptr<ueds_connector::UedsConnector> ueds_connector = std::make_shared<ueds_connector::UedsConnector>("100.127.88.27", port); */
+    std::shared_ptr<ueds_connector::UedsConnector> ueds_connector = std::make_shared<ueds_connector::UedsConnector>(LOCALHOST, port);
 
     ueds_connectors_.push_back(ueds_connector);
 
