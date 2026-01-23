@@ -228,6 +228,7 @@ private:
   std::string             weather_type_;
   ueds_connector::Daytime daytime_;
   bool                    uavs_mutual_visibility_ = true;
+  std::vector<std::string> uav_names;
 
   int daytime_hour_   = 0;
   int daytime_minute_ = 0;
@@ -879,7 +880,7 @@ void FlightforgeSimulator::timerInit() {
 
   it_ = std::make_shared<image_transport::ImageTransport>(node_);
 
-  std::vector<std::string> uav_names;
+  /* std::vector<std::string> uav_names; */
   param_loader.loadParam("uav_names", uav_names);
 
   for (size_t i = 0; i < uav_names.size(); i++) {
@@ -901,7 +902,7 @@ void FlightforgeSimulator::timerInit() {
 
   // | ----------- initialize the FlightForge connector ---------- |
 
-  ueds_game_controller_ = std::make_shared<ueds_connector::GameModeController>(LOCALHOST, 8551);
+  ueds_game_controller_ = std::make_shared<ueds_connector::GameModeController>("100.127.88.27", 8551);
 
   while (rclcpp::ok()) {
 
@@ -1058,7 +1059,7 @@ void FlightforgeSimulator::timerInit() {
 
     RCLCPP_INFO(node_->get_logger(), "%s spawned", uav_name.c_str());
 
-    std::shared_ptr<ueds_connector::UedsConnector> ueds_connector = std::make_shared<ueds_connector::UedsConnector>(LOCALHOST, port);
+    std::shared_ptr<ueds_connector::UedsConnector> ueds_connector = std::make_shared<ueds_connector::UedsConnector>("100.127.88.27", port);
 
     ueds_connectors_.push_back(ueds_connector);
 
@@ -1629,8 +1630,9 @@ void FlightforgeSimulator::timerLidar() {
 
     // TODO we should publish the actual stamp from the unreal sim (transformed to the simtime)
     pcl_msg.header.stamp = last_step_time - rclcpp::Duration(std::chrono::duration<double>(0.01));
+    const std::string uav_name = uav_names[i];
 
-    pcl_msg.header.frame_id = "uav" + std::to_string(i + 1) + "/lidar";
+    pcl_msg.header.frame_id = uav_name + "/lidar";
     pcl_msg.height          = lidar_vertical_rays_;
     pcl_msg.width           = lidar_horizontal_rays_;
     pcl_msg.is_dense        = true;
@@ -2558,14 +2560,15 @@ void FlightforgeSimulator::publishStaticTfs(void) {
   for (size_t i = 0; i < uavs_.size(); i++) {
 
     geometry_msgs::msg::TransformStamped tf;
+    const std::string uav_name = uav_names[i];
 
     /* // | ------------------------- rgb tf ------------------------- | */
 
     {
       tf.header.stamp = clock_->now();
 
-      tf.header.frame_id = "uav" + std::to_string(i + 1) + "/fcu";
-      tf.child_frame_id  = "uav" + std::to_string(i + 1) + "/rgb";
+      tf.header.frame_id = uav_name + "/fcu";
+      tf.child_frame_id  = uav_name + "/rgb";
 
       tf.transform.translation.x = rgb_offset_x_;
       tf.transform.translation.y = rgb_offset_y_;
@@ -2608,8 +2611,8 @@ void FlightforgeSimulator::publishStaticTfs(void) {
     {
       tf.header.stamp = clock_->now();
 
-      tf.header.frame_id = "uav" + std::to_string(i + 1) + "/fcu";
-      tf.child_frame_id  = "uav" + std::to_string(i + 1) + "/stereo_left";
+      tf.header.frame_id = uav_name + "/fcu";
+      tf.child_frame_id  = uav_name + "/stereo_left";
 
       tf.transform.translation.x = stereo_offset_x_left_;
       tf.transform.translation.y = stereo_offset_y_left_;
@@ -2650,8 +2653,8 @@ void FlightforgeSimulator::publishStaticTfs(void) {
     {
       tf.header.stamp = clock_->now();
 
-      tf.header.frame_id = "uav" + std::to_string(i + 1) + "/fcu";
-      tf.child_frame_id  = "uav" + std::to_string(i + 1) + "/stereo_right";
+      tf.header.frame_id = uav_name + "/fcu";
+      tf.child_frame_id  = uav_name + "/stereo_right";
 
       tf.transform.translation.x = stereo_offset_x_right_;
       tf.transform.translation.y = stereo_offset_y_right_;
@@ -2693,8 +2696,8 @@ void FlightforgeSimulator::publishStaticTfs(void) {
     // | ------------------------- lidar tf ------------------------- |
     {
       tf.header.stamp    = clock_->now();
-      tf.header.frame_id = "uav" + std::to_string(i + 1) + "/fcu";
-      tf.child_frame_id  = "uav" + std::to_string(i + 1) + "/lidar";
+      tf.header.frame_id = uav_name + "/fcu";
+      tf.child_frame_id  = uav_name + "/lidar";
 
       tf.transform.translation.x = lidar_offset_x_;
       tf.transform.translation.y = lidar_offset_y_;
