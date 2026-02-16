@@ -3,6 +3,9 @@ mrs_uav_flightforge_simulator:
   # the rate of stepping the simulation
   simulation_rate: 100.0 # Hz
 
+  # The ip address of the simulator. If running locally, set to "localhost". 
+  simulator_ip: "localhost"
+
   # the rate of publishing of /clock
   clock_rate:      400.0 # Hz, should be >= simulation_rate, ideally in whole multiples of simulation_rate
 

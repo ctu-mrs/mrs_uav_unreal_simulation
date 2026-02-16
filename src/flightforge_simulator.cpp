@@ -111,6 +111,7 @@ private:
   std::mutex   mutex_sim_time_;
 
   std::string _world_frame_name_;
+  std::string _simulator_ip_;
 
   // | ------------------------- timers ------------------------- |
 
@@ -725,6 +726,16 @@ void FlightforgeSimulator::timerInit() {
 
   param_loader.loadParam(yaml_prefix + "simulation_rate", _simulation_rate_);
   param_loader.loadParam(yaml_prefix + "clock_rate", _clock_rate_);
+  param_loader.loadParam(yaml_prefix + "simulator_ip", _simulator_ip_);
+
+  // Validate the simulator_ip parameter
+  if (_simulator_ip_.empty()) {
+    RCLCPP_ERROR(node_->get_logger(), "simulator_ip parameter is empty!");
+    rclcpp::shutdown();
+    exit(1);
+  }
+
+  RCLCPP_INFO(node_->get_logger(), "Using simulator IP: %s", _simulator_ip_.c_str());
 
   if (_clock_rate_ < _simulation_rate_) {
     RCLCPP_ERROR(node_->get_logger(), "clock_rate (%.2f Hz) should be higher than simulation rate (%.2f Hz)!", _clock_rate_, _simulation_rate_);
@@ -902,8 +913,7 @@ void FlightforgeSimulator::timerInit() {
 
   // | ----------- initialize the FlightForge connector ---------- |
 
-  /* ueds_game_controller_ = std::make_shared<ueds_connector::GameModeController>("100.127.88.27", 8551); */
-  ueds_game_controller_ = std::make_shared<ueds_connector::GameModeController>(LOCALHOST, 8551);
+  ueds_game_controller_ = std::make_shared<ueds_connector::GameModeController>(_simulator_ip_, 8551);
 
   while (rclcpp::ok()) {
 
@@ -1060,8 +1070,7 @@ void FlightforgeSimulator::timerInit() {
 
     RCLCPP_INFO(node_->get_logger(), "%s spawned", uav_name.c_str());
 
-    /* std::shared_ptr<ueds_connector::UedsConnector> ueds_connector = std::make_shared<ueds_connector::UedsConnector>("100.127.88.27", port); */
-    std::shared_ptr<ueds_connector::UedsConnector> ueds_connector = std::make_shared<ueds_connector::UedsConnector>(LOCALHOST, port);
+    std::shared_ptr<ueds_connector::UedsConnector> ueds_connector = std::make_shared<ueds_connector::UedsConnector>(_simulator_ip_, port);
 
     ueds_connectors_.push_back(ueds_connector);
 
