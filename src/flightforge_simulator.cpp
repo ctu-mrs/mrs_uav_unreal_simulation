@@ -1685,8 +1685,6 @@ void FlightforgeSimulator::timerLidar() {
     modifier.setPointCloud2Fields(4, "x", 1, sensor_msgs::msg::PointField::FLOAT32, "y", 1, sensor_msgs::msg::PointField::FLOAT32, "z", 1,
                                   sensor_msgs::msg::PointField::FLOAT32, "intensity", 1, sensor_msgs::msg::PointField::FLOAT32);
 
-    auto last_step_time = mrs_lib::get_mutexed(mutex_sim_time_, last_step_time_);
-
     // TODO we should publish the actual stamp from the unreal sim (transformed to the simtime)
     pcl_msg.header.stamp = last_step_time - rclcpp::Duration(std::chrono::duration<double>(0.01));
 
