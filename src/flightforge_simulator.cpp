@@ -1075,14 +1075,13 @@ void FlightforgeSimulator::timerInit() {
     RCLCPP_INFO(node_->get_logger(), "%s spawning at [%.2lf, %.2lf, %.2lf] ...", uav_name.c_str(), uav_state.x(0), uav_state.x(1), uav_state.x(2));
 
     std::string uav_frame = "x500";
-    /* TODO: frame param */
-    /* param_loader.loadParam(uav_names[i] + "/frame", uav_frame); */
+    param_loader.loadParam(uav_name + "/frame", uav_frame);
 
     RCLCPP_INFO(node_->get_logger(), "Frame type to spawn is %s", uav_frame.c_str());
 
-    int uav_frame_id = ueds_connector::UavFrameType::Type2IdMesh().at(uav_frame);
+    /* int uav_frame_id = ueds_connector::UavFrameType::Type2IdMesh().at(uav_frame); */
 
-    auto [resSpawn, port] = ueds_game_controller_->SpawnDroneAtLocation(pos, uav_frame_id);
+    auto [resSpawn, port] = ueds_game_controller_->SpawnDroneAtLocation(pos,uav_frame);
 
     if (!resSpawn) {
       RCLCPP_ERROR(node_->get_logger(), "failed to spawn %s", uav_names[i].c_str());
@@ -1647,11 +1646,12 @@ void FlightforgeSimulator::timerLidar() {
     bool                                   res;
     std::vector<ueds_connector::LidarData> lidarData;
     ueds_connector::Coordinates            start;
+    double stamp;
 
     {
       std::scoped_lock lock(mutex_flightforge_);
 
-      std::tie(res, lidarData, start) = ueds_connectors_[i]->GetLidarData();
+      std::tie(res, lidarData, start, stamp) = ueds_connectors_[i]->GetLidarData();
     }
 
     if (!res) {
@@ -1685,8 +1685,8 @@ void FlightforgeSimulator::timerLidar() {
     modifier.setPointCloud2Fields(4, "x", 1, sensor_msgs::msg::PointField::FLOAT32, "y", 1, sensor_msgs::msg::PointField::FLOAT32, "z", 1,
                                   sensor_msgs::msg::PointField::FLOAT32, "intensity", 1, sensor_msgs::msg::PointField::FLOAT32);
 
-    // TODO we should publish the actual stamp from the unreal sim (transformed to the simtime)
-    pcl_msg.header.stamp = last_step_time - rclcpp::Duration(std::chrono::duration<double>(0.01));
+
+    pcl_msg.header.stamp = flightforgeTimeToSimtime(stamp);
 
     pcl_msg.header.frame_id = uav_name + "/lidar";
     pcl_msg.is_dense        = true;
@@ -1707,8 +1707,7 @@ void FlightforgeSimulator::timerLidar() {
     modifier_free.setPointCloud2Fields(4, "x", 1, sensor_msgs::msg::PointField::FLOAT32, "y", 1, sensor_msgs::msg::PointField::FLOAT32, "z", 1,
                                        sensor_msgs::msg::PointField::FLOAT32, "intensity", 1, sensor_msgs::msg::PointField::FLOAT32);
 
-    // TODO we should publish the actual stamp from the unreal sim (transformed to the simtime)
-    pcl_free_msg.header.stamp = last_step_time - rclcpp::Duration(std::chrono::duration<double>(0.01));
+    pcl_free_msg.header.stamp = flightforgeTimeToSimtime(stamp);
 
     pcl_free_msg.header.frame_id = uav_name + "/lidar";
     pcl_free_msg.is_dense        = true;
@@ -1803,11 +1802,12 @@ void FlightforgeSimulator::timerSegLidar() {
     bool                                      res;
     std::vector<ueds_connector::LidarSegData> lidarSegData;
     ueds_connector::Coordinates               start;
+    double stamp;
 
     {
       std::scoped_lock lock(mutex_flightforge_);
 
-      std::tie(res, lidarSegData, start) = ueds_connectors_[i]->GetLidarSegData();
+      std::tie(res, lidarSegData, start, stamp) = ueds_connectors_[i]->GetLidarSegData();
     }
 
     if (!res) {
@@ -1846,10 +1846,9 @@ void FlightforgeSimulator::timerSegLidar() {
     sensor_msgs::msg::PointCloud2 pcl_msg;
     pcl::toROSMsg(pcl_cloud, pcl_msg);
 
-    auto last_step_time = mrs_lib::get_mutexed(mutex_sim_time_, last_step_time_);
+    /* auto last_step_time = mrs_lib::get_mutexed(mutex_sim_time_, last_step_time_); */
 
-    // TODO we should publish the actual stamp from the unreal sim (transformed to the simtime)
-    pcl_msg.header.stamp = last_step_time - rclcpp::Duration(std::chrono::duration<double>(0.01));
+    pcl_msg.header.stamp = flightforgeTimeToSimtime(stamp);
 
     pcl_msg.header.frame_id = "uav" + std::to_string(i + 1) + "/lidar";
     ph_seg_lidars_[i].publish(pcl_msg);
@@ -1877,11 +1876,12 @@ void FlightforgeSimulator::timerIntLidar() {
     bool                                      res;
     std::vector<ueds_connector::LidarIntData> lidarData;
     ueds_connector::Coordinates               start;
+    double stamp;
 
     {
       std::scoped_lock lock(mutex_flightforge_);
 
-      std::tie(res, lidarData, start) = ueds_connectors_[i]->GetLidarIntData();
+      std::tie(res, lidarData, start, stamp) = ueds_connectors_[i]->GetLidarIntData();
     }
 
     if (!res) {
@@ -1898,8 +1898,7 @@ void FlightforgeSimulator::timerIntLidar() {
     // Msg header
     auto last_step_time = mrs_lib::get_mutexed(mutex_sim_time_, last_step_time_);
 
-    // TODO we should publish the actual stamp from the unreal sim (transformed to the simtime)
-    pcl_msg.header.stamp = last_step_time - rclcpp::Duration(std::chrono::duration<double>(0.01));
+    pcl_msg.header.stamp = flightforgeTimeToSimtime(stamp);
 
     pcl_msg.header.frame_id = "uav" + std::to_string(i + 1) + "/lidar";
     pcl_msg.height          = lidar_vertical_rays_;
