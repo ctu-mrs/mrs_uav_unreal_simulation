@@ -750,14 +750,6 @@ void FlightforgeSimulator::timerInit() {
 
   dynparam_mgr_->register_param(yaml_prefix + "world_collisions/enabled", &drs_params_.world_collisions_enabled);
 
-  dynparam_mgr_->register_param(yaml_prefix + "dynamic_rtf", &drs_params_.dynamic_rtf);
-
-  dynparam_mgr_->register_param(yaml_prefix + "dynamic/collisions/enabled", &drs_params_.collisions_enabled);
-
-  dynparam_mgr_->register_param(yaml_prefix + "dynamic/collisions/crash", &drs_params_.collisions_crash);
-
-  dynparam_mgr_->register_param(yaml_prefix + "dynamic/collisions/rebounce", &drs_params_.collisions_rebounce, mrs_lib::DynparamMgr::range_t<double>(0.1, 1000));
-
   dynparam_mgr_->register_param(yaml_prefix + "paused", &drs_params_.paused, false,
                                 (std::function<void(const bool&)>)std::bind(&FlightforgeSimulator::callbackPause, this, std::placeholders::_1));
 

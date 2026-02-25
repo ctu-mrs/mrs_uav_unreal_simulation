@@ -16,19 +16,6 @@ mrs_uav_flightforge_simulator:
   world_collisions: 
     enabled: true
 
- # Colisions inside the mrs_uav_multirotor_simulator 
- # DO NOT CHANGE UNLESS YOU KNOW WHAT YOU ARE DOING
-  dynamic:
-
-    realtime_factor: 1.0 # [-]
-
-    collisions:
-
-      enabled: true
-      crash: true
-
-      # if crash==false, then the collisions are elastic
-      rebounce: 100.0
 
 
   # when true, the simulation time will get initialized from wall time
@@ -234,10 +221,10 @@ randomization:
 # * when enabled, this will place a temporary patch of ground just under the spawn location
 # * this patch will disappear after the total_thrust > 0.9*hover_thrust
 individual_takeoff_platform:
-  enabled: false
+  enabled: true 
 
 ground:
-  enabled: true
+  enabled: false 
   z: 0.0 # [m]
 
 iterate_without_input: true
@@ -299,4 +286,18 @@ frames:
     publish_tf: false
   rangefinder:
     name: "garmin"
-    publish_tf: true
+    publish_tf: false 
+
+# Colisions inside the mrs_uav_multirotor_simulator 
+# DO NOT CHANGE UNLESS YOU KNOW WHAT YOU ARE DOING
+dynamic:
+
+  realtime_factor: 1.0 # [-]
+
+  collisions:
+
+    enabled: false 
+    crash: true
+
+    # if crash==false, then the collisions are elastic
+    rebounce: 100.0
