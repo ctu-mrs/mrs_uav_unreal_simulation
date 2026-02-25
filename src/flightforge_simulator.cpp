@@ -977,7 +977,7 @@ void FlightforgeSimulator::timerInit() {
     }
     throw std::invalid_argument(error_msg);
   }
-  res = ueds_game_controller_->SwitchWorldLevel(ueds_connector::WorldName::Name2Id().at(flightforge_world_level_name_enum_));
+  res = ueds_game_controller_->SwitchWorldLevel(flightforge_world_level_name_enum_);
 
   if (res) {
     RCLCPP_INFO(node_->get_logger(), "World was switched succesfully.");
