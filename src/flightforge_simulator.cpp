@@ -103,7 +103,7 @@ private:
 
   double _simulation_rate_;
   double _clock_rate_;
-  bool   _collisions_ = false;
+  /* bool   _collisions_ = false; */
 
   rclcpp::Time sim_time_;
   rclcpp::Time last_step_time_;
@@ -251,6 +251,7 @@ private:
 
     // TODO load collisions params
     // TODO implement mutual collisions
+    bool world_collisions_enabled = true;
     bool   collisions_enabled  = false;
     bool   collisions_crash    = false;
     double collisions_rebounce = 1;
@@ -746,6 +747,8 @@ void FlightforgeSimulator::timerInit() {
 
   dynparam_mgr_->register_param(yaml_prefix + "realtime_factor", &drs_params_.realtime_factor, mrs_lib::DynparamMgr::range_t<double>(0.01, 10),
                                 (std::function<void(const double&)>)std::bind(&FlightforgeSimulator::callbackRealtimeFactor, this, std::placeholders::_1));
+
+  dynparam_mgr_->register_param(yaml_prefix + "world_collisions/enabled", &drs_params_.world_collisions_enabled);
 
   dynparam_mgr_->register_param(yaml_prefix + "dynamic_rtf", &drs_params_.dynamic_rtf);
 
@@ -1498,7 +1501,7 @@ void FlightforgeSimulator::timerStatus() {
   timer_main_ = node_->create_wall_timer(std::chrono::duration<double>(1.0 / (_clock_rate_ * desired_rtf)), std::bind(&FlightforgeSimulator::timerMain, this),
                                          cbgrp_main_);
 
-  if (_collisions_) {
+  if (drs_params.world_collisions_enabled) {
     checkForCrash();
   }
 
@@ -2560,6 +2563,7 @@ void FlightforgeSimulator::updateUnrealPoses(const bool teleport_without_collisi
 
   // | ------------ set each UAV's position in unreal ----------- |
 
+  auto drs_params = mrs_lib::get_mutexed(mutex_drs_params_, drs_params_);
   {
     std::scoped_lock lock(mutex_flightforge_);
 
@@ -2578,7 +2582,7 @@ void FlightforgeSimulator::updateUnrealPoses(const bool teleport_without_collisi
       rot.roll  = 180.0 * (roll / M_PI);
       rot.yaw   = 180.0 * (-yaw / M_PI);
 
-      ueds_connectors_[i]->SetLocationAndRotationAsync(pos, rot, !teleport_without_collision && _collisions_);
+      ueds_connectors_[i]->SetLocationAndRotationAsync(pos, rot, !teleport_without_collision && drs_params.world_collisions_enabled);
     }
   }
 }

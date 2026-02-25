@@ -13,9 +13,14 @@ mrs_uav_flightforge_simulator:
 
   dynamic_rtf: true
 
-  collisions:
+  world_collisions: 
     enabled: true
-    crash: true
+
+ # Colisions inside the mrs_uav_multirotor_simulator 
+ # DO NOT CHANGE UNLESS YOU KNOW WHAT YOU ARE DOING
+  collisions:
+    enabled: false 
+    crash: false 
 
     # if crash==false, then the collisions are elastic
     rebounce: 100.0
