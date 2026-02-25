@@ -18,12 +18,18 @@ mrs_uav_flightforge_simulator:
 
  # Colisions inside the mrs_uav_multirotor_simulator 
  # DO NOT CHANGE UNLESS YOU KNOW WHAT YOU ARE DOING
-  collisions:
-    enabled: false 
-    crash: false 
+  dynamic:
 
-    # if crash==false, then the collisions are elastic
-    rebounce: 100.0
+    realtime_factor: 1.0 # [-]
+
+    collisions:
+
+      enabled: true
+      crash: true
+
+      # if crash==false, then the collisions are elastic
+      rebounce: 100.0
+
 
   # when true, the simulation time will get initialized from wall time
   sim_time_from_wall_time: true
