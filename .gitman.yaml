@@ -2,7 +2,7 @@ location: .gitman
 sources:
   - repo: https://github.com/ctu-mrs/mrs_flight_forge_connector.git
     name: mrs_flight_forge_connector
-    rev: dev
+    rev: 36fd0b396ebd2fadb558accc2670be652585a04b
     type: git
     params:
     sparse_paths:
@@ -11,6 +11,8 @@ sources:
     links:
       -
     scripts:
+      -
+    patches:
       -
 sources_locked:
   - repo: https://github.com/ctu-mrs/mrs_flight_forge_connector.git
@@ -24,6 +26,8 @@ sources_locked:
     links:
       -
     scripts:
+      -
+    patches:
       -
 default_group: ''
 groups:
