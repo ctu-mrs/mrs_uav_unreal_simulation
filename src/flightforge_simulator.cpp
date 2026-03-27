@@ -102,7 +102,7 @@ private:
 
   double _simulation_rate_;
   double _clock_rate_;
-  bool   _collisions_ = false;
+  bool   _collisions_ = true;
 
   rclcpp::Time sim_time_;
   rclcpp::Time last_step_time_;
@@ -1296,6 +1296,10 @@ void FlightforgeSimulator::timerInit() {
   RCLCPP_INFO(node_->get_logger(), "initialized");
 
   timer_init_->cancel();
+
+  // test that the node is actually the one I am editing
+  /* kill the node */
+  /* rclcpp::shutdown(); */
 }
 
 //}//}
@@ -1347,6 +1351,12 @@ void FlightforgeSimulator::timerMain() {
     last_step_wall_time_ = now_wall;
   }
 
+  //debug print RCLCPP_INFO_THROTTLED
+
+  RCLCPP_INFO_THROTTLE(node_->get_logger(), *clock_, 5000, "Before crash check");
+
+
+  checkForCrash();
   // step the sim
   {
     const double dt_since_last_step = (sim_time - last_step_time_).seconds();
@@ -1355,7 +1365,10 @@ void FlightforgeSimulator::timerMain() {
 
       for (size_t i = 0; i < uavs_.size(); i++) {
 
-        uavs_.at(i)->makeStep(dt_since_last_step, sim_time.seconds());
+        if (!uavs_[i]->hasCrashed()) {
+          uavs_.at(i)->makeStep(dt_since_last_step, sim_time.seconds());
+
+        }
       }
 
       publishPoses();
@@ -1439,9 +1452,9 @@ void FlightforgeSimulator::timerStatus() {
   timer_main_->cancel();
   timer_main_ = node_->create_wall_timer(std::chrono::duration<double>(1.0 / (_clock_rate_ * desired_rtf)), std::bind(&FlightforgeSimulator::timerMain, this), cbgrp_main_);
 
-  if (_collisions_) {
-    checkForCrash();
-  }
+  /* if (_collisions_) { */
+  /*   checkForCrash(); */
+  /* } */
 
   RCLCPP_INFO(node_->get_logger(), "%s, desired RTF = %.2f, actual RTF = %.2f, FlightForge FPS = %.2f, FlightForge RTF = %.2f", drs_params.paused ? "paused" : "running", drs_params.realtime_factor, actual_rtf, flightforge_fps_, flightforge_rtf);
 
@@ -2482,6 +2495,9 @@ void FlightforgeSimulator::checkForCrash(void) {
     for (size_t i = 0; i < uavs_.size(); i++) {
 
       auto [res, crashed] = ueds_connectors_[i]->GetCrashState();
+
+      // debug print the crash state every 5 seconds
+      RCLCPP_INFO_THROTTLE(node_->get_logger(), *clock_, 5000, "uav%lu crash state: %s", i + 1, crashed ? "CRASHED" : "OK");
 
       /* if the uav has crashed check the rangefinder data to determine if its not just a landing */
       if (crashed) {
