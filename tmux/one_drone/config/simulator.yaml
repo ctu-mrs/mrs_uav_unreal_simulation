@@ -39,7 +39,7 @@ mrs_uav_flightforge_simulator:
       enabled: true
 
       rgb_segmented:
-        enabled: false
+        enabled: true
         rate: 10.0 # [Hz]
 
       depth:

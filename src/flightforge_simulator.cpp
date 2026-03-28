@@ -1284,11 +1284,11 @@ void FlightforgeSimulator::timerInit() {
   {
       std::function<void()> callback_fcn = std::bind(&FlightforgeSimulator::timerDepth, this);
 
-      timer_rgb_segmented_ = std::make_shared<TimerType>(timer_opts_sensors, rclcpp::Rate(drs_params_.depth_rate, clock_), callback_fcn);
+      timer_depth_ = std::make_shared<TimerType>(timer_opts_sensors, rclcpp::Rate(drs_params_.depth_rate, clock_), callback_fcn);
   }
 
   if (drs_params_.depth_enabled) {
-      timer_rgb_segmented_->start();
+      timer_depth_->start();
   }
    //if (drs_params_.rgb_depth_rate > 0) { 
    //    RCLCPP_WARN(node_->get_logger(), "[DEPTH] creating timer");
