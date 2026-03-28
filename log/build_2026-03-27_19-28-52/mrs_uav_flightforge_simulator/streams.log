@@ -1,0 +1,229 @@
+[0.059s] Invoking command in '/mnt/d/ros/mrs_uav_flightforge_simulator/build/mrs_uav_flightforge_simulator': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --build /mnt/d/ros/mrs_uav_flightforge_simulator/build/mrs_uav_flightforge_simulator -- -j16 -l16
+[0.313s] [  2%] Built target mrs_uav_flightforge_simulator__rosidl_generator_type_description
+[0.379s] [  7%] Built target MrsUavFlightforgeSimulator_HwApiPlugin
+[0.428s] [  9%] Built target mrs_uav_flightforge_simulator__cpp
+[0.496s] [ 19%] Built target MrsUavFlightforgeSimulator_FlightforgeConnector
+[0.546s] [ 30%] Built target mrs_uav_flightforge_simulator__rosidl_generator_c
+[0.700s] [ 45%] Built target mrs_uav_flightforge_simulator__rosidl_typesupport_c
+[0.702s] [ 45%] Built target mrs_uav_flightforge_simulator__rosidl_typesupport_cpp
+[0.726s] [ 69%] Built target mrs_uav_flightforge_simulator__rosidl_typesupport_introspection_cpp
+[0.727s] [ 69%] Built target mrs_uav_flightforge_simulator__rosidl_typesupport_fastrtps_c
+[0.728s] [ 69%] Built target mrs_uav_flightforge_simulator__rosidl_typesupport_introspection_c
+[0.732s] [ 73%] Built target mrs_uav_flightforge_simulator__rosidl_typesupport_fastrtps_cpp
+[0.791s] [ 73%] Built target mrs_uav_flightforge_simulator
+[0.814s] [ 73%] Built target ament_cmake_python_copy_mrs_uav_flightforge_simulator
+[0.903s] [ 76%] Built target mrs_uav_flightforge_simulator__py
+[1.019s] [ 80%] Built target mrs_uav_flightforge_simulator__rosidl_generator_py
+[1.135s] running egg_info
+[1.136s] [ 90%] Built target mrs_uav_flightforge_simulator_s__rosidl_typesupport_introspection_c
+[1.139s] [ 90%] Built target mrs_uav_flightforge_simulator_s__rosidl_typesupport_c
+[1.154s] [ 95%] Built target mrs_uav_flightforge_simulator_s__rosidl_typesupport_fastrtps_c
+[1.162s] writing mrs_uav_flightforge_simulator.egg-info/PKG-INFO
+[1.166s] writing dependency_links to mrs_uav_flightforge_simulator.egg-info/dependency_links.txt
+[1.173s] writing top-level names to mrs_uav_flightforge_simulator.egg-info/top_level.txt
+[1.272s] reading manifest file 'mrs_uav_flightforge_simulator.egg-info/SOURCES.txt'
+[1.311s] writing manifest file 'mrs_uav_flightforge_simulator.egg-info/SOURCES.txt'
+[1.347s] [ 95%] Built target ament_cmake_python_build_mrs_uav_flightforge_simulator_egg
+[2.234s] [ 97%] [32mBuilding CXX object CMakeFiles/MrsUavFlightforgeSimulator_FlightforgeSimulator.dir/src/flightforge_simulator.cpp.o[0m
+[47.804s] In file included from [01m[K/mnt/d/ros/mrs_uav_flightforge_simulator/include/flight_forge_connector/socket_client.h:17[m[K,
+[47.805s]                  from [01m[K/mnt/d/ros/mrs_uav_flightforge_simulator/include/flight_forge_connector/flight_forge_connector.h:10[m[K,
+[47.806s]                  from [01m[K/mnt/d/ros/mrs_uav_flightforge_simulator/src/flightforge_simulator.cpp:40[m[K:
+[47.807s] [01m[K/mnt/d/ros/mrs_uav_flightforge_simulator/include/kissnet/kissnet.hpp:403:41:[m[K [01;35m[Kwarning: [m[Kmissing initializer for member ‘[01m[Ksockaddr_storage::__ss_padding[m[K’ [[01;35m[K]8;;https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wmissing-field-initializers-Wmissing-field-initializers]8;;[m[K]
+[47.808s]   403 |             sockaddr_storage adrinf = {0[01;35m[K}[m[K;
+[47.809s]       |                                         [01;35m[K^[m[K
+[47.810s] [01m[K/mnt/d/ros/mrs_uav_flightforge_simulator/include/kissnet/kissnet.hpp:403:41:[m[K [01;35m[Kwarning: [m[Kmissing initializer for member ‘[01m[Ksockaddr_storage::__ss_align[m[K’ [[01;35m[K]8;;https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wmissing-field-initializers-Wmissing-field-initializers]8;;[m[K]
+[83.643s] [100%] [32m[1mLinking CXX shared library libMrsUavFlightforgeSimulator_FlightforgeSimulator.so[0m
+[92.964s] [100%] Built target MrsUavFlightforgeSimulator_FlightforgeSimulator
+[93.142s] Invoked command in '/mnt/d/ros/mrs_uav_flightforge_simulator/build/mrs_uav_flightforge_simulator' returned '0': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --build /mnt/d/ros/mrs_uav_flightforge_simulator/build/mrs_uav_flightforge_simulator -- -j16 -l16
+[93.178s] Invoking command in '/mnt/d/ros/mrs_uav_flightforge_simulator/build/mrs_uav_flightforge_simulator': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --install /mnt/d/ros/mrs_uav_flightforge_simulator/build/mrs_uav_flightforge_simulator
+[93.196s] -- Install configuration: ""
+[93.221s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/ament_index/resource_index/rosidl_interfaces/mrs_uav_flightforge_simulator
+[93.245s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/srv/SetOrientation.json
+[93.257s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator
+[93.277s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/msg
+[93.305s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/msg/rosidl_generator_c__visibility_control.h
+[93.322s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/srv
+[93.348s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/srv/detail
+[93.381s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/srv/detail/set_orientation__description.c
+[93.408s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/srv/detail/set_orientation__functions.c
+[93.434s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/srv/detail/set_orientation__functions.h
+[93.460s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/srv/detail/set_orientation__struct.h
+[93.486s] -- Installing: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/srv/detail/set_orientation__type_support.c
+[93.580s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/srv/detail/set_orientation__type_support.h
+[93.603s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/srv/set_orientation.h
+[93.616s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/environment/library_path.sh
+[93.634s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/environment/library_path.dsv
+[93.661s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib/libmrs_uav_flightforge_simulator__rosidl_generator_c.so
+[93.689s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator
+[93.710s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/msg
+[93.738s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/msg/rosidl_typesupport_fastrtps_c__visibility_control.h
+[93.755s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/srv
+[93.780s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/srv/detail
+[93.814s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/srv/detail/set_orientation__rosidl_typesupport_fastrtps_c.h
+[93.844s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib/libmrs_uav_flightforge_simulator__rosidl_typesupport_fastrtps_c.so
+[93.876s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator
+[93.898s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/msg
+[93.928s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/msg/rosidl_generator_cpp__visibility_control.hpp
+[93.946s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/srv
+[93.972s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/srv/detail
+[94.007s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/srv/detail/set_orientation__builder.hpp
+[94.034s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/srv/detail/set_orientation__struct.hpp
+[94.061s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/srv/detail/set_orientation__traits.hpp
+[94.088s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/srv/detail/set_orientation__type_support.hpp
+[94.113s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/srv/set_orientation.hpp
+[94.130s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator
+[94.153s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/msg
+[94.183s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/msg/rosidl_typesupport_fastrtps_cpp__visibility_control.h
+[94.201s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/srv
+[94.226s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/srv/detail
+[94.258s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/srv/detail/dds_fastrtps
+[94.293s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/srv/detail/set_orientation__rosidl_typesupport_fastrtps_cpp.hpp
+[94.322s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib/libmrs_uav_flightforge_simulator__rosidl_typesupport_fastrtps_cpp.so
+[94.352s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator
+[94.373s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/msg
+[94.400s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/msg/rosidl_typesupport_introspection_c__visibility_control.h
+[94.417s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/srv
+[94.443s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/srv/detail
+[94.475s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/srv/detail/set_orientation__rosidl_typesupport_introspection_c.h
+[94.500s] -- Installing: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/srv/detail/set_orientation__type_support.c
+[94.597s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib/libmrs_uav_flightforge_simulator__rosidl_typesupport_introspection_c.so
+[94.636s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib/libmrs_uav_flightforge_simulator__rosidl_typesupport_c.so
+[94.662s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator
+[94.683s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/srv
+[94.709s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/srv/detail
+[94.742s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/srv/detail/set_orientation__rosidl_typesupport_introspection_cpp.hpp
+[94.770s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/srv/detail/set_orientation__type_support.cpp
+[94.798s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib/libmrs_uav_flightforge_simulator__rosidl_typesupport_introspection_cpp.so
+[94.842s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib/libmrs_uav_flightforge_simulator__rosidl_typesupport_cpp.so
+[94.877s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/environment/pythonpath.sh
+[94.895s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/environment/pythonpath.dsv
+[94.909s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib/python3.12/site-packages/mrs_uav_flightforge_simulator-2.0.0-py3.12.egg-info
+[94.934s] -- Installing: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib/python3.12/site-packages/mrs_uav_flightforge_simulator-2.0.0-py3.12.egg-info/dependency_links.txt
+[94.998s] -- Installing: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib/python3.12/site-packages/mrs_uav_flightforge_simulator-2.0.0-py3.12.egg-info/PKG-INFO
+[95.062s] -- Installing: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib/python3.12/site-packages/mrs_uav_flightforge_simulator-2.0.0-py3.12.egg-info/SOURCES.txt
+[95.125s] -- Installing: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib/python3.12/site-packages/mrs_uav_flightforge_simulator-2.0.0-py3.12.egg-info/top_level.txt
+[95.188s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib/python3.12/site-packages/mrs_uav_flightforge_simulator
+[95.210s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib/python3.12/site-packages/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator_s__rosidl_typesupport_c.so
+[95.227s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib/python3.12/site-packages/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator_s__rosidl_typesupport_fastrtps_c.so
+[95.244s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib/python3.12/site-packages/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator_s__rosidl_typesupport_introspection_c.so
+[95.259s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib/python3.12/site-packages/mrs_uav_flightforge_simulator/srv
+[95.286s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib/python3.12/site-packages/mrs_uav_flightforge_simulator/srv/_set_orientation.py
+[95.307s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib/python3.12/site-packages/mrs_uav_flightforge_simulator/srv/_set_orientation_s.c
+[95.328s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib/python3.12/site-packages/mrs_uav_flightforge_simulator/srv/__init__.py
+[95.346s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib/python3.12/site-packages/mrs_uav_flightforge_simulator/_mrs_uav_flightforge_simulator_s.ep.rosidl_typesupport_c.c
+[95.362s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib/python3.12/site-packages/mrs_uav_flightforge_simulator/_mrs_uav_flightforge_simulator_s.ep.rosidl_typesupport_fastrtps_c.c
+[95.379s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib/python3.12/site-packages/mrs_uav_flightforge_simulator/_mrs_uav_flightforge_simulator_s.ep.rosidl_typesupport_introspection_c.c
+[95.396s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib/python3.12/site-packages/mrs_uav_flightforge_simulator/__init__.py
+[95.521s] Listing '/mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib/python3.12/site-packages/mrs_uav_flightforge_simulator'...
+[95.521s] Listing '/mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib/python3.12/site-packages/mrs_uav_flightforge_simulator/srv'...
+[95.569s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib/python3.12/site-packages/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator_s__rosidl_typesupport_fastrtps_c.so
+[95.649s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib/python3.12/site-packages/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator_s__rosidl_typesupport_introspection_c.so
+[95.727s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib/python3.12/site-packages/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator_s__rosidl_typesupport_c.so
+[95.790s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib/libmrs_uav_flightforge_simulator__rosidl_generator_py.so
+[95.832s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/srv/SetOrientation.idl
+[95.851s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/srv/SetOrientation.srv
+[95.865s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/plugins.xml
+[95.891s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib/libMrsUavFlightforgeSimulator_FlightforgeConnector.so
+[95.918s] -- Installing: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib/libMrsUavFlightforgeSimulator_FlightforgeSimulator.so
+[96.479s] -- Set non-toolchain portion of runtime path of "/mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib/libMrsUavFlightforgeSimulator_FlightforgeSimulator.so" to ""
+[96.499s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib/libMrsUavFlightforgeSimulator_HwApiPlugin.so
+[96.521s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/./include
+[96.534s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/./include/cereal
+[96.543s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/./include/flight_forge_connector
+[96.553s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/./include/kissnet
+[96.561s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/launch
+[96.581s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/launch/flightforge_simulator.launch.py
+[96.596s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/launch/hw_api.launch.py
+[96.608s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/config
+[96.626s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/config/flightforge_simulator.yaml
+[96.641s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/config/hw_api.yaml
+[96.656s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/config/uavs.yaml
+[96.667s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux
+[96.684s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone
+[96.704s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/.mrs_status_display_config~
+[96.722s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/build
+[96.749s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/build/.built_by
+[96.769s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/build/COLCON_IGNORE
+[96.790s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/config
+[96.817s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/config/automatic_start.yaml
+[96.839s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/config/custom_config.yaml
+[96.861s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/config/network_config.yaml
+[96.882s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/config/simulator.yaml
+[96.904s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/config/world_config.yaml
+[96.922s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/goto.py
+[96.936s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/install
+[96.958s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/install/.colcon_install_layout
+[96.974s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/install/COLCON_IGNORE
+[96.993s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/install/local_setup.bash
+[97.012s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/install/local_setup.ps1
+[97.032s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/install/local_setup.sh
+[97.053s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/install/local_setup.zsh
+[97.074s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/install/setup.bash
+[97.093s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/install/setup.ps1
+[97.114s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/install/setup.sh
+[97.136s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/install/setup.zsh
+[97.158s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/install/_local_setup_util_ps1.py
+[97.181s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/install/_local_setup_util_sh.py
+[97.198s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/kill.sh
+[97.213s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/layout.json
+[97.229s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/log
+[97.257s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/log/build_2026-03-27_16-50-15
+[97.290s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/log/build_2026-03-27_16-50-15/events.log
+[97.316s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/log/build_2026-03-27_16-50-15/logger_all.log
+[97.339s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/log/build_2026-03-27_16-50-21
+[97.373s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/log/build_2026-03-27_16-50-21/events.log
+[97.399s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/log/build_2026-03-27_16-50-21/logger_all.log
+[97.420s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/log/COLCON_IGNORE
+[97.443s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/log/latest
+[97.457s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/log/latest_build
+[97.467s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/path.py
+[97.483s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/rviz.rviz
+[97.498s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/session.yml
+[97.512s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/start.sh
+[97.528s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/takeoff.sh
+[97.544s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/srv
+[97.564s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/srv/SetOrientation.srv
+[97.597s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/ament_index/resource_index/package_run_dependencies/mrs_uav_flightforge_simulator
+[97.628s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/ament_index/resource_index/parent_prefix_path/mrs_uav_flightforge_simulator
+[97.641s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/environment/ament_prefix_path.sh
+[97.659s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/environment/ament_prefix_path.dsv
+[97.671s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/environment/path.sh
+[97.688s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/environment/path.dsv
+[97.704s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/local_setup.bash
+[97.719s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/local_setup.sh
+[97.734s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/local_setup.zsh
+[97.749s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/local_setup.dsv
+[97.763s] -- Installing: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/package.dsv
+[97.824s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/ament_index/resource_index/packages/mrs_uav_flightforge_simulator
+[97.855s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/ament_index/resource_index/mrs_uav_hw_api__pluginlib__plugin/mrs_uav_flightforge_simulator
+[97.893s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/cmake/export_mrs_uav_flightforge_simulator__rosidl_generator_cExport.cmake
+[97.918s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/cmake/export_mrs_uav_flightforge_simulator__rosidl_generator_cExport-noconfig.cmake
+[97.953s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/cmake/export_mrs_uav_flightforge_simulator__rosidl_typesupport_fastrtps_cExport.cmake
+[97.976s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/cmake/export_mrs_uav_flightforge_simulator__rosidl_typesupport_fastrtps_cExport-noconfig.cmake
+[98.009s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/cmake/export_mrs_uav_flightforge_simulator__rosidl_generator_cppExport.cmake
+[98.043s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/cmake/export_mrs_uav_flightforge_simulator__rosidl_typesupport_fastrtps_cppExport.cmake
+[98.065s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/cmake/export_mrs_uav_flightforge_simulator__rosidl_typesupport_fastrtps_cppExport-noconfig.cmake
+[98.099s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/cmake/mrs_uav_flightforge_simulator__rosidl_typesupport_introspection_cExport.cmake
+[98.122s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/cmake/mrs_uav_flightforge_simulator__rosidl_typesupport_introspection_cExport-noconfig.cmake
+[98.158s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/cmake/mrs_uav_flightforge_simulator__rosidl_typesupport_cExport.cmake
+[98.183s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/cmake/mrs_uav_flightforge_simulator__rosidl_typesupport_cExport-noconfig.cmake
+[98.220s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/cmake/mrs_uav_flightforge_simulator__rosidl_typesupport_introspection_cppExport.cmake
+[98.243s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/cmake/mrs_uav_flightforge_simulator__rosidl_typesupport_introspection_cppExport-noconfig.cmake
+[98.277s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/cmake/mrs_uav_flightforge_simulator__rosidl_typesupport_cppExport.cmake
+[98.300s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/cmake/mrs_uav_flightforge_simulator__rosidl_typesupport_cppExport-noconfig.cmake
+[98.336s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/cmake/export_mrs_uav_flightforge_simulator__rosidl_generator_pyExport.cmake
+[98.358s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/cmake/export_mrs_uav_flightforge_simulator__rosidl_generator_pyExport-noconfig.cmake
+[98.393s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/cmake/export_mrs_uav_flightforge_simulatorExport.cmake
+[98.416s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/cmake/export_mrs_uav_flightforge_simulatorExport-noconfig.cmake
+[98.446s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/ament_index/resource_index/rclcpp_components/mrs_uav_flightforge_simulator
+[98.464s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/cmake/rosidl_cmake-extras.cmake
+[98.482s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/cmake/ament_cmake_export_dependencies-extras.cmake
+[98.500s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/cmake/ament_cmake_export_include_directories-extras.cmake
+[98.518s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/cmake/ament_cmake_export_libraries-extras.cmake
+[98.535s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/cmake/ament_cmake_export_targets-extras.cmake
+[98.553s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/cmake/rosidl_cmake_export_typesupport_targets-extras.cmake
+[98.574s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/cmake/rosidl_cmake_export_typesupport_libraries-extras.cmake
+[98.593s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/cmake/mrs_uav_flightforge_simulatorConfig.cmake
+[98.609s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/cmake/mrs_uav_flightforge_simulatorConfig-version.cmake
+[98.623s] -- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/package.xml
+[98.640s] Invoked command in '/mnt/d/ros/mrs_uav_flightforge_simulator/build/mrs_uav_flightforge_simulator' returned '0': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --install /mnt/d/ros/mrs_uav_flightforge_simulator/build/mrs_uav_flightforge_simulator

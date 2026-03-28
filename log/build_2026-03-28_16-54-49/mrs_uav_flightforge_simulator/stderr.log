@@ -1,0 +1,32 @@
+In file included from [01m[K/mnt/d/ros/mrs_uav_flightforge_simulator/include/flight_forge_connector/socket_client.h:17[m[K,
+                 from [01m[K/mnt/d/ros/mrs_uav_flightforge_simulator/include/flight_forge_connector/flight_forge_connector.h:10[m[K,
+                 from [01m[K/mnt/d/ros/mrs_uav_flightforge_simulator/src/flightforge_simulator.cpp:40[m[K:
+[01m[K/mnt/d/ros/mrs_uav_flightforge_simulator/include/kissnet/kissnet.hpp:403:41:[m[K [01;35m[Kwarning: [m[Kmissing initializer for member ‘[01m[Ksockaddr_storage::__ss_padding[m[K’ [[01;35m[K]8;;https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wmissing-field-initializers-Wmissing-field-initializers]8;;[m[K]
+  403 |             sockaddr_storage adrinf = {0[01;35m[K}[m[K;
+      |                                         [01;35m[K^[m[K
+[01m[K/mnt/d/ros/mrs_uav_flightforge_simulator/include/kissnet/kissnet.hpp:403:41:[m[K [01;35m[Kwarning: [m[Kmissing initializer for member ‘[01m[Ksockaddr_storage::__ss_align[m[K’ [[01;35m[K]8;;https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wmissing-field-initializers-Wmissing-field-initializers]8;;[m[K]
+[01m[K/mnt/d/ros/mrs_uav_flightforge_simulator/src/flightforge_simulator.cpp:[m[K In member function ‘[01m[Kvoid mrs_uav_flightforge_simulator::FlightforgeSimulator::[01;32m[KtimerInit[m[K()[m[K’:
+[01m[K/mnt/d/ros/mrs_uav_flightforge_simulator/src/flightforge_simulator.cpp:830:89:[m[K [01;31m[Kerror: [m[K‘[01m[Kstruct mrs_uav_flightforge_simulator::FlightforgeSimulator::drs_params[m[K’ has no member named ‘[01m[Krgb_depth_enabled[m[K’; did you mean ‘[01m[Kdepth_enabled[m[K’?
+  830 |   dynparam_mgr_->register_param(yaml_prefix + "sensors/rgb/depth/enabled", &drs_params_.[01;31m[Krgb_depth_enabled[m[K, (std::function<void(const bool&)>)std::bind(&FlightforgeSimulator::callbackDepthEnable, this, std::placeholders::_1));
+      |                                                                                         [01;31m[K^~~~~~~~~~~~~~~~~[m[K
+      |                                                                                         [32m[Kdepth_enabled[m[K
+[01m[K/mnt/d/ros/mrs_uav_flightforge_simulator/src/flightforge_simulator.cpp:831:86:[m[K [01;31m[Kerror: [m[K‘[01m[Kstruct mrs_uav_flightforge_simulator::FlightforgeSimulator::drs_params[m[K’ has no member named ‘[01m[Krgb_depth_rate[m[K’; did you mean ‘[01m[Kdepth_rate[m[K’?
+  831 |   dynparam_mgr_->register_param(yaml_prefix + "sensors/rgb/depth/rate", &drs_params_.[01;31m[Krgb_depth_rate[m[K, mrs_lib::DynparamMgr::range_t<double>(1.0, 100.0), (std::function<void(const double&)>)std::bind(&FlightforgeSimulator::callbackDepthRate, this, std::placeholders::_1));
+      |                                                                                      [01;31m[K^~~~~~~~~~~~~~[m[K
+      |                                                                                      [32m[Kdepth_rate[m[K
+[01m[K/mnt/d/ros/mrs_uav_flightforge_simulator/src/flightforge_simulator.cpp:1287:103:[m[K [01;31m[Kerror: [m[K‘[01m[Kstruct mrs_uav_flightforge_simulator::FlightforgeSimulator::drs_params[m[K’ has no member named ‘[01m[Krgb_depth_rate[m[K’; did you mean ‘[01m[Kdepth_rate[m[K’?
+ 1287 |     timer_rgb_segmented_ = std::make_shared<TimerType>(timer_opts_sensors, rclcpp::Rate(drs_params_.[01;31m[Krgb_depth_rate[m[K, clock_), callback_fcn);
+      |                                                                                                     [01;31m[K^~~~~~~~~~~~~~[m[K
+      |                                                                                                     [32m[Kdepth_rate[m[K
+[01m[K/mnt/d/ros/mrs_uav_flightforge_simulator/src/flightforge_simulator.cpp:1290:19:[m[K [01;31m[Kerror: [m[K‘[01m[Kstruct mrs_uav_flightforge_simulator::FlightforgeSimulator::drs_params[m[K’ has no member named ‘[01m[Krgb_depth_enabled[m[K’; did you mean ‘[01m[Kdepth_enabled[m[K’?
+ 1290 |   if (drs_params_.[01;31m[Krgb_depth_enabled[m[K) {
+      |                   [01;31m[K^~~~~~~~~~~~~~~~~[m[K
+      |                   [32m[Kdepth_enabled[m[K
+[01m[K/mnt/d/ros/mrs_uav_flightforge_simulator/src/flightforge_simulator.cpp:[m[K In member function ‘[01m[Kvoid mrs_uav_flightforge_simulator::FlightforgeSimulator::[01;32m[KcallbackDepthRate[m[K(const double&)[m[K’:
+[01m[K/mnt/d/ros/mrs_uav_flightforge_simulator/src/flightforge_simulator.cpp:2376:19:[m[K [01;31m[Kerror: [m[K‘[01m[Kstruct mrs_uav_flightforge_simulator::FlightforgeSimulator::drs_params[m[K’ has no member named ‘[01m[Krgb_depth_enabled[m[K’; did you mean ‘[01m[Kdepth_enabled[m[K’?
+ 2376 |   if (drs_params_.[01;31m[Krgb_depth_enabled[m[K) {
+      |                   [01;31m[K^~~~~~~~~~~~~~~~~[m[K
+      |                   [32m[Kdepth_enabled[m[K
+gmake[2]: *** [CMakeFiles/MrsUavFlightforgeSimulator_FlightforgeSimulator.dir/build.make:76: CMakeFiles/MrsUavFlightforgeSimulator_FlightforgeSimulator.dir/src/flightforge_simulator.cpp.o] Error 1
+gmake[1]: *** [CMakeFiles/Makefile2:654: CMakeFiles/MrsUavFlightforgeSimulator_FlightforgeSimulator.dir/all] Error 2
+gmake: *** [Makefile:146: all] Error 2

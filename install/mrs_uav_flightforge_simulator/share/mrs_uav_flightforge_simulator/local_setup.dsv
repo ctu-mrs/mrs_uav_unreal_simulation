@@ -1,0 +1,4 @@
+source;share/mrs_uav_flightforge_simulator/environment/ament_prefix_path.sh
+source;share/mrs_uav_flightforge_simulator/environment/library_path.sh
+source;share/mrs_uav_flightforge_simulator/environment/path.sh
+source;share/mrs_uav_flightforge_simulator/environment/pythonpath.sh

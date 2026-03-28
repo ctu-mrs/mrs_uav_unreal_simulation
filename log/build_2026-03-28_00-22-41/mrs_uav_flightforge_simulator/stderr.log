@@ -1,0 +1,19 @@
+In file included from [01m[K/mnt/d/ros/mrs_uav_flightforge_simulator/include/flight_forge_connector/socket_client.h:17[m[K,
+                 from [01m[K/mnt/d/ros/mrs_uav_flightforge_simulator/include/flight_forge_connector/flight_forge_connector.h:10[m[K,
+                 from [01m[K/mnt/d/ros/mrs_uav_flightforge_simulator/src/flightforge_simulator.cpp:40[m[K:
+[01m[K/mnt/d/ros/mrs_uav_flightforge_simulator/include/kissnet/kissnet.hpp:403:41:[m[K [01;35m[Kwarning: [m[Kmissing initializer for member ‘[01m[Ksockaddr_storage::__ss_padding[m[K’ [[01;35m[K]8;;https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wmissing-field-initializers-Wmissing-field-initializers]8;;[m[K]
+  403 |             sockaddr_storage adrinf = {0[01;35m[K}[m[K;
+      |                                         [01;35m[K^[m[K
+[01m[K/mnt/d/ros/mrs_uav_flightforge_simulator/include/kissnet/kissnet.hpp:403:41:[m[K [01;35m[Kwarning: [m[Kmissing initializer for member ‘[01m[Ksockaddr_storage::__ss_align[m[K’ [[01;35m[K]8;;https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wmissing-field-initializers-Wmissing-field-initializers]8;;[m[K]
+[01m[K/mnt/d/ros/mrs_uav_flightforge_simulator/src/flightforge_simulator.cpp:[m[K In member function ‘[01m[Kvoid mrs_uav_flightforge_simulator::FlightforgeSimulator::[01;32m[KtimerStatus[m[K()[m[K’:
+[01m[K/mnt/d/ros/mrs_uav_flightforge_simulator/src/flightforge_simulator.cpp:1451:18:[m[K [01;31m[Kerror: [m[K‘[01m[Kstruct mrs_uav_flightforge_simulator::FlightforgeSimulator::drs_params[m[K’ has no member named ‘[01m[Kdepth_rate[m[K’; did you mean ‘[01m[Krgb_depth_rate[m[K’?
+ 1451 |   if (drs_params.[01;31m[Kdepth_rate[m[K > highest_fps) {
+      |                  [01;31m[K^~~~~~~~~~[m[K
+      |                  [32m[Krgb_depth_rate[m[K
+[01m[K/mnt/d/ros/mrs_uav_flightforge_simulator/src/flightforge_simulator.cpp:1452:32:[m[K [01;31m[Kerror: [m[K‘[01m[Kstruct mrs_uav_flightforge_simulator::FlightforgeSimulator::drs_params[m[K’ has no member named ‘[01m[Kdepth_rate[m[K’; did you mean ‘[01m[Krgb_depth_rate[m[K’?
+ 1452 |       highest_fps = drs_params.[01;31m[Kdepth_rate[m[K;
+      |                                [01;31m[K^~~~~~~~~~[m[K
+      |                                [32m[Krgb_depth_rate[m[K
+gmake[2]: *** [CMakeFiles/MrsUavFlightforgeSimulator_FlightforgeSimulator.dir/build.make:76: CMakeFiles/MrsUavFlightforgeSimulator_FlightforgeSimulator.dir/src/flightforge_simulator.cpp.o] Error 1
+gmake[1]: *** [CMakeFiles/Makefile2:654: CMakeFiles/MrsUavFlightforgeSimulator_FlightforgeSimulator.dir/all] Error 2
+gmake: *** [Makefile:146: all] Error 2

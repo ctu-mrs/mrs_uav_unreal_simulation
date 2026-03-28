@@ -1,0 +1,60 @@
+[0.055s] Invoking command in '/mnt/d/ros/mrs_uav_flightforge_simulator/build/mrs_uav_flightforge_simulator': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --build /mnt/d/ros/mrs_uav_flightforge_simulator/build/mrs_uav_flightforge_simulator -- -j16 -l16
+[0.407s] [  2%] Built target mrs_uav_flightforge_simulator__rosidl_generator_type_description
+[0.464s] [  7%] Built target MrsUavFlightforgeSimulator_HwApiPlugin
+[0.519s] [  9%] Built target mrs_uav_flightforge_simulator__cpp
+[0.571s] [ 19%] Built target MrsUavFlightforgeSimulator_FlightforgeConnector
+[0.626s] [ 30%] Built target mrs_uav_flightforge_simulator__rosidl_generator_c
+[0.769s] [ 42%] Built target mrs_uav_flightforge_simulator__rosidl_typesupport_c
+[0.774s] [ 45%] Built target mrs_uav_flightforge_simulator__rosidl_typesupport_cpp
+[0.793s] [ 61%] Built target mrs_uav_flightforge_simulator__rosidl_typesupport_introspection_c
+[0.795s] [ 64%] Built target mrs_uav_flightforge_simulator__rosidl_typesupport_introspection_cpp
+[0.801s] [ 73%] Built target mrs_uav_flightforge_simulator__rosidl_typesupport_fastrtps_cpp
+[0.803s] [ 73%] Built target mrs_uav_flightforge_simulator__rosidl_typesupport_fastrtps_c
+[0.858s] [ 73%] Built target mrs_uav_flightforge_simulator
+[0.879s] [ 73%] Built target ament_cmake_python_copy_mrs_uav_flightforge_simulator
+[0.959s] [ 76%] Built target mrs_uav_flightforge_simulator__py
+[1.068s] [ 80%] Built target mrs_uav_flightforge_simulator__rosidl_generator_py
+[1.181s] [ 95%] Built target mrs_uav_flightforge_simulator_s__rosidl_typesupport_fastrtps_c
+[1.182s] [ 95%] Built target mrs_uav_flightforge_simulator_s__rosidl_typesupport_c
+[1.182s] [ 95%] Built target mrs_uav_flightforge_simulator_s__rosidl_typesupport_introspection_c
+[1.187s] running egg_info
+[1.212s] writing mrs_uav_flightforge_simulator.egg-info/PKG-INFO
+[1.217s] writing dependency_links to mrs_uav_flightforge_simulator.egg-info/dependency_links.txt
+[1.223s] writing top-level names to mrs_uav_flightforge_simulator.egg-info/top_level.txt
+[1.318s] reading manifest file 'mrs_uav_flightforge_simulator.egg-info/SOURCES.txt'
+[1.354s] writing manifest file 'mrs_uav_flightforge_simulator.egg-info/SOURCES.txt'
+[1.387s] [ 95%] Built target ament_cmake_python_build_mrs_uav_flightforge_simulator_egg
+[2.210s] [ 97%] [32mBuilding CXX object CMakeFiles/MrsUavFlightforgeSimulator_FlightforgeSimulator.dir/src/flightforge_simulator.cpp.o[0m
+[43.414s] In file included from [01m[K/mnt/d/ros/mrs_uav_flightforge_simulator/include/flight_forge_connector/socket_client.h:17[m[K,
+[43.415s]                  from [01m[K/mnt/d/ros/mrs_uav_flightforge_simulator/include/flight_forge_connector/flight_forge_connector.h:10[m[K,
+[43.415s]                  from [01m[K/mnt/d/ros/mrs_uav_flightforge_simulator/src/flightforge_simulator.cpp:40[m[K:
+[43.416s] [01m[K/mnt/d/ros/mrs_uav_flightforge_simulator/include/kissnet/kissnet.hpp:403:41:[m[K [01;35m[Kwarning: [m[Kmissing initializer for member ‘[01m[Ksockaddr_storage::__ss_padding[m[K’ [[01;35m[K]8;;https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wmissing-field-initializers-Wmissing-field-initializers]8;;[m[K]
+[43.417s]   403 |             sockaddr_storage adrinf = {0[01;35m[K}[m[K;
+[43.418s]       |                                         [01;35m[K^[m[K
+[43.419s] [01m[K/mnt/d/ros/mrs_uav_flightforge_simulator/include/kissnet/kissnet.hpp:403:41:[m[K [01;35m[Kwarning: [m[Kmissing initializer for member ‘[01m[Ksockaddr_storage::__ss_align[m[K’ [[01;35m[K]8;;https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wmissing-field-initializers-Wmissing-field-initializers]8;;[m[K]
+[44.404s] [01m[K/mnt/d/ros/mrs_uav_flightforge_simulator/src/flightforge_simulator.cpp:[m[K In member function ‘[01m[Kvoid mrs_uav_flightforge_simulator::FlightforgeSimulator::[01;32m[KtimerInit[m[K()[m[K’:
+[44.405s] [01m[K/mnt/d/ros/mrs_uav_flightforge_simulator/src/flightforge_simulator.cpp:830:89:[m[K [01;31m[Kerror: [m[K‘[01m[Kstruct mrs_uav_flightforge_simulator::FlightforgeSimulator::drs_params[m[K’ has no member named ‘[01m[Krgb_depth_enabled[m[K’; did you mean ‘[01m[Kdepth_enabled[m[K’?
+[44.405s]   830 |   dynparam_mgr_->register_param(yaml_prefix + "sensors/rgb/depth/enabled", &drs_params_.[01;31m[Krgb_depth_enabled[m[K, (std::function<void(const bool&)>)std::bind(&FlightforgeSimulator::callbackDepthEnable, this, std::placeholders::_1));
+[44.406s]       |                                                                                         [01;31m[K^~~~~~~~~~~~~~~~~[m[K
+[44.407s]       |                                                                                         [32m[Kdepth_enabled[m[K
+[44.407s] [01m[K/mnt/d/ros/mrs_uav_flightforge_simulator/src/flightforge_simulator.cpp:831:86:[m[K [01;31m[Kerror: [m[K‘[01m[Kstruct mrs_uav_flightforge_simulator::FlightforgeSimulator::drs_params[m[K’ has no member named ‘[01m[Krgb_depth_rate[m[K’; did you mean ‘[01m[Kdepth_rate[m[K’?
+[44.408s]   831 |   dynparam_mgr_->register_param(yaml_prefix + "sensors/rgb/depth/rate", &drs_params_.[01;31m[Krgb_depth_rate[m[K, mrs_lib::DynparamMgr::range_t<double>(1.0, 100.0), (std::function<void(const double&)>)std::bind(&FlightforgeSimulator::callbackDepthRate, this, std::placeholders::_1));
+[44.408s]       |                                                                                      [01;31m[K^~~~~~~~~~~~~~[m[K
+[44.409s]       |                                                                                      [32m[Kdepth_rate[m[K
+[44.449s] [01m[K/mnt/d/ros/mrs_uav_flightforge_simulator/src/flightforge_simulator.cpp:1287:103:[m[K [01;31m[Kerror: [m[K‘[01m[Kstruct mrs_uav_flightforge_simulator::FlightforgeSimulator::drs_params[m[K’ has no member named ‘[01m[Krgb_depth_rate[m[K’; did you mean ‘[01m[Kdepth_rate[m[K’?
+[44.449s]  1287 |     timer_rgb_segmented_ = std::make_shared<TimerType>(timer_opts_sensors, rclcpp::Rate(drs_params_.[01;31m[Krgb_depth_rate[m[K, clock_), callback_fcn);
+[44.450s]       |                                                                                                     [01;31m[K^~~~~~~~~~~~~~[m[K
+[44.451s]       |                                                                                                     [32m[Kdepth_rate[m[K
+[44.451s] [01m[K/mnt/d/ros/mrs_uav_flightforge_simulator/src/flightforge_simulator.cpp:1290:19:[m[K [01;31m[Kerror: [m[K‘[01m[Kstruct mrs_uav_flightforge_simulator::FlightforgeSimulator::drs_params[m[K’ has no member named ‘[01m[Krgb_depth_enabled[m[K’; did you mean ‘[01m[Kdepth_enabled[m[K’?
+[44.452s]  1290 |   if (drs_params_.[01;31m[Krgb_depth_enabled[m[K) {
+[44.453s]       |                   [01;31m[K^~~~~~~~~~~~~~~~~[m[K
+[44.454s]       |                   [32m[Kdepth_enabled[m[K
+[44.567s] [01m[K/mnt/d/ros/mrs_uav_flightforge_simulator/src/flightforge_simulator.cpp:[m[K In member function ‘[01m[Kvoid mrs_uav_flightforge_simulator::FlightforgeSimulator::[01;32m[KcallbackDepthRate[m[K(const double&)[m[K’:
+[44.568s] [01m[K/mnt/d/ros/mrs_uav_flightforge_simulator/src/flightforge_simulator.cpp:2376:19:[m[K [01;31m[Kerror: [m[K‘[01m[Kstruct mrs_uav_flightforge_simulator::FlightforgeSimulator::drs_params[m[K’ has no member named ‘[01m[Krgb_depth_enabled[m[K’; did you mean ‘[01m[Kdepth_enabled[m[K’?
+[44.569s]  2376 |   if (drs_params_.[01;31m[Krgb_depth_enabled[m[K) {
+[44.570s]       |                   [01;31m[K^~~~~~~~~~~~~~~~~[m[K
+[44.570s]       |                   [32m[Kdepth_enabled[m[K
+[60.820s] gmake[2]: *** [CMakeFiles/MrsUavFlightforgeSimulator_FlightforgeSimulator.dir/build.make:76: CMakeFiles/MrsUavFlightforgeSimulator_FlightforgeSimulator.dir/src/flightforge_simulator.cpp.o] Error 1
+[60.823s] gmake[1]: *** [CMakeFiles/Makefile2:654: CMakeFiles/MrsUavFlightforgeSimulator_FlightforgeSimulator.dir/all] Error 2
+[60.824s] gmake: *** [Makefile:146: all] Error 2
+[60.829s] Invoked command in '/mnt/d/ros/mrs_uav_flightforge_simulator/build/mrs_uav_flightforge_simulator' returned '2': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --build /mnt/d/ros/mrs_uav_flightforge_simulator/build/mrs_uav_flightforge_simulator -- -j16 -l16

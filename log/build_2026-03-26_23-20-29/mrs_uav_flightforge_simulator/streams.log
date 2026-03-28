@@ -1,0 +1,120 @@
+[0.162s] Invoking command in '/mnt/d/ros/mrs_uav_flightforge_simulator/build/mrs_uav_flightforge_simulator': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake /mnt/d/ros/mrs_uav_flightforge_simulator -DCMAKE_INSTALL_PREFIX=/mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator
+[0.940s] -- The C compiler identification is GNU 13.3.0
+[2.242s] -- The CXX compiler identification is GNU 13.3.0
+[3.279s] -- Detecting C compiler ABI info
+[4.624s] -- Detecting C compiler ABI info - done
+[4.686s] -- Check for working C compiler: /usr/bin/cc - skipped
+[4.689s] -- Detecting C compile features
+[4.691s] -- Detecting C compile features - done
+[4.921s] -- Detecting CXX compiler ABI info
+[6.182s] -- Detecting CXX compiler ABI info - done
+[6.247s] -- Check for working CXX compiler: /usr/bin/c++ - skipped
+[6.249s] -- Detecting CXX compile features
+[6.250s] -- Detecting CXX compile features - done
+[6.375s] -- Found rclcpp: 28.1.16 (/opt/ros/jazzy/share/rclcpp/cmake)
+[6.689s] -- Found Python3: /usr/bin/python3 (found version "3.12.3") found components: Interpreter 
+[8.765s] -- Found rosidl_generator_c: 4.6.7 (/opt/ros/jazzy/share/rosidl_generator_c/cmake)
+[8.964s] -- Found rosidl_generator_cpp: 4.6.7 (/opt/ros/jazzy/share/rosidl_generator_cpp/cmake)
+[9.169s] -- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+[9.386s] -- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+[10.130s] -- Found rmw_implementation_cmake: 7.3.3 (/opt/ros/jazzy/share/rmw_implementation_cmake/cmake)
+[10.187s] -- Found rmw_fastrtps_cpp: 8.4.3 (/opt/ros/jazzy/share/rmw_fastrtps_cpp/cmake)
+[10.664s] -- Found OpenSSL: /usr/lib/x86_64-linux-gnu/libcrypto.so (found version "3.0.13")  
+[11.017s] -- Found FastRTPS: /opt/ros/jazzy/include (Required is at least version "2.13") 
+[11.236s] -- Using RMW implementation 'rmw_fastrtps_cpp' as default
+[11.964s] -- Found rclcpp_components: 28.1.16 (/opt/ros/jazzy/share/rclcpp_components/cmake)
+[12.333s] -- Found mrs_lib: 2.0.0 (/opt/ros/jazzy/share/mrs_lib/cmake)
+[13.280s] -- Found eigen3_cmake_module: 0.3.0 (/opt/ros/jazzy/share/eigen3_cmake_module/cmake)
+[13.288s] -- Found Eigen3: TRUE (found version "3.4.0") 
+[13.289s] -- Ensuring Eigen3 include directory is part of orocos-kdl CMake target
+[14.467s] -- Found mrs_uav_hw_api: 2.0.0 (/opt/ros/jazzy/share/mrs_uav_hw_api/cmake)
+[15.000s] -- Found mrs_multirotor_simulator: 2.0.0 (/opt/ros/jazzy/share/mrs_multirotor_simulator/cmake)
+[15.127s] -- Found image_transport: 5.1.7 (/opt/ros/jazzy/share/image_transport/cmake)
+[15.200s] -- Found cv_bridge: 4.1.0 (/opt/ros/jazzy/share/cv_bridge/cmake)
+[15.326s] -- Found pcl_ros: 2.6.2 (/opt/ros/jazzy/share/pcl_ros/cmake)
+[15.925s] [33mCMake Warning (dev) at /usr/lib/x86_64-linux-gnu/cmake/pcl/Modules/FindFLANN.cmake:45 (find_package):
+[15.927s]   Policy CMP0144 is not set: find_package uses upper-case <PACKAGENAME>_ROOT
+[15.928s]   variables.  Run "cmake --help-policy CMP0144" for policy details.  Use the
+[15.929s]   cmake_policy command to set the policy and suppress this warning.
+[15.932s] 
+[15.933s]   CMake variable FLANN_ROOT is set to:
+[15.934s] 
+[15.936s]     /usr
+[15.937s] 
+[15.938s]   For compatibility, find_package is ignoring the variable, but code in a
+[15.940s]   .cmake module might still use it.
+[15.941s] Call Stack (most recent call first):
+[15.943s]   /usr/lib/x86_64-linux-gnu/cmake/pcl/PCLConfig.cmake:261 (find_package)
+[15.944s]   /usr/lib/x86_64-linux-gnu/cmake/pcl/PCLConfig.cmake:306 (find_flann)
+[15.946s]   /usr/lib/x86_64-linux-gnu/cmake/pcl/PCLConfig.cmake:570 (find_external_library)
+[15.948s]   /opt/ros/jazzy/share/pcl_conversions/cmake/ament_cmake_export_dependencies-extras.cmake:21 (find_package)
+[15.949s]   /opt/ros/jazzy/share/pcl_conversions/cmake/pcl_conversionsConfig.cmake:41 (include)
+[15.951s]   /opt/ros/jazzy/share/pcl_ros/cmake/ament_cmake_export_dependencies-extras.cmake:21 (find_package)
+[15.952s]   /opt/ros/jazzy/share/pcl_ros/cmake/pcl_rosConfig.cmake:41 (include)
+[15.953s]   CMakeLists.txt:62 (find_package)
+[15.955s] This warning is for project developers.  Use -Wno-dev to suppress it.
+[15.956s] [0m
+[15.971s] -- Found flann version 1.9.2
+[19.459s] -- Found OpenMP_CXX: -fopenmp (found version "4.5") 
+[19.461s] -- Found OpenMP: TRUE (found version "4.5") found components: CXX 
+[49.487s] -- Checking for module 'libusb-1.0'
+[49.514s] --   Found libusb-1.0, version 1.0.27
+[49.706s] -- Found libusb: /usr/lib/x86_64-linux-gnu/libusb-1.0.so  
+[49.711s] -- OpenNI found (version: 1.5.4.0, include: /usr/include/ni, lib: /usr/lib/libOpenNI.so;libusb::libusb)
+[50.129s] -- OpenNI2 found (version: 2.2.0.33, include: /usr/include/openni2, lib: /usr/lib/x86_64-linux-gnu/libOpenNI2.so;libusb::libusb)
+[50.273s] -- Found Pcap: /usr/lib/x86_64-linux-gnu/libpcap.so  
+[51.547s] -- Found ZLIB: /usr/lib/x86_64-linux-gnu/libz.so (found version "1.3")  
+[52.618s] -- Found PNG: /usr/lib/x86_64-linux-gnu/libpng.so (found version "1.6.43") 
+[70.075s] -- OpenNI found (version: 1.5.4.0, include: /usr/include/ni, lib: /usr/lib/libOpenNI.so;libusb::libusb)
+[70.095s] -- OpenNI2 found (version: 2.2.0.33, include: /usr/include/openni2, lib: /usr/lib/x86_64-linux-gnu/libOpenNI2.so;libusb::libusb)
+[87.192s] -- Found Qhull version 8.0.2
+[104.927s] -- OpenNI found (version: 1.5.4.0, include: /usr/include/ni, lib: /usr/lib/libOpenNI.so;libusb::libusb)
+[121.891s] -- Found PCL_COMMON: /usr/lib/x86_64-linux-gnu/libpcl_common.so  
+[121.894s] -- Found PCL_KDTREE: /usr/lib/x86_64-linux-gnu/libpcl_kdtree.so  
+[121.896s] -- Found PCL_OCTREE: /usr/lib/x86_64-linux-gnu/libpcl_octree.so  
+[121.898s] -- Found PCL_SEARCH: /usr/lib/x86_64-linux-gnu/libpcl_search.so  
+[121.900s] -- Found PCL_SAMPLE_CONSENSUS: /usr/lib/x86_64-linux-gnu/libpcl_sample_consensus.so  
+[121.902s] -- Found PCL_FILTERS: /usr/lib/x86_64-linux-gnu/libpcl_filters.so  
+[121.903s] -- Found PCL_2D: /usr/include/pcl-1.14  
+[121.905s] -- Found PCL_GEOMETRY: /usr/include/pcl-1.14  
+[121.906s] -- Found PCL_IO: /usr/lib/x86_64-linux-gnu/libpcl_io.so  
+[121.908s] -- Found PCL_FEATURES: /usr/lib/x86_64-linux-gnu/libpcl_features.so  
+[121.910s] -- Found PCL_ML: /usr/lib/x86_64-linux-gnu/libpcl_ml.so  
+[121.912s] -- Found PCL_SEGMENTATION: /usr/lib/x86_64-linux-gnu/libpcl_segmentation.so  
+[121.914s] -- Found PCL_VISUALIZATION: /usr/lib/x86_64-linux-gnu/libpcl_visualization.so  
+[121.916s] -- Found PCL_SURFACE: /usr/lib/x86_64-linux-gnu/libpcl_surface.so  
+[121.918s] -- Found PCL_REGISTRATION: /usr/lib/x86_64-linux-gnu/libpcl_registration.so  
+[121.920s] -- Found PCL_KEYPOINTS: /usr/lib/x86_64-linux-gnu/libpcl_keypoints.so  
+[121.922s] -- Found PCL_TRACKING: /usr/lib/x86_64-linux-gnu/libpcl_tracking.so  
+[121.924s] -- Found PCL_RECOGNITION: /usr/lib/x86_64-linux-gnu/libpcl_recognition.so  
+[121.926s] -- Found PCL_STEREO: /usr/lib/x86_64-linux-gnu/libpcl_stereo.so  
+[121.928s] -- Found PCL_APPS: /usr/lib/x86_64-linux-gnu/libpcl_apps.so  
+[121.929s] -- Found PCL_IN_HAND_SCANNER: /usr/include/pcl-1.14  
+[121.931s] -- Found PCL_MODELER: /usr/include/pcl-1.14  
+[121.934s] -- Found PCL_POINT_CLOUD_EDITOR: /usr/include/pcl-1.14  
+[121.936s] -- Found PCL_OUTOFCORE: /usr/lib/x86_64-linux-gnu/libpcl_outofcore.so  
+[121.938s] -- Found PCL_PEOPLE: /usr/lib/x86_64-linux-gnu/libpcl_people.so  
+[122.039s] -- Found rosidl_default_generators: 1.6.0 (/opt/ros/jazzy/share/rosidl_default_generators/cmake)
+[122.330s] -- Found rosidl_adapter: 4.6.7 (/opt/ros/jazzy/share/rosidl_adapter/cmake)
+[130.382s] -- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+[132.283s] -- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+[132.333s] -- Found python_cmake_module: 0.11.1 (/opt/ros/jazzy/share/python_cmake_module/cmake)
+[132.574s] -- Found PythonExtra: /usr/bin/python3  
+[133.614s] -- Found Python3: /usr/bin/python3 (found version "3.12.3") found components: Interpreter Development NumPy Development.Module Development.Embed 
+[136.042s] -- Configuring done (135.7s)
+[136.331s] [31mCMake Error at CMakeLists.txt:83 (add_library):
+[136.332s]   Cannot find source file:
+[136.334s] 
+[136.335s]     src/flight_forge_connector/socket_client.cpp
+[136.337s] 
+[136.338s]   Tried extensions .c .C .c++ .cc .cpp .cxx .cu .mpp .m .M .mm .ixx .cppm
+[136.339s]   .ccm .cxxm .c++m .h .hh .h++ .hm .hpp .hxx .in .txx .f .F .for .f77 .f90
+[136.341s]   .f95 .f03 .hip .ispc
+[136.343s] 
+[136.344s] [0m
+[136.435s] [31mCMake Error at CMakeLists.txt:83 (add_library):
+[136.436s]   No SOURCES given to target: MrsUavFlightforgeSimulator_FlightforgeConnector
+[136.438s] 
+[136.439s] [0m
+[136.441s] [0mCMake Generate step failed.  Build files cannot be regenerated correctly.[0m
+[136.483s] Invoked command in '/mnt/d/ros/mrs_uav_flightforge_simulator/build/mrs_uav_flightforge_simulator' returned '1': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake /mnt/d/ros/mrs_uav_flightforge_simulator -DCMAKE_INSTALL_PREFIX=/mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator

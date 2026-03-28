@@ -1,0 +1,14 @@
+source;share/mrs_uav_flightforge_simulator/hook/cmake_prefix_path.ps1
+source;share/mrs_uav_flightforge_simulator/hook/cmake_prefix_path.dsv
+source;share/mrs_uav_flightforge_simulator/hook/cmake_prefix_path.sh
+source;share/mrs_uav_flightforge_simulator/hook/ld_library_path_lib.ps1
+source;share/mrs_uav_flightforge_simulator/hook/ld_library_path_lib.dsv
+source;share/mrs_uav_flightforge_simulator/hook/ld_library_path_lib.sh
+source;share/mrs_uav_flightforge_simulator/hook/pythonpath.ps1
+source;share/mrs_uav_flightforge_simulator/hook/pythonpath.dsv
+source;share/mrs_uav_flightforge_simulator/hook/pythonpath.sh
+source;share/mrs_uav_flightforge_simulator/local_setup.bash
+source;share/mrs_uav_flightforge_simulator/local_setup.dsv
+source;share/mrs_uav_flightforge_simulator/local_setup.ps1
+source;share/mrs_uav_flightforge_simulator/local_setup.sh
+source;share/mrs_uav_flightforge_simulator/local_setup.zsh

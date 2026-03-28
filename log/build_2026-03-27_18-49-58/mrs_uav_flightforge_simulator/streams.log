@@ -1,0 +1,100 @@
+[0.081s] Invoking command in '/mnt/d/ros/mrs_uav_flightforge_simulator/build/mrs_uav_flightforge_simulator': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --build /mnt/d/ros/mrs_uav_flightforge_simulator/build/mrs_uav_flightforge_simulator -- -j16 -l16
+[0.562s] [  2%] Built target mrs_uav_flightforge_simulator__rosidl_generator_type_description
+[0.630s] [  7%] Built target MrsUavFlightforgeSimulator_HwApiPlugin
+[0.682s] [  9%] Built target mrs_uav_flightforge_simulator__cpp
+[0.752s] [ 19%] Built target MrsUavFlightforgeSimulator_FlightforgeConnector
+[0.800s] [ 30%] Built target mrs_uav_flightforge_simulator__rosidl_generator_c
+[0.968s] [ 45%] Built target mrs_uav_flightforge_simulator__rosidl_typesupport_c
+[0.969s] [ 45%] Built target mrs_uav_flightforge_simulator__rosidl_typesupport_cpp
+[0.996s] [ 57%] Built target mrs_uav_flightforge_simulator__rosidl_typesupport_introspection_c
+[1.001s] [ 64%] Built target mrs_uav_flightforge_simulator__rosidl_typesupport_fastrtps_c
+[1.006s] [ 69%] Built target mrs_uav_flightforge_simulator__rosidl_typesupport_fastrtps_cpp
+[1.013s] [ 73%] Built target mrs_uav_flightforge_simulator__rosidl_typesupport_introspection_cpp
+[1.078s] [ 73%] Built target mrs_uav_flightforge_simulator
+[1.097s] [ 73%] Built target ament_cmake_python_copy_mrs_uav_flightforge_simulator
+[1.194s] [ 76%] Built target mrs_uav_flightforge_simulator__py
+[1.315s] [ 80%] Built target mrs_uav_flightforge_simulator__rosidl_generator_py
+[1.436s] [ 90%] Built target mrs_uav_flightforge_simulator_s__rosidl_typesupport_c
+[1.438s] [ 92%] Built target mrs_uav_flightforge_simulator_s__rosidl_typesupport_fastrtps_c
+[1.443s] [ 95%] Built target mrs_uav_flightforge_simulator_s__rosidl_typesupport_introspection_c
+[1.446s] running egg_info
+[1.473s] writing mrs_uav_flightforge_simulator.egg-info/PKG-INFO
+[1.478s] writing dependency_links to mrs_uav_flightforge_simulator.egg-info/dependency_links.txt
+[1.485s] writing top-level names to mrs_uav_flightforge_simulator.egg-info/top_level.txt
+[1.589s] reading manifest file 'mrs_uav_flightforge_simulator.egg-info/SOURCES.txt'
+[1.632s] writing manifest file 'mrs_uav_flightforge_simulator.egg-info/SOURCES.txt'
+[1.674s] [ 95%] Built target ament_cmake_python_build_mrs_uav_flightforge_simulator_egg
+[2.554s] [ 97%] [32mBuilding CXX object CMakeFiles/MrsUavFlightforgeSimulator_FlightforgeSimulator.dir/src/flightforge_simulator.cpp.o[0m
+[49.445s] In file included from [01m[K/mnt/d/ros/mrs_uav_flightforge_simulator/include/flight_forge_connector/socket_client.h:17[m[K,
+[49.446s]                  from [01m[K/mnt/d/ros/mrs_uav_flightforge_simulator/include/flight_forge_connector/flight_forge_connector.h:10[m[K,
+[49.447s]                  from [01m[K/mnt/d/ros/mrs_uav_flightforge_simulator/src/flightforge_simulator.cpp:40[m[K:
+[49.447s] [01m[K/mnt/d/ros/mrs_uav_flightforge_simulator/include/kissnet/kissnet.hpp:403:41:[m[K [01;35m[Kwarning: [m[Kmissing initializer for member ‘[01m[Ksockaddr_storage::__ss_padding[m[K’ [[01;35m[K]8;;https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wmissing-field-initializers-Wmissing-field-initializers]8;;[m[K]
+[49.448s]   403 |             sockaddr_storage adrinf = {0[01;35m[K}[m[K;
+[49.449s]       |                                         [01;35m[K^[m[K
+[49.450s] [01m[K/mnt/d/ros/mrs_uav_flightforge_simulator/include/kissnet/kissnet.hpp:403:41:[m[K [01;35m[Kwarning: [m[Kmissing initializer for member ‘[01m[Ksockaddr_storage::__ss_align[m[K’ [[01;35m[K]8;;https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wmissing-field-initializers-Wmissing-field-initializers]8;;[m[K]
+[50.548s] In file included from [01m[K/opt/ros/jazzy/include/rclcpp/rclcpp/logging.hpp:24[m[K,
+[50.549s]                  from [01m[K/opt/ros/jazzy/include/rclcpp/rclcpp/copy_all_parameter_values.hpp:27[m[K,
+[50.549s]                  from [01m[K/opt/ros/jazzy/include/rclcpp/rclcpp/rclcpp.hpp:171[m[K,
+[50.550s]                  from [01m[K/mnt/d/ros/mrs_uav_flightforge_simulator/src/flightforge_simulator.cpp:3[m[K:
+[50.552s] [01m[K/mnt/d/ros/mrs_uav_flightforge_simulator/src/flightforge_simulator.cpp:[m[K In member function ‘[01m[Kvoid mrs_uav_flightforge_simulator::FlightforgeSimulator::[01;32m[KtimerInit[m[K()[m[K’:
+[50.552s] [01m[K/mnt/d/ros/mrs_uav_flightforge_simulator/src/flightforge_simulator.cpp:1172:42:[m[K [01;35m[Kwarning: [m[Ktoo many arguments for format [[01;35m[K]8;;https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wformat-extra-args-Wformat-extra-args]8;;[m[K]
+[50.553s]  1172 |         RCLCPP_INFO(node_->get_logger(), [01;35m[K"fuck you"[m[K, i + 1);
+[50.554s]       |                                          [01;35m[K^~~~~~~~~~[m[K
+[50.559s] [01m[K/mnt/d/ros/mrs_uav_flightforge_simulator/src/flightforge_simulator.cpp:1281:177:[m[K [01;31m[Kerror: [m[Kno match for ‘[01m[Koperator=[m[K’ (operand types are ‘[01m[Kstd::shared_ptr<mrs_lib::ThreadTimer>[m[K’ and ‘[01m[Krclcpp::WallTimer<std::_Bind<void (mrs_uav_flightforge_simulator::FlightforgeSimulator::*(mrs_uav_flightforge_simulator::FlightforgeSimulator*))()>, 0>::SharedPtr[m[K’ {aka ‘[01m[Kstd::shared_ptr<rclcpp::WallTimer<std::_Bind<void (mrs_uav_flightforge_simulator::FlightforgeSimulator::*(mrs_uav_flightforge_simulator::FlightforgeSimulator*))()>, 0> >[m[K’})
+[50.560s]  1281 | te_wall_timer(std::chrono::duration<double>(1.0 / drs_params_.rgb_depth_rate), std::bind(&FlightforgeSimulator::timerDepth, this), cbgrp_sensors_[01;31m[K)[m[K;
+[50.561s]       |                                                                                                                                                  [01;31m[K^[m[K
+[50.561s] 
+[50.562s] In file included from [01m[K/usr/include/c++/13/memory:80[m[K,
+[50.563s]                  from [01m[K/opt/ros/jazzy/include/rclcpp/rclcpp/rclcpp.hpp:169[m[K:
+[50.564s] [01m[K/usr/include/c++/13/bits/shared_ptr.h:418:9:[m[K [01;36m[Knote: [m[Kcandidate: ‘[01m[Ktemplate<class _Yp> std::shared_ptr<_Tp>::_Assignable<const std::shared_ptr<_Yp>&> std::shared_ptr<_Tp>::[01;32m[Koperator=[m[K(const std::shared_ptr<_Yp>&) [35m[K[with _Tp = mrs_lib::ThreadTimer][m[K[m[K’
+[50.564s]   418 |         [01;36m[Koperator[m[K=(const shared_ptr<_Yp>& __r) noexcept
+[50.565s]       |         [01;36m[K^~~~~~~~[m[K
+[50.566s] [01m[K/usr/include/c++/13/bits/shared_ptr.h:418:9:[m[K [01;36m[Knote: [m[K  template argument deduction/substitution failed:
+[50.566s] /usr/include/c++/13/bits/shared_ptr.h: In substitution of ‘[01m[Ktemplate<class _Tp> template<class _Arg> using std::shared_ptr<_Tp>::_Assignable = typename std::enable_if<std::is_assignable<std::__shared_ptr<_Tp>&, _Arg>::value, std::shared_ptr<_Tp>&>::type [35m[K[with _Arg = const std::shared_ptr<rclcpp::WallTimer<std::_Bind<void (mrs_uav_flightforge_simulator::FlightforgeSimulator::*(mrs_uav_flightforge_simulator::FlightforgeSimulator*))()>, 0> >&; _Tp = mrs_lib::ThreadTimer][m[K[m[K’:
+[50.567s] [01m[K/usr/include/c++/13/bits/shared_ptr.h:418:2:[m[K   required by substitution of ‘[01m[Ktemplate<class _Yp> std::shared_ptr<mrs_lib::ThreadTimer>::_Assignable<const std::shared_ptr<_Tp>&> std::shared_ptr<mrs_lib::ThreadTimer>::[01;32m[Koperator=[m[K(const std::shared_ptr<_Tp>&) [35m[K[with _Yp = rclcpp::WallTimer<std::_Bind<void (mrs_uav_flightforge_simulator::FlightforgeSimulator::*(mrs_uav_flightforge_simulator::FlightforgeSimulator*))()>, 0>][m[K[m[K’
+[50.568s] [01m[K/mnt/d/ros/mrs_uav_flightforge_simulator/src/flightforge_simulator.cpp:1281:177:[m[K   required from here
+[50.568s] [01m[K/usr/include/c++/13/bits/shared_ptr.h:183:15:[m[K [01;31m[Kerror: [m[Kno type named ‘[01m[Ktype[m[K’ in ‘[01m[Kstruct std::enable_if<false, std::shared_ptr<mrs_lib::ThreadTimer>&>[m[K’
+[50.569s]   183 |         using [01;31m[K_Assignable[m[K = typename enable_if<
+[50.570s]       |               [01;31m[K^~~~~~~~~~~[m[K
+[50.571s] [01m[K/usr/include/c++/13/bits/shared_ptr.h:429:9:[m[K [01;36m[Knote: [m[Kcandidate: ‘[01m[Ktemplate<class _Yp> std::shared_ptr<_Tp>::_Assignable<std::auto_ptr<_Up> > std::shared_ptr<_Tp>::[01;32m[Koperator=[m[K(std::auto_ptr<_Up>&&) [35m[K[with _Tp = mrs_lib::ThreadTimer][m[K[m[K’
+[50.571s]   429 |         [01;36m[Koperator[m[K=(auto_ptr<_Yp>&& __r)
+[50.572s]       |         [01;36m[K^~~~~~~~[m[K
+[50.573s] [01m[K/usr/include/c++/13/bits/shared_ptr.h:429:9:[m[K [01;36m[Knote: [m[K  template argument deduction/substitution failed:
+[50.574s] [01m[K/mnt/d/ros/mrs_uav_flightforge_simulator/src/flightforge_simulator.cpp:1281:177:[m[K [01;36m[Knote: [m[K  ‘[01m[Krclcpp::WallTimer<std::_Bind<void (mrs_uav_flightforge_simulator::FlightforgeSimulator::*(mrs_uav_flightforge_simulator::FlightforgeSimulator*))()>, 0>::SharedPtr[m[K’ {aka ‘[01m[Kstd::shared_ptr<rclcpp::WallTimer<std::_Bind<void (mrs_uav_flightforge_simulator::FlightforgeSimulator::*(mrs_uav_flightforge_simulator::FlightforgeSimulator*))()>, 0> >[m[K’} is not derived from ‘[01m[Kstd::auto_ptr<_Up>[m[K’
+[50.574s]  1281 | te_wall_timer(std::chrono::duration<double>(1.0 / drs_params_.rgb_depth_rate), std::bind(&FlightforgeSimulator::timerDepth, this), cbgrp_sensors_[01;36m[K)[m[K;
+[50.575s]       |                                                                                                                                                  [01;36m[K^[m[K
+[50.576s] 
+[50.576s] [01m[K/usr/include/c++/13/bits/shared_ptr.h:446:9:[m[K [01;36m[Knote: [m[Kcandidate: ‘[01m[Ktemplate<class _Yp> std::shared_ptr<_Tp>::_Assignable<std::shared_ptr<_Yp> > std::shared_ptr<_Tp>::[01;32m[Koperator=[m[K(std::shared_ptr<_Yp>&&) [35m[K[with _Tp = mrs_lib::ThreadTimer][m[K[m[K’
+[50.577s]   446 |         [01;36m[Koperator[m[K=(shared_ptr<_Yp>&& __r) noexcept
+[50.578s]       |         [01;36m[K^~~~~~~~[m[K
+[50.578s] [01m[K/usr/include/c++/13/bits/shared_ptr.h:446:9:[m[K [01;36m[Knote: [m[K  template argument deduction/substitution failed:
+[50.579s] /usr/include/c++/13/bits/shared_ptr.h: In substitution of ‘[01m[Ktemplate<class _Tp> template<class _Arg> using std::shared_ptr<_Tp>::_Assignable = typename std::enable_if<std::is_assignable<std::__shared_ptr<_Tp>&, _Arg>::value, std::shared_ptr<_Tp>&>::type [35m[K[with _Arg = std::shared_ptr<rclcpp::WallTimer<std::_Bind<void (mrs_uav_flightforge_simulator::FlightforgeSimulator::*(mrs_uav_flightforge_simulator::FlightforgeSimulator*))()>, 0> >; _Tp = mrs_lib::ThreadTimer][m[K[m[K’:
+[50.580s] [01m[K/usr/include/c++/13/bits/shared_ptr.h:446:2:[m[K   required by substitution of ‘[01m[Ktemplate<class _Yp> std::shared_ptr<mrs_lib::ThreadTimer>::_Assignable<std::shared_ptr<_Tp> > std::shared_ptr<mrs_lib::ThreadTimer>::[01;32m[Koperator=[m[K(std::shared_ptr<_Tp>&&) [35m[K[with _Yp = rclcpp::WallTimer<std::_Bind<void (mrs_uav_flightforge_simulator::FlightforgeSimulator::*(mrs_uav_flightforge_simulator::FlightforgeSimulator*))()>, 0>][m[K[m[K’
+[50.580s] [01m[K/mnt/d/ros/mrs_uav_flightforge_simulator/src/flightforge_simulator.cpp:1281:177:[m[K   required from here
+[50.581s] [01m[K/usr/include/c++/13/bits/shared_ptr.h:183:15:[m[K [01;31m[Kerror: [m[Kno type named ‘[01m[Ktype[m[K’ in ‘[01m[Kstruct std::enable_if<false, std::shared_ptr<mrs_lib::ThreadTimer>&>[m[K’
+[50.582s]   183 |         using [01;31m[K_Assignable[m[K = typename enable_if<
+[50.583s]       |               [01;31m[K^~~~~~~~~~~[m[K
+[50.583s] [01m[K/usr/include/c++/13/bits/shared_ptr.h:454:9:[m[K [01;36m[Knote: [m[Kcandidate: ‘[01m[Ktemplate<class _Yp, class _Del> std::shared_ptr<_Tp>::_Assignable<std::unique_ptr<_Up, _Ep> > std::shared_ptr<_Tp>::[01;32m[Koperator=[m[K(std::unique_ptr<_Up, _Ep>&&) [35m[K[with _Del = _Yp; _Tp = mrs_lib::ThreadTimer][m[K[m[K’
+[50.584s]   454 |         [01;36m[Koperator[m[K=(unique_ptr<_Yp, _Del>&& __r)
+[50.585s]       |         [01;36m[K^~~~~~~~[m[K
+[50.586s] [01m[K/usr/include/c++/13/bits/shared_ptr.h:454:9:[m[K [01;36m[Knote: [m[K  template argument deduction/substitution failed:
+[50.587s] [01m[K/mnt/d/ros/mrs_uav_flightforge_simulator/src/flightforge_simulator.cpp:1281:177:[m[K [01;36m[Knote: [m[K  ‘[01m[Krclcpp::WallTimer<std::_Bind<void (mrs_uav_flightforge_simulator::FlightforgeSimulator::*(mrs_uav_flightforge_simulator::FlightforgeSimulator*))()>, 0>::SharedPtr[m[K’ {aka ‘[01m[Kstd::shared_ptr<rclcpp::WallTimer<std::_Bind<void (mrs_uav_flightforge_simulator::FlightforgeSimulator::*(mrs_uav_flightforge_simulator::FlightforgeSimulator*))()>, 0> >[m[K’} is not derived from ‘[01m[Kstd::unique_ptr<_Tp, _Dp>[m[K’
+[50.588s]  1281 | te_wall_timer(std::chrono::duration<double>(1.0 / drs_params_.rgb_depth_rate), std::bind(&FlightforgeSimulator::timerDepth, this), cbgrp_sensors_[01;36m[K)[m[K;
+[50.588s]       |                                                                                                                                                  [01;36m[K^[m[K
+[50.589s] 
+[50.590s] [01m[K/usr/include/c++/13/bits/shared_ptr.h:414:19:[m[K [01;36m[Knote: [m[Kcandidate: ‘[01m[Kstd::shared_ptr<_Tp>& std::shared_ptr<_Tp>::[01;32m[Koperator=[m[K(const std::shared_ptr<_Tp>&) [35m[K[with _Tp = mrs_lib::ThreadTimer][m[K[m[K’
+[50.590s]   414 |       shared_ptr& [01;36m[Koperator[m[K=(const shared_ptr&) noexcept = default;
+[50.591s]       |                   [01;36m[K^~~~~~~~[m[K
+[50.592s] [01m[K/usr/include/c++/13/bits/shared_ptr.h:414:29:[m[K [01;36m[Knote: [m[K  no known conversion for argument 1 from ‘[01m[Krclcpp::WallTimer<std::_Bind<void (mrs_uav_flightforge_simulator::FlightforgeSimulator::*(mrs_uav_flightforge_simulator::FlightforgeSimulator*))()>, 0>::SharedPtr[m[K’ {aka ‘[01m[Kstd::shared_ptr<rclcpp::WallTimer<std::_Bind<void (mrs_uav_flightforge_simulator::FlightforgeSimulator::*(mrs_uav_flightforge_simulator::FlightforgeSimulator*))()>, 0> >[m[K’} to ‘[01m[Kconst std::shared_ptr<mrs_lib::ThreadTimer>&[m[K’
+[50.593s]   414 |       shared_ptr& operator=([01;36m[Kconst shared_ptr&[m[K) noexcept = default;
+[50.594s]       |                             [01;36m[K^~~~~~~~~~~~~~~~~[m[K
+[50.594s] [01m[K/usr/include/c++/13/bits/shared_ptr.h:438:7:[m[K [01;36m[Knote: [m[Kcandidate: ‘[01m[Kstd::shared_ptr<_Tp>& std::shared_ptr<_Tp>::[01;32m[Koperator=[m[K(std::shared_ptr<_Tp>&&) [35m[K[with _Tp = mrs_lib::ThreadTimer][m[K[m[K’
+[50.595s]   438 |       [01;36m[Koperator[m[K=(shared_ptr&& __r) noexcept
+[50.596s]       |       [01;36m[K^~~~~~~~[m[K
+[50.596s] [01m[K/usr/include/c++/13/bits/shared_ptr.h:438:30:[m[K [01;36m[Knote: [m[K  no known conversion for argument 1 from ‘[01m[Krclcpp::WallTimer<std::_Bind<void (mrs_uav_flightforge_simulator::FlightforgeSimulator::*(mrs_uav_flightforge_simulator::FlightforgeSimulator*))()>, 0>::SharedPtr[m[K’ {aka ‘[01m[Kstd::shared_ptr<rclcpp::WallTimer<std::_Bind<void (mrs_uav_flightforge_simulator::FlightforgeSimulator::*(mrs_uav_flightforge_simulator::FlightforgeSimulator*))()>, 0> >[m[K’} to ‘[01m[Kstd::shared_ptr<mrs_lib::ThreadTimer>&&[m[K’
+[50.597s]   438 |       operator=([01;36m[Kshared_ptr&& __r[m[K) noexcept
+[50.598s]       |                 [01;36m[K~~~~~~~~~~~~~^~~[m[K
+[75.421s] gmake[2]: *** [CMakeFiles/MrsUavFlightforgeSimulator_FlightforgeSimulator.dir/build.make:76: CMakeFiles/MrsUavFlightforgeSimulator_FlightforgeSimulator.dir/src/flightforge_simulator.cpp.o] Error 1
+[75.426s] gmake[1]: *** [CMakeFiles/Makefile2:654: CMakeFiles/MrsUavFlightforgeSimulator_FlightforgeSimulator.dir/all] Error 2
+[75.428s] gmake: *** [Makefile:146: all] Error 2
+[75.429s] Invoked command in '/mnt/d/ros/mrs_uav_flightforge_simulator/build/mrs_uav_flightforge_simulator' returned '2': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --build /mnt/d/ros/mrs_uav_flightforge_simulator/build/mrs_uav_flightforge_simulator -- -j16 -l16

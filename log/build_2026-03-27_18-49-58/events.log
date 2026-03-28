@@ -1,0 +1,855 @@
+[0.000000] (-) TimerEvent: {}
+[0.000593] (mrs_uav_flightforge_simulator) JobQueued: {'identifier': 'mrs_uav_flightforge_simulator', 'dependencies': OrderedDict()}
+[0.000859] (mrs_uav_flightforge_simulator) JobStarted: {'identifier': 'mrs_uav_flightforge_simulator'}
+[0.033316] (mrs_uav_flightforge_simulator) JobProgress: {'identifier': 'mrs_uav_flightforge_simulator', 'progress': 'cmake'}
+[0.060205] (mrs_uav_flightforge_simulator) JobProgress: {'identifier': 'mrs_uav_flightforge_simulator', 'progress': 'build'}
+[0.068398] (mrs_uav_flightforge_simulator) Command: {'cmd': ['/usr/bin/cmake', '--build', '/mnt/d/ros/mrs_uav_flightforge_simulator/build/mrs_uav_flightforge_simulator', '--', '-j16', '-l16'], 'cwd': '/mnt/d/ros/mrs_uav_flightforge_simulator/build/mrs_uav_flightforge_simulator', 'env': OrderedDict({'GZ_SIM_SYSTEM_PLUGIN_PATH': '/opt/ros/jazzy/lib/mrs_gazebo_common_resources', 'LESSOPEN': '| /usr/bin/lesspipe %s', 'GZ_SIM_RESOURCE_PATH': '/opt/ros/jazzy/share', 'USER': 'aidar', 'GZ_CONFIG_PATH': '/opt/ros/jazzy/opt/gz_sim_vendor/share/gz:/opt/ros/jazzy/opt/sdformat_vendor/share/gz:/opt/ros/jazzy/opt/gz_gui_vendor/share/gz:/opt/ros/jazzy/opt/gz_transport_vendor/share/gz:/opt/ros/jazzy/opt/gz_rendering_vendor/share/gz:/opt/ros/jazzy/opt/gz_plugin_vendor/share/gz:/opt/ros/jazzy/opt/gz_fuel_tools_vendor/share/gz:/opt/ros/jazzy/opt/gz_msgs_vendor/share/gz:/opt/ros/jazzy/opt/gz_common_vendor/share/gz', 'SHLVL': '1', 'LD_LIBRARY_PATH': '/opt/ros/jazzy/opt/zenoh_cpp_vendor/lib:/opt/ros/jazzy/opt/gz_sim_vendor/lib:/opt/ros/jazzy/opt/gz_sensors_vendor/lib:/opt/ros/jazzy/opt/gz_physics_vendor/lib:/opt/ros/jazzy/opt/sdformat_vendor/lib:/opt/ros/jazzy/opt/rviz_ogre_vendor/lib:/opt/ros/jazzy/lib/x86_64-linux-gnu:/opt/ros/jazzy/opt/gz_gui_vendor/lib:/opt/ros/jazzy/opt/gz_transport_vendor/lib:/opt/ros/jazzy/opt/gz_rendering_vendor/lib:/opt/ros/jazzy/opt/gz_plugin_vendor/lib:/opt/ros/jazzy/opt/gz_fuel_tools_vendor/lib:/opt/ros/jazzy/opt/gz_msgs_vendor/lib:/opt/ros/jazzy/opt/gz_common_vendor/lib:/opt/ros/jazzy/opt/gz_math_vendor/lib:/opt/ros/jazzy/opt/gz_utils_vendor/lib:/opt/ros/jazzy/opt/gz_tools_vendor/lib:/opt/ros/jazzy/opt/gz_ogre_next_vendor/lib:/opt/ros/jazzy/opt/gz_dartsim_vendor/lib:/opt/ros/jazzy/opt/gz_cmake_vendor/lib:/opt/ros/jazzy/lib', 'WT_PROFILE_ID': '{61c54bbd-c2c6-5271-96e7-009a87ff44bf}', 'HOME': '/home/aidar', 'OLDPWD': '/mnt/c/Users/helst', 'ROS_PYTHON_VERSION': '3', 'WSL_DISTRO_NAME': 'Ubuntu', 'DEBUGINFOD_URLS': 'https://debuginfod.ubuntu.com', 'WAYLAND_DISPLAY': 'wayland-0', 'ROS_DISTRO': 'jazzy', 'LOGNAME': 'aidar', 'NAME': 'Agent', 'WSL_INTEROP': '/run/WSL/18169_interop', 'IGN_GAZEBO_MODEL_PATH': '/opt/ros/jazzy/share', 'PULSE_SERVER': 'unix:/mnt/wslg/PulseServer', '_': '/usr/bin/colcon', 'ROS_VERSION': '2', 'TERM': 'xterm-256color', 'GAZEBO_MODEL_PATH': '/opt/ros/jazzy/share', 'PATH': '/home/aidar/.local/bin:/opt/ros/jazzy/opt/gz_msgs_vendor/bin:/opt/ros/jazzy/opt/gz_tools_vendor/bin:/opt/ros/jazzy/opt/gz_ogre_next_vendor/bin:/opt/ros/jazzy/bin:/home/aidar/autotools/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/lib/wsl/lib:/mnt/c/Windows/system32:/mnt/c/Windows:/mnt/c/Windows/System32/Wbem:/mnt/c/Windows/System32/WindowsPowerShell/v1.0/:/mnt/c/Windows/System32/OpenSSH/:/mnt/c/Program Files (x86)/NVIDIA Corporation/PhysX/Common:/mnt/c/WINDOWS/system32:/mnt/c/WINDOWS:/mnt/c/WINDOWS/System32/Wbem:/mnt/c/WINDOWS/System32/WindowsPowerShell/v1.0/:/mnt/c/WINDOWS/System32/OpenSSH/:/mnt/c/Program Files/Microsoft SQL Server/150/Tools/Binn/:/mnt/c/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/:/mnt/c/Program Files/dotnet/:/mnt/c/Program Files/NVIDIA Corporation/NVIDIA app/NvDLISR:/mnt/d/CMAKE/bin:/mnt/d/Git/cmd:/mnt/d/Git LFS:/mnt/c/ProgramData/chocolatey/bin:/mnt/d/Windows Kits/10/Windows Performance Toolkit/:/mnt/d/pgrframeworkvs2019/pgrframework/bin:/mnt/d/Microsoft_VS_Code/Microsoft VS Code/bin:/mnt/c/Users/helst/AppData/Local/JetBrains/Toolbox/scripts', 'WT_SESSION': '2a8cc0e1-958d-4697-8aa9-9e9e6fd16536', 'XDG_RUNTIME_DIR': '/mnt/wslg/runtime-dir', 'DISPLAY': ':0', 'LANG': 'C.UTF-8', 'LS_COLORS': 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=00:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.avif=01;35:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:*~=00;90:*#=00;90:*.bak=00;90:*.crdownload=00;90:*.dpkg-dist=00;90:*.dpkg-new=00;90:*.dpkg-old=00;90:*.dpkg-tmp=00;90:*.old=00;90:*.orig=00;90:*.part=00;90:*.rej=00;90:*.rpmnew=00;90:*.rpmorig=00;90:*.rpmsave=00;90:*.swp=00;90:*.tmp=00;90:*.ucf-dist=00;90:*.ucf-new=00;90:*.ucf-old=00;90:', 'AMENT_PREFIX_PATH': '/opt/ros/jazzy', 'SHELL': '/bin/bash', 'LESSCLOSE': '/usr/bin/lesspipe %s %s', 'IGN_GAZEBO_RESOURCE_PATH': '/opt/ros/jazzy/share', 'GAZEBO_RESOURCE_PATH': '/opt/ros/jazzy/share', 'ROS_AUTOMATIC_DISCOVERY_RANGE': 'SUBNET', 'PWD': '/mnt/d/ros/mrs_uav_flightforge_simulator/build/mrs_uav_flightforge_simulator', 'PYTHONPATH': '/opt/ros/jazzy/lib/python3.12/site-packages', 'COLCON': '1', 'WSL2_GUI_APPS_ENABLED': '1', 'HOSTTYPE': 'x86_64', 'CMAKE_PREFIX_PATH': '/opt/ros/jazzy:/opt/ros/jazzy/opt/gz_sim_vendor:/opt/ros/jazzy/opt/gz_sensors_vendor:/opt/ros/jazzy/opt/gz_physics_vendor:/opt/ros/jazzy/opt/sdformat_vendor:/opt/ros/jazzy/opt/gz_gui_vendor:/opt/ros/jazzy/opt/gz_transport_vendor:/opt/ros/jazzy/opt/gz_rendering_vendor:/opt/ros/jazzy/opt/gz_plugin_vendor:/opt/ros/jazzy/opt/gz_fuel_tools_vendor:/opt/ros/jazzy/opt/gz_msgs_vendor:/opt/ros/jazzy/opt/gz_common_vendor:/opt/ros/jazzy/opt/gz_math_vendor:/opt/ros/jazzy/opt/gz_utils_vendor:/opt/ros/jazzy/opt/gz_tools_vendor:/opt/ros/jazzy/opt/gz_ogre_next_vendor:/opt/ros/jazzy/opt/gz_dartsim_vendor:/opt/ros/jazzy/opt/gz_cmake_vendor', 'WSLENV': 'WT_SESSION:WT_PROFILE_ID:'}), 'shell': False}
+[0.098393] (-) TimerEvent: {}
+[0.199095] (-) TimerEvent: {}
+[0.299667] (-) TimerEvent: {}
+[0.400337] (-) TimerEvent: {}
+[0.500839] (-) TimerEvent: {}
+[0.561890] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'[  2%] Built target mrs_uav_flightforge_simulator__rosidl_generator_type_description\n'}
+[0.600981] (-) TimerEvent: {}
+[0.630571] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'[  7%] Built target MrsUavFlightforgeSimulator_HwApiPlugin\n'}
+[0.682547] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'[  9%] Built target mrs_uav_flightforge_simulator__cpp\n'}
+[0.701112] (-) TimerEvent: {}
+[0.752604] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'[ 19%] Built target MrsUavFlightforgeSimulator_FlightforgeConnector\n'}
+[0.800592] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'[ 30%] Built target mrs_uav_flightforge_simulator__rosidl_generator_c\n'}
+[0.801672] (-) TimerEvent: {}
+[0.902220] (-) TimerEvent: {}
+[0.967456] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'[ 45%] Built target mrs_uav_flightforge_simulator__rosidl_typesupport_c\n'}
+[0.969258] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'[ 45%] Built target mrs_uav_flightforge_simulator__rosidl_typesupport_cpp\n'}
+[0.995983] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'[ 57%] Built target mrs_uav_flightforge_simulator__rosidl_typesupport_introspection_c\n'}
+[1.001109] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'[ 64%] Built target mrs_uav_flightforge_simulator__rosidl_typesupport_fastrtps_c\n'}
+[1.002482] (-) TimerEvent: {}
+[1.005504] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'[ 69%] Built target mrs_uav_flightforge_simulator__rosidl_typesupport_fastrtps_cpp\n'}
+[1.013074] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'[ 73%] Built target mrs_uav_flightforge_simulator__rosidl_typesupport_introspection_cpp\n'}
+[1.077981] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'[ 73%] Built target mrs_uav_flightforge_simulator\n'}
+[1.097129] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'[ 73%] Built target ament_cmake_python_copy_mrs_uav_flightforge_simulator\n'}
+[1.102621] (-) TimerEvent: {}
+[1.194658] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'[ 76%] Built target mrs_uav_flightforge_simulator__py\n'}
+[1.202743] (-) TimerEvent: {}
+[1.303212] (-) TimerEvent: {}
+[1.315627] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'[ 80%] Built target mrs_uav_flightforge_simulator__rosidl_generator_py\n'}
+[1.403335] (-) TimerEvent: {}
+[1.436661] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'[ 90%] Built target mrs_uav_flightforge_simulator_s__rosidl_typesupport_c\n'}
+[1.438636] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'[ 92%] Built target mrs_uav_flightforge_simulator_s__rosidl_typesupport_fastrtps_c\n'}
+[1.443626] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'[ 95%] Built target mrs_uav_flightforge_simulator_s__rosidl_typesupport_introspection_c\n'}
+[1.445929] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'running egg_info\n'}
+[1.473684] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'writing mrs_uav_flightforge_simulator.egg-info/PKG-INFO\n'}
+[1.478814] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'writing dependency_links to mrs_uav_flightforge_simulator.egg-info/dependency_links.txt\n'}
+[1.485210] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'writing top-level names to mrs_uav_flightforge_simulator.egg-info/top_level.txt\n'}
+[1.503471] (-) TimerEvent: {}
+[1.589199] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b"reading manifest file 'mrs_uav_flightforge_simulator.egg-info/SOURCES.txt'\n"}
+[1.603621] (-) TimerEvent: {}
+[1.632729] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b"writing manifest file 'mrs_uav_flightforge_simulator.egg-info/SOURCES.txt'\n"}
+[1.674819] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'[ 95%] Built target ament_cmake_python_build_mrs_uav_flightforge_simulator_egg\n'}
+[1.703799] (-) TimerEvent: {}
+[1.804403] (-) TimerEvent: {}
+[1.905016] (-) TimerEvent: {}
+[2.005516] (-) TimerEvent: {}
+[2.105971] (-) TimerEvent: {}
+[2.206571] (-) TimerEvent: {}
+[2.307047] (-) TimerEvent: {}
+[2.407857] (-) TimerEvent: {}
+[2.508366] (-) TimerEvent: {}
+[2.554807] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'[ 97%] \x1b[32mBuilding CXX object CMakeFiles/MrsUavFlightforgeSimulator_FlightforgeSimulator.dir/src/flightforge_simulator.cpp.o\x1b[0m\n'}
+[2.608593] (-) TimerEvent: {}
+[2.709304] (-) TimerEvent: {}
+[2.809883] (-) TimerEvent: {}
+[2.910484] (-) TimerEvent: {}
+[3.011017] (-) TimerEvent: {}
+[3.111532] (-) TimerEvent: {}
+[3.212049] (-) TimerEvent: {}
+[3.312562] (-) TimerEvent: {}
+[3.413256] (-) TimerEvent: {}
+[3.513772] (-) TimerEvent: {}
+[3.614302] (-) TimerEvent: {}
+[3.714879] (-) TimerEvent: {}
+[3.815419] (-) TimerEvent: {}
+[3.916005] (-) TimerEvent: {}
+[4.016517] (-) TimerEvent: {}
+[4.117078] (-) TimerEvent: {}
+[4.217659] (-) TimerEvent: {}
+[4.318204] (-) TimerEvent: {}
+[4.418708] (-) TimerEvent: {}
+[4.519311] (-) TimerEvent: {}
+[4.619868] (-) TimerEvent: {}
+[4.720450] (-) TimerEvent: {}
+[4.820948] (-) TimerEvent: {}
+[4.921457] (-) TimerEvent: {}
+[5.022089] (-) TimerEvent: {}
+[5.122652] (-) TimerEvent: {}
+[5.223183] (-) TimerEvent: {}
+[5.323741] (-) TimerEvent: {}
+[5.424254] (-) TimerEvent: {}
+[5.524756] (-) TimerEvent: {}
+[5.625318] (-) TimerEvent: {}
+[5.725851] (-) TimerEvent: {}
+[5.826462] (-) TimerEvent: {}
+[5.927047] (-) TimerEvent: {}
+[6.027575] (-) TimerEvent: {}
+[6.128189] (-) TimerEvent: {}
+[6.228810] (-) TimerEvent: {}
+[6.329327] (-) TimerEvent: {}
+[6.429870] (-) TimerEvent: {}
+[6.530373] (-) TimerEvent: {}
+[6.630916] (-) TimerEvent: {}
+[6.731511] (-) TimerEvent: {}
+[6.832173] (-) TimerEvent: {}
+[6.932688] (-) TimerEvent: {}
+[7.033270] (-) TimerEvent: {}
+[7.133796] (-) TimerEvent: {}
+[7.234435] (-) TimerEvent: {}
+[7.334950] (-) TimerEvent: {}
+[7.435759] (-) TimerEvent: {}
+[7.536314] (-) TimerEvent: {}
+[7.637005] (-) TimerEvent: {}
+[7.737513] (-) TimerEvent: {}
+[7.838003] (-) TimerEvent: {}
+[7.938498] (-) TimerEvent: {}
+[8.038996] (-) TimerEvent: {}
+[8.139500] (-) TimerEvent: {}
+[8.240020] (-) TimerEvent: {}
+[8.340573] (-) TimerEvent: {}
+[8.441048] (-) TimerEvent: {}
+[8.541625] (-) TimerEvent: {}
+[8.642229] (-) TimerEvent: {}
+[8.742834] (-) TimerEvent: {}
+[8.843325] (-) TimerEvent: {}
+[8.943851] (-) TimerEvent: {}
+[9.044337] (-) TimerEvent: {}
+[9.144955] (-) TimerEvent: {}
+[9.245484] (-) TimerEvent: {}
+[9.346005] (-) TimerEvent: {}
+[9.446506] (-) TimerEvent: {}
+[9.547148] (-) TimerEvent: {}
+[9.647669] (-) TimerEvent: {}
+[9.748238] (-) TimerEvent: {}
+[9.848753] (-) TimerEvent: {}
+[9.949496] (-) TimerEvent: {}
+[10.050067] (-) TimerEvent: {}
+[10.150635] (-) TimerEvent: {}
+[10.251196] (-) TimerEvent: {}
+[10.351818] (-) TimerEvent: {}
+[10.452351] (-) TimerEvent: {}
+[10.552824] (-) TimerEvent: {}
+[10.653298] (-) TimerEvent: {}
+[10.753804] (-) TimerEvent: {}
+[10.854318] (-) TimerEvent: {}
+[10.954805] (-) TimerEvent: {}
+[11.055297] (-) TimerEvent: {}
+[11.155843] (-) TimerEvent: {}
+[11.256418] (-) TimerEvent: {}
+[11.356921] (-) TimerEvent: {}
+[11.457420] (-) TimerEvent: {}
+[11.557922] (-) TimerEvent: {}
+[11.658504] (-) TimerEvent: {}
+[11.759140] (-) TimerEvent: {}
+[11.859696] (-) TimerEvent: {}
+[11.960216] (-) TimerEvent: {}
+[12.061073] (-) TimerEvent: {}
+[12.161803] (-) TimerEvent: {}
+[12.262566] (-) TimerEvent: {}
+[12.363341] (-) TimerEvent: {}
+[12.463949] (-) TimerEvent: {}
+[12.564466] (-) TimerEvent: {}
+[12.665101] (-) TimerEvent: {}
+[12.765657] (-) TimerEvent: {}
+[12.866350] (-) TimerEvent: {}
+[12.966925] (-) TimerEvent: {}
+[13.067423] (-) TimerEvent: {}
+[13.167914] (-) TimerEvent: {}
+[13.268445] (-) TimerEvent: {}
+[13.368950] (-) TimerEvent: {}
+[13.469449] (-) TimerEvent: {}
+[13.569962] (-) TimerEvent: {}
+[13.670494] (-) TimerEvent: {}
+[13.771161] (-) TimerEvent: {}
+[13.871739] (-) TimerEvent: {}
+[13.972254] (-) TimerEvent: {}
+[14.072824] (-) TimerEvent: {}
+[14.173328] (-) TimerEvent: {}
+[14.273879] (-) TimerEvent: {}
+[14.374390] (-) TimerEvent: {}
+[14.474924] (-) TimerEvent: {}
+[14.575459] (-) TimerEvent: {}
+[14.676105] (-) TimerEvent: {}
+[14.776629] (-) TimerEvent: {}
+[14.877164] (-) TimerEvent: {}
+[14.977703] (-) TimerEvent: {}
+[15.078185] (-) TimerEvent: {}
+[15.178931] (-) TimerEvent: {}
+[15.279481] (-) TimerEvent: {}
+[15.380268] (-) TimerEvent: {}
+[15.480947] (-) TimerEvent: {}
+[15.581646] (-) TimerEvent: {}
+[15.682156] (-) TimerEvent: {}
+[15.782656] (-) TimerEvent: {}
+[15.883124] (-) TimerEvent: {}
+[15.983655] (-) TimerEvent: {}
+[16.084271] (-) TimerEvent: {}
+[16.184883] (-) TimerEvent: {}
+[16.285425] (-) TimerEvent: {}
+[16.385914] (-) TimerEvent: {}
+[16.486423] (-) TimerEvent: {}
+[16.586925] (-) TimerEvent: {}
+[16.687497] (-) TimerEvent: {}
+[16.788156] (-) TimerEvent: {}
+[16.888736] (-) TimerEvent: {}
+[16.989590] (-) TimerEvent: {}
+[17.090202] (-) TimerEvent: {}
+[17.190723] (-) TimerEvent: {}
+[17.291223] (-) TimerEvent: {}
+[17.391783] (-) TimerEvent: {}
+[17.492372] (-) TimerEvent: {}
+[17.592849] (-) TimerEvent: {}
+[17.693352] (-) TimerEvent: {}
+[17.793849] (-) TimerEvent: {}
+[17.894349] (-) TimerEvent: {}
+[17.994896] (-) TimerEvent: {}
+[18.095462] (-) TimerEvent: {}
+[18.195990] (-) TimerEvent: {}
+[18.296794] (-) TimerEvent: {}
+[18.397380] (-) TimerEvent: {}
+[18.497876] (-) TimerEvent: {}
+[18.598367] (-) TimerEvent: {}
+[18.698949] (-) TimerEvent: {}
+[18.799530] (-) TimerEvent: {}
+[18.900024] (-) TimerEvent: {}
+[19.000652] (-) TimerEvent: {}
+[19.101174] (-) TimerEvent: {}
+[19.201741] (-) TimerEvent: {}
+[19.302253] (-) TimerEvent: {}
+[19.402721] (-) TimerEvent: {}
+[19.503202] (-) TimerEvent: {}
+[19.603684] (-) TimerEvent: {}
+[19.704201] (-) TimerEvent: {}
+[19.804783] (-) TimerEvent: {}
+[19.905310] (-) TimerEvent: {}
+[20.005882] (-) TimerEvent: {}
+[20.106453] (-) TimerEvent: {}
+[20.207104] (-) TimerEvent: {}
+[20.307661] (-) TimerEvent: {}
+[20.408203] (-) TimerEvent: {}
+[20.508700] (-) TimerEvent: {}
+[20.609476] (-) TimerEvent: {}
+[20.709995] (-) TimerEvent: {}
+[20.810617] (-) TimerEvent: {}
+[20.911109] (-) TimerEvent: {}
+[21.011667] (-) TimerEvent: {}
+[21.112393] (-) TimerEvent: {}
+[21.212973] (-) TimerEvent: {}
+[21.313470] (-) TimerEvent: {}
+[21.413951] (-) TimerEvent: {}
+[21.514419] (-) TimerEvent: {}
+[21.614897] (-) TimerEvent: {}
+[21.715408] (-) TimerEvent: {}
+[21.815917] (-) TimerEvent: {}
+[21.916391] (-) TimerEvent: {}
+[22.016894] (-) TimerEvent: {}
+[22.117406] (-) TimerEvent: {}
+[22.218014] (-) TimerEvent: {}
+[22.318539] (-) TimerEvent: {}
+[22.419146] (-) TimerEvent: {}
+[22.519673] (-) TimerEvent: {}
+[22.620196] (-) TimerEvent: {}
+[22.720819] (-) TimerEvent: {}
+[22.821328] (-) TimerEvent: {}
+[22.922056] (-) TimerEvent: {}
+[23.022764] (-) TimerEvent: {}
+[23.123306] (-) TimerEvent: {}
+[23.223818] (-) TimerEvent: {}
+[23.324368] (-) TimerEvent: {}
+[23.424935] (-) TimerEvent: {}
+[23.525472] (-) TimerEvent: {}
+[23.625976] (-) TimerEvent: {}
+[23.726553] (-) TimerEvent: {}
+[23.827034] (-) TimerEvent: {}
+[23.927556] (-) TimerEvent: {}
+[24.028098] (-) TimerEvent: {}
+[24.128763] (-) TimerEvent: {}
+[24.229289] (-) TimerEvent: {}
+[24.329775] (-) TimerEvent: {}
+[24.430269] (-) TimerEvent: {}
+[24.530812] (-) TimerEvent: {}
+[24.631436] (-) TimerEvent: {}
+[24.731970] (-) TimerEvent: {}
+[24.832458] (-) TimerEvent: {}
+[24.932960] (-) TimerEvent: {}
+[25.033532] (-) TimerEvent: {}
+[25.134142] (-) TimerEvent: {}
+[25.234804] (-) TimerEvent: {}
+[25.335326] (-) TimerEvent: {}
+[25.435917] (-) TimerEvent: {}
+[25.536411] (-) TimerEvent: {}
+[25.637228] (-) TimerEvent: {}
+[25.737835] (-) TimerEvent: {}
+[25.838575] (-) TimerEvent: {}
+[25.939212] (-) TimerEvent: {}
+[26.039941] (-) TimerEvent: {}
+[26.140481] (-) TimerEvent: {}
+[26.241331] (-) TimerEvent: {}
+[26.341837] (-) TimerEvent: {}
+[26.442537] (-) TimerEvent: {}
+[26.543092] (-) TimerEvent: {}
+[26.643959] (-) TimerEvent: {}
+[26.744547] (-) TimerEvent: {}
+[26.845204] (-) TimerEvent: {}
+[26.945718] (-) TimerEvent: {}
+[27.046227] (-) TimerEvent: {}
+[27.146822] (-) TimerEvent: {}
+[27.247396] (-) TimerEvent: {}
+[27.347886] (-) TimerEvent: {}
+[27.448506] (-) TimerEvent: {}
+[27.549012] (-) TimerEvent: {}
+[27.649503] (-) TimerEvent: {}
+[27.749984] (-) TimerEvent: {}
+[27.850466] (-) TimerEvent: {}
+[27.950957] (-) TimerEvent: {}
+[28.051514] (-) TimerEvent: {}
+[28.152127] (-) TimerEvent: {}
+[28.252700] (-) TimerEvent: {}
+[28.353165] (-) TimerEvent: {}
+[28.453647] (-) TimerEvent: {}
+[28.554159] (-) TimerEvent: {}
+[28.654744] (-) TimerEvent: {}
+[28.755390] (-) TimerEvent: {}
+[28.855872] (-) TimerEvent: {}
+[28.956501] (-) TimerEvent: {}
+[29.057002] (-) TimerEvent: {}
+[29.157506] (-) TimerEvent: {}
+[29.258003] (-) TimerEvent: {}
+[29.358485] (-) TimerEvent: {}
+[29.458987] (-) TimerEvent: {}
+[29.559492] (-) TimerEvent: {}
+[29.659989] (-) TimerEvent: {}
+[29.760492] (-) TimerEvent: {}
+[29.860976] (-) TimerEvent: {}
+[29.961471] (-) TimerEvent: {}
+[30.061972] (-) TimerEvent: {}
+[30.162481] (-) TimerEvent: {}
+[30.263143] (-) TimerEvent: {}
+[30.363627] (-) TimerEvent: {}
+[30.464317] (-) TimerEvent: {}
+[30.564979] (-) TimerEvent: {}
+[30.665715] (-) TimerEvent: {}
+[30.766204] (-) TimerEvent: {}
+[30.866771] (-) TimerEvent: {}
+[30.967401] (-) TimerEvent: {}
+[31.067958] (-) TimerEvent: {}
+[31.168541] (-) TimerEvent: {}
+[31.269369] (-) TimerEvent: {}
+[31.369859] (-) TimerEvent: {}
+[31.470507] (-) TimerEvent: {}
+[31.571052] (-) TimerEvent: {}
+[31.671696] (-) TimerEvent: {}
+[31.772284] (-) TimerEvent: {}
+[31.872905] (-) TimerEvent: {}
+[31.973388] (-) TimerEvent: {}
+[32.073851] (-) TimerEvent: {}
+[32.174333] (-) TimerEvent: {}
+[32.274893] (-) TimerEvent: {}
+[32.375376] (-) TimerEvent: {}
+[32.475852] (-) TimerEvent: {}
+[32.576394] (-) TimerEvent: {}
+[32.676953] (-) TimerEvent: {}
+[32.777455] (-) TimerEvent: {}
+[32.877957] (-) TimerEvent: {}
+[32.978607] (-) TimerEvent: {}
+[33.079105] (-) TimerEvent: {}
+[33.179625] (-) TimerEvent: {}
+[33.280141] (-) TimerEvent: {}
+[33.380677] (-) TimerEvent: {}
+[33.481171] (-) TimerEvent: {}
+[33.581821] (-) TimerEvent: {}
+[33.682335] (-) TimerEvent: {}
+[33.782993] (-) TimerEvent: {}
+[33.883477] (-) TimerEvent: {}
+[33.983949] (-) TimerEvent: {}
+[34.084460] (-) TimerEvent: {}
+[34.185049] (-) TimerEvent: {}
+[34.285543] (-) TimerEvent: {}
+[34.386017] (-) TimerEvent: {}
+[34.486502] (-) TimerEvent: {}
+[34.586999] (-) TimerEvent: {}
+[34.687470] (-) TimerEvent: {}
+[34.787954] (-) TimerEvent: {}
+[34.888449] (-) TimerEvent: {}
+[34.989039] (-) TimerEvent: {}
+[35.089548] (-) TimerEvent: {}
+[35.190107] (-) TimerEvent: {}
+[35.290763] (-) TimerEvent: {}
+[35.391691] (-) TimerEvent: {}
+[35.492445] (-) TimerEvent: {}
+[35.593044] (-) TimerEvent: {}
+[35.693572] (-) TimerEvent: {}
+[35.794346] (-) TimerEvent: {}
+[35.894926] (-) TimerEvent: {}
+[35.995536] (-) TimerEvent: {}
+[36.096085] (-) TimerEvent: {}
+[36.196716] (-) TimerEvent: {}
+[36.297429] (-) TimerEvent: {}
+[36.397938] (-) TimerEvent: {}
+[36.498438] (-) TimerEvent: {}
+[36.598972] (-) TimerEvent: {}
+[36.699565] (-) TimerEvent: {}
+[36.800068] (-) TimerEvent: {}
+[36.900706] (-) TimerEvent: {}
+[37.001249] (-) TimerEvent: {}
+[37.101801] (-) TimerEvent: {}
+[37.202278] (-) TimerEvent: {}
+[37.302768] (-) TimerEvent: {}
+[37.403261] (-) TimerEvent: {}
+[37.503733] (-) TimerEvent: {}
+[37.604231] (-) TimerEvent: {}
+[37.704732] (-) TimerEvent: {}
+[37.805260] (-) TimerEvent: {}
+[37.905835] (-) TimerEvent: {}
+[38.006382] (-) TimerEvent: {}
+[38.107006] (-) TimerEvent: {}
+[38.207848] (-) TimerEvent: {}
+[38.308348] (-) TimerEvent: {}
+[38.408988] (-) TimerEvent: {}
+[38.509498] (-) TimerEvent: {}
+[38.610165] (-) TimerEvent: {}
+[38.710669] (-) TimerEvent: {}
+[38.811317] (-) TimerEvent: {}
+[38.911910] (-) TimerEvent: {}
+[39.012475] (-) TimerEvent: {}
+[39.112955] (-) TimerEvent: {}
+[39.213742] (-) TimerEvent: {}
+[39.314229] (-) TimerEvent: {}
+[39.414817] (-) TimerEvent: {}
+[39.515327] (-) TimerEvent: {}
+[39.615856] (-) TimerEvent: {}
+[39.716542] (-) TimerEvent: {}
+[39.817242] (-) TimerEvent: {}
+[39.917909] (-) TimerEvent: {}
+[40.018585] (-) TimerEvent: {}
+[40.119240] (-) TimerEvent: {}
+[40.219833] (-) TimerEvent: {}
+[40.320535] (-) TimerEvent: {}
+[40.421196] (-) TimerEvent: {}
+[40.521766] (-) TimerEvent: {}
+[40.622278] (-) TimerEvent: {}
+[40.722796] (-) TimerEvent: {}
+[40.823275] (-) TimerEvent: {}
+[40.923758] (-) TimerEvent: {}
+[41.024283] (-) TimerEvent: {}
+[41.124836] (-) TimerEvent: {}
+[41.225360] (-) TimerEvent: {}
+[41.325838] (-) TimerEvent: {}
+[41.426377] (-) TimerEvent: {}
+[41.526887] (-) TimerEvent: {}
+[41.627485] (-) TimerEvent: {}
+[41.728032] (-) TimerEvent: {}
+[41.828547] (-) TimerEvent: {}
+[41.929080] (-) TimerEvent: {}
+[42.029567] (-) TimerEvent: {}
+[42.130212] (-) TimerEvent: {}
+[42.230735] (-) TimerEvent: {}
+[42.331252] (-) TimerEvent: {}
+[42.431853] (-) TimerEvent: {}
+[42.532382] (-) TimerEvent: {}
+[42.632918] (-) TimerEvent: {}
+[42.733527] (-) TimerEvent: {}
+[42.834241] (-) TimerEvent: {}
+[42.934912] (-) TimerEvent: {}
+[43.035613] (-) TimerEvent: {}
+[43.136290] (-) TimerEvent: {}
+[43.236981] (-) TimerEvent: {}
+[43.337725] (-) TimerEvent: {}
+[43.438405] (-) TimerEvent: {}
+[43.539055] (-) TimerEvent: {}
+[43.639808] (-) TimerEvent: {}
+[43.740564] (-) TimerEvent: {}
+[43.841263] (-) TimerEvent: {}
+[43.941947] (-) TimerEvent: {}
+[44.042581] (-) TimerEvent: {}
+[44.143201] (-) TimerEvent: {}
+[44.243822] (-) TimerEvent: {}
+[44.344541] (-) TimerEvent: {}
+[44.445151] (-) TimerEvent: {}
+[44.545809] (-) TimerEvent: {}
+[44.646470] (-) TimerEvent: {}
+[44.747132] (-) TimerEvent: {}
+[44.847784] (-) TimerEvent: {}
+[44.948570] (-) TimerEvent: {}
+[45.049225] (-) TimerEvent: {}
+[45.149961] (-) TimerEvent: {}
+[45.250628] (-) TimerEvent: {}
+[45.351363] (-) TimerEvent: {}
+[45.452170] (-) TimerEvent: {}
+[45.552863] (-) TimerEvent: {}
+[45.653494] (-) TimerEvent: {}
+[45.754086] (-) TimerEvent: {}
+[45.854701] (-) TimerEvent: {}
+[45.955392] (-) TimerEvent: {}
+[46.056095] (-) TimerEvent: {}
+[46.156734] (-) TimerEvent: {}
+[46.257405] (-) TimerEvent: {}
+[46.358081] (-) TimerEvent: {}
+[46.458651] (-) TimerEvent: {}
+[46.559313] (-) TimerEvent: {}
+[46.659889] (-) TimerEvent: {}
+[46.760631] (-) TimerEvent: {}
+[46.861302] (-) TimerEvent: {}
+[46.961980] (-) TimerEvent: {}
+[47.062601] (-) TimerEvent: {}
+[47.163238] (-) TimerEvent: {}
+[47.263792] (-) TimerEvent: {}
+[47.364389] (-) TimerEvent: {}
+[47.464960] (-) TimerEvent: {}
+[47.565628] (-) TimerEvent: {}
+[47.666265] (-) TimerEvent: {}
+[47.767017] (-) TimerEvent: {}
+[47.867672] (-) TimerEvent: {}
+[47.968517] (-) TimerEvent: {}
+[48.069220] (-) TimerEvent: {}
+[48.169869] (-) TimerEvent: {}
+[48.270479] (-) TimerEvent: {}
+[48.371131] (-) TimerEvent: {}
+[48.471816] (-) TimerEvent: {}
+[48.572515] (-) TimerEvent: {}
+[48.673109] (-) TimerEvent: {}
+[48.773722] (-) TimerEvent: {}
+[48.874367] (-) TimerEvent: {}
+[48.975036] (-) TimerEvent: {}
+[49.075759] (-) TimerEvent: {}
+[49.176468] (-) TimerEvent: {}
+[49.277164] (-) TimerEvent: {}
+[49.377970] (-) TimerEvent: {}
+[49.445454] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'In file included from \x1b[01m\x1b[K/mnt/d/ros/mrs_uav_flightforge_simulator/include/flight_forge_connector/socket_client.h:17\x1b[m\x1b[K,\n'}
+[49.446629] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/mnt/d/ros/mrs_uav_flightforge_simulator/include/flight_forge_connector/flight_forge_connector.h:10\x1b[m\x1b[K,\n'}
+[49.447320] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/mnt/d/ros/mrs_uav_flightforge_simulator/src/flightforge_simulator.cpp:40\x1b[m\x1b[K:\n'}
+[49.448051] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'\x1b[01m\x1b[K/mnt/d/ros/mrs_uav_flightforge_simulator/include/kissnet/kissnet.hpp:403:41:\x1b[m\x1b[K \x1b[01;35m\x1b[Kwarning: \x1b[m\x1b[Kmissing initializer for member \xe2\x80\x98\x1b[01m\x1b[Ksockaddr_storage::__ss_padding\x1b[m\x1b[K\xe2\x80\x99 [\x1b[01;35m\x1b[K\x1b]8;;https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wmissing-field-initializers\x07-Wmissing-field-initializers\x1b]8;;\x07\x1b[m\x1b[K]\n'}
+[49.448714] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'  403 |             sockaddr_storage adrinf = {0\x1b[01;35m\x1b[K}\x1b[m\x1b[K;\n'}
+[49.449707] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'      |                                         \x1b[01;35m\x1b[K^\x1b[m\x1b[K\n'}
+[49.450351] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'\x1b[01m\x1b[K/mnt/d/ros/mrs_uav_flightforge_simulator/include/kissnet/kissnet.hpp:403:41:\x1b[m\x1b[K \x1b[01;35m\x1b[Kwarning: \x1b[m\x1b[Kmissing initializer for member \xe2\x80\x98\x1b[01m\x1b[Ksockaddr_storage::__ss_align\x1b[m\x1b[K\xe2\x80\x99 [\x1b[01;35m\x1b[K\x1b]8;;https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wmissing-field-initializers\x07-Wmissing-field-initializers\x1b]8;;\x07\x1b[m\x1b[K]\n'}
+[49.478109] (-) TimerEvent: {}
+[49.578762] (-) TimerEvent: {}
+[49.679470] (-) TimerEvent: {}
+[49.780162] (-) TimerEvent: {}
+[49.881119] (-) TimerEvent: {}
+[49.981819] (-) TimerEvent: {}
+[50.082540] (-) TimerEvent: {}
+[50.183141] (-) TimerEvent: {}
+[50.283862] (-) TimerEvent: {}
+[50.384506] (-) TimerEvent: {}
+[50.485143] (-) TimerEvent: {}
+[50.548252] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'In file included from \x1b[01m\x1b[K/opt/ros/jazzy/include/rclcpp/rclcpp/logging.hpp:24\x1b[m\x1b[K,\n'}
+[50.549258] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/opt/ros/jazzy/include/rclcpp/rclcpp/copy_all_parameter_values.hpp:27\x1b[m\x1b[K,\n'}
+[50.549912] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/opt/ros/jazzy/include/rclcpp/rclcpp/rclcpp.hpp:171\x1b[m\x1b[K,\n'}
+[50.550816] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/mnt/d/ros/mrs_uav_flightforge_simulator/src/flightforge_simulator.cpp:3\x1b[m\x1b[K:\n'}
+[50.551892] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'\x1b[01m\x1b[K/mnt/d/ros/mrs_uav_flightforge_simulator/src/flightforge_simulator.cpp:\x1b[m\x1b[K In member function \xe2\x80\x98\x1b[01m\x1b[Kvoid mrs_uav_flightforge_simulator::FlightforgeSimulator::\x1b[01;32m\x1b[KtimerInit\x1b[m\x1b[K()\x1b[m\x1b[K\xe2\x80\x99:\n'}
+[50.552875] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'\x1b[01m\x1b[K/mnt/d/ros/mrs_uav_flightforge_simulator/src/flightforge_simulator.cpp:1172:42:\x1b[m\x1b[K \x1b[01;35m\x1b[Kwarning: \x1b[m\x1b[Ktoo many arguments for format [\x1b[01;35m\x1b[K\x1b]8;;https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wformat-extra-args\x07-Wformat-extra-args\x1b]8;;\x07\x1b[m\x1b[K]\n'}
+[50.553623] (mrs_uav_flightforge_simulator) StderrLine: {'line': b' 1172 |         RCLCPP_INFO(node_->get_logger(), \x1b[01;35m\x1b[K"fuck you"\x1b[m\x1b[K, i + 1);\n'}
+[50.554294] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'      |                                          \x1b[01;35m\x1b[K^~~~~~~~~~\x1b[m\x1b[K\n'}
+[50.559435] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'\x1b[01m\x1b[K/mnt/d/ros/mrs_uav_flightforge_simulator/src/flightforge_simulator.cpp:1281:177:\x1b[m\x1b[K \x1b[01;31m\x1b[Kerror: \x1b[m\x1b[Kno match for \xe2\x80\x98\x1b[01m\x1b[Koperator=\x1b[m\x1b[K\xe2\x80\x99 (operand types are \xe2\x80\x98\x1b[01m\x1b[Kstd::shared_ptr<mrs_lib::ThreadTimer>\x1b[m\x1b[K\xe2\x80\x99 and \xe2\x80\x98\x1b[01m\x1b[Krclcpp::WallTimer<std::_Bind<void (mrs_uav_flightforge_simulator::FlightforgeSimulator::*(mrs_uav_flightforge_simulator::FlightforgeSimulator*))()>, 0>::SharedPtr\x1b[m\x1b[K\xe2\x80\x99 {aka \xe2\x80\x98\x1b[01m\x1b[Kstd::shared_ptr<rclcpp::WallTimer<std::_Bind<void (mrs_uav_flightforge_simulator::FlightforgeSimulator::*(mrs_uav_flightforge_simulator::FlightforgeSimulator*))()>, 0> >\x1b[m\x1b[K\xe2\x80\x99})\n'}
+[50.560442] (mrs_uav_flightforge_simulator) StderrLine: {'line': b' 1281 | te_wall_timer(std::chrono::duration<double>(1.0 / drs_params_.rgb_depth_rate), std::bind(&FlightforgeSimulator::timerDepth, this), cbgrp_sensors_\x1b[01;31m\x1b[K)\x1b[m\x1b[K;\n'}
+[50.561156] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'      |                                                                                                                                                  \x1b[01;31m\x1b[K^\x1b[m\x1b[K\n'}
+[50.561861] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'\n'}
+[50.562544] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'In file included from \x1b[01m\x1b[K/usr/include/c++/13/memory:80\x1b[m\x1b[K,\n'}
+[50.563307] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/opt/ros/jazzy/include/rclcpp/rclcpp/rclcpp.hpp:169\x1b[m\x1b[K:\n'}
+[50.563981] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'\x1b[01m\x1b[K/usr/include/c++/13/bits/shared_ptr.h:418:9:\x1b[m\x1b[K \x1b[01;36m\x1b[Knote: \x1b[m\x1b[Kcandidate: \xe2\x80\x98\x1b[01m\x1b[Ktemplate<class _Yp> std::shared_ptr<_Tp>::_Assignable<const std::shared_ptr<_Yp>&> std::shared_ptr<_Tp>::\x1b[01;32m\x1b[Koperator=\x1b[m\x1b[K(const std::shared_ptr<_Yp>&) \x1b[35m\x1b[K[with _Tp = mrs_lib::ThreadTimer]\x1b[m\x1b[K\x1b[m\x1b[K\xe2\x80\x99\n'}
+[50.564834] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'  418 |         \x1b[01;36m\x1b[Koperator\x1b[m\x1b[K=(const shared_ptr<_Yp>& __r) noexcept\n'}
+[50.565502] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'      |         \x1b[01;36m\x1b[K^~~~~~~~\x1b[m\x1b[K\n'}
+[50.566162] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'\x1b[01m\x1b[K/usr/include/c++/13/bits/shared_ptr.h:418:9:\x1b[m\x1b[K \x1b[01;36m\x1b[Knote: \x1b[m\x1b[K  template argument deduction/substitution failed:\n'}
+[50.566943] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'/usr/include/c++/13/bits/shared_ptr.h: In substitution of \xe2\x80\x98\x1b[01m\x1b[Ktemplate<class _Tp> template<class _Arg> using std::shared_ptr<_Tp>::_Assignable = typename std::enable_if<std::is_assignable<std::__shared_ptr<_Tp>&, _Arg>::value, std::shared_ptr<_Tp>&>::type \x1b[35m\x1b[K[with _Arg = const std::shared_ptr<rclcpp::WallTimer<std::_Bind<void (mrs_uav_flightforge_simulator::FlightforgeSimulator::*(mrs_uav_flightforge_simulator::FlightforgeSimulator*))()>, 0> >&; _Tp = mrs_lib::ThreadTimer]\x1b[m\x1b[K\x1b[m\x1b[K\xe2\x80\x99:\n'}
+[50.567647] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'\x1b[01m\x1b[K/usr/include/c++/13/bits/shared_ptr.h:418:2:\x1b[m\x1b[K   required by substitution of \xe2\x80\x98\x1b[01m\x1b[Ktemplate<class _Yp> std::shared_ptr<mrs_lib::ThreadTimer>::_Assignable<const std::shared_ptr<_Tp>&> std::shared_ptr<mrs_lib::ThreadTimer>::\x1b[01;32m\x1b[Koperator=\x1b[m\x1b[K(const std::shared_ptr<_Tp>&) \x1b[35m\x1b[K[with _Yp = rclcpp::WallTimer<std::_Bind<void (mrs_uav_flightforge_simulator::FlightforgeSimulator::*(mrs_uav_flightforge_simulator::FlightforgeSimulator*))()>, 0>]\x1b[m\x1b[K\x1b[m\x1b[K\xe2\x80\x99\n'}
+[50.568322] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'\x1b[01m\x1b[K/mnt/d/ros/mrs_uav_flightforge_simulator/src/flightforge_simulator.cpp:1281:177:\x1b[m\x1b[K   required from here\n'}
+[50.568989] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'\x1b[01m\x1b[K/usr/include/c++/13/bits/shared_ptr.h:183:15:\x1b[m\x1b[K \x1b[01;31m\x1b[Kerror: \x1b[m\x1b[Kno type named \xe2\x80\x98\x1b[01m\x1b[Ktype\x1b[m\x1b[K\xe2\x80\x99 in \xe2\x80\x98\x1b[01m\x1b[Kstruct std::enable_if<false, std::shared_ptr<mrs_lib::ThreadTimer>&>\x1b[m\x1b[K\xe2\x80\x99\n'}
+[50.569681] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'  183 |         using \x1b[01;31m\x1b[K_Assignable\x1b[m\x1b[K = typename enable_if<\n'}
+[50.570335] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'      |               \x1b[01;31m\x1b[K^~~~~~~~~~~\x1b[m\x1b[K\n'}
+[50.571011] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'\x1b[01m\x1b[K/usr/include/c++/13/bits/shared_ptr.h:429:9:\x1b[m\x1b[K \x1b[01;36m\x1b[Knote: \x1b[m\x1b[Kcandidate: \xe2\x80\x98\x1b[01m\x1b[Ktemplate<class _Yp> std::shared_ptr<_Tp>::_Assignable<std::auto_ptr<_Up> > std::shared_ptr<_Tp>::\x1b[01;32m\x1b[Koperator=\x1b[m\x1b[K(std::auto_ptr<_Up>&&) \x1b[35m\x1b[K[with _Tp = mrs_lib::ThreadTimer]\x1b[m\x1b[K\x1b[m\x1b[K\xe2\x80\x99\n'}
+[50.572064] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'  429 |         \x1b[01;36m\x1b[Koperator\x1b[m\x1b[K=(auto_ptr<_Yp>&& __r)\n'}
+[50.572835] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'      |         \x1b[01;36m\x1b[K^~~~~~~~\x1b[m\x1b[K\n'}
+[50.573525] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'\x1b[01m\x1b[K/usr/include/c++/13/bits/shared_ptr.h:429:9:\x1b[m\x1b[K \x1b[01;36m\x1b[Knote: \x1b[m\x1b[K  template argument deduction/substitution failed:\n'}
+[50.574163] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'\x1b[01m\x1b[K/mnt/d/ros/mrs_uav_flightforge_simulator/src/flightforge_simulator.cpp:1281:177:\x1b[m\x1b[K \x1b[01;36m\x1b[Knote: \x1b[m\x1b[K  \xe2\x80\x98\x1b[01m\x1b[Krclcpp::WallTimer<std::_Bind<void (mrs_uav_flightforge_simulator::FlightforgeSimulator::*(mrs_uav_flightforge_simulator::FlightforgeSimulator*))()>, 0>::SharedPtr\x1b[m\x1b[K\xe2\x80\x99 {aka \xe2\x80\x98\x1b[01m\x1b[Kstd::shared_ptr<rclcpp::WallTimer<std::_Bind<void (mrs_uav_flightforge_simulator::FlightforgeSimulator::*(mrs_uav_flightforge_simulator::FlightforgeSimulator*))()>, 0> >\x1b[m\x1b[K\xe2\x80\x99} is not derived from \xe2\x80\x98\x1b[01m\x1b[Kstd::auto_ptr<_Up>\x1b[m\x1b[K\xe2\x80\x99\n'}
+[50.574833] (mrs_uav_flightforge_simulator) StderrLine: {'line': b' 1281 | te_wall_timer(std::chrono::duration<double>(1.0 / drs_params_.rgb_depth_rate), std::bind(&FlightforgeSimulator::timerDepth, this), cbgrp_sensors_\x1b[01;36m\x1b[K)\x1b[m\x1b[K;\n'}
+[50.575467] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'      |                                                                                                                                                  \x1b[01;36m\x1b[K^\x1b[m\x1b[K\n'}
+[50.576110] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'\n'}
+[50.576755] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'\x1b[01m\x1b[K/usr/include/c++/13/bits/shared_ptr.h:446:9:\x1b[m\x1b[K \x1b[01;36m\x1b[Knote: \x1b[m\x1b[Kcandidate: \xe2\x80\x98\x1b[01m\x1b[Ktemplate<class _Yp> std::shared_ptr<_Tp>::_Assignable<std::shared_ptr<_Yp> > std::shared_ptr<_Tp>::\x1b[01;32m\x1b[Koperator=\x1b[m\x1b[K(std::shared_ptr<_Yp>&&) \x1b[35m\x1b[K[with _Tp = mrs_lib::ThreadTimer]\x1b[m\x1b[K\x1b[m\x1b[K\xe2\x80\x99\n'}
+[50.577402] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'  446 |         \x1b[01;36m\x1b[Koperator\x1b[m\x1b[K=(shared_ptr<_Yp>&& __r) noexcept\n'}
+[50.578042] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'      |         \x1b[01;36m\x1b[K^~~~~~~~\x1b[m\x1b[K\n'}
+[50.578885] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'\x1b[01m\x1b[K/usr/include/c++/13/bits/shared_ptr.h:446:9:\x1b[m\x1b[K \x1b[01;36m\x1b[Knote: \x1b[m\x1b[K  template argument deduction/substitution failed:\n'}
+[50.579559] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'/usr/include/c++/13/bits/shared_ptr.h: In substitution of \xe2\x80\x98\x1b[01m\x1b[Ktemplate<class _Tp> template<class _Arg> using std::shared_ptr<_Tp>::_Assignable = typename std::enable_if<std::is_assignable<std::__shared_ptr<_Tp>&, _Arg>::value, std::shared_ptr<_Tp>&>::type \x1b[35m\x1b[K[with _Arg = std::shared_ptr<rclcpp::WallTimer<std::_Bind<void (mrs_uav_flightforge_simulator::FlightforgeSimulator::*(mrs_uav_flightforge_simulator::FlightforgeSimulator*))()>, 0> >; _Tp = mrs_lib::ThreadTimer]\x1b[m\x1b[K\x1b[m\x1b[K\xe2\x80\x99:\n'}
+[50.580229] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'\x1b[01m\x1b[K/usr/include/c++/13/bits/shared_ptr.h:446:2:\x1b[m\x1b[K   required by substitution of \xe2\x80\x98\x1b[01m\x1b[Ktemplate<class _Yp> std::shared_ptr<mrs_lib::ThreadTimer>::_Assignable<std::shared_ptr<_Tp> > std::shared_ptr<mrs_lib::ThreadTimer>::\x1b[01;32m\x1b[Koperator=\x1b[m\x1b[K(std::shared_ptr<_Tp>&&) \x1b[35m\x1b[K[with _Yp = rclcpp::WallTimer<std::_Bind<void (mrs_uav_flightforge_simulator::FlightforgeSimulator::*(mrs_uav_flightforge_simulator::FlightforgeSimulator*))()>, 0>]\x1b[m\x1b[K\x1b[m\x1b[K\xe2\x80\x99\n'}
+[50.580931] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'\x1b[01m\x1b[K/mnt/d/ros/mrs_uav_flightforge_simulator/src/flightforge_simulator.cpp:1281:177:\x1b[m\x1b[K   required from here\n'}
+[50.581643] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'\x1b[01m\x1b[K/usr/include/c++/13/bits/shared_ptr.h:183:15:\x1b[m\x1b[K \x1b[01;31m\x1b[Kerror: \x1b[m\x1b[Kno type named \xe2\x80\x98\x1b[01m\x1b[Ktype\x1b[m\x1b[K\xe2\x80\x99 in \xe2\x80\x98\x1b[01m\x1b[Kstruct std::enable_if<false, std::shared_ptr<mrs_lib::ThreadTimer>&>\x1b[m\x1b[K\xe2\x80\x99\n'}
+[50.582412] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'  183 |         using \x1b[01;31m\x1b[K_Assignable\x1b[m\x1b[K = typename enable_if<\n'}
+[50.583077] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'      |               \x1b[01;31m\x1b[K^~~~~~~~~~~\x1b[m\x1b[K\n'}
+[50.583901] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'\x1b[01m\x1b[K/usr/include/c++/13/bits/shared_ptr.h:454:9:\x1b[m\x1b[K \x1b[01;36m\x1b[Knote: \x1b[m\x1b[Kcandidate: \xe2\x80\x98\x1b[01m\x1b[Ktemplate<class _Yp, class _Del> std::shared_ptr<_Tp>::_Assignable<std::unique_ptr<_Up, _Ep> > std::shared_ptr<_Tp>::\x1b[01;32m\x1b[Koperator=\x1b[m\x1b[K(std::unique_ptr<_Up, _Ep>&&) \x1b[35m\x1b[K[with _Del = _Yp; _Tp = mrs_lib::ThreadTimer]\x1b[m\x1b[K\x1b[m\x1b[K\xe2\x80\x99\n'}
+[50.584568] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'  454 |         \x1b[01;36m\x1b[Koperator\x1b[m\x1b[K=(unique_ptr<_Yp, _Del>&& __r)\n'}
+[50.585350] (-) TimerEvent: {}
+[50.585622] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'      |         \x1b[01;36m\x1b[K^~~~~~~~\x1b[m\x1b[K\n'}
+[50.586488] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'\x1b[01m\x1b[K/usr/include/c++/13/bits/shared_ptr.h:454:9:\x1b[m\x1b[K \x1b[01;36m\x1b[Knote: \x1b[m\x1b[K  template argument deduction/substitution failed:\n'}
+[50.587272] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'\x1b[01m\x1b[K/mnt/d/ros/mrs_uav_flightforge_simulator/src/flightforge_simulator.cpp:1281:177:\x1b[m\x1b[K \x1b[01;36m\x1b[Knote: \x1b[m\x1b[K  \xe2\x80\x98\x1b[01m\x1b[Krclcpp::WallTimer<std::_Bind<void (mrs_uav_flightforge_simulator::FlightforgeSimulator::*(mrs_uav_flightforge_simulator::FlightforgeSimulator*))()>, 0>::SharedPtr\x1b[m\x1b[K\xe2\x80\x99 {aka \xe2\x80\x98\x1b[01m\x1b[Kstd::shared_ptr<rclcpp::WallTimer<std::_Bind<void (mrs_uav_flightforge_simulator::FlightforgeSimulator::*(mrs_uav_flightforge_simulator::FlightforgeSimulator*))()>, 0> >\x1b[m\x1b[K\xe2\x80\x99} is not derived from \xe2\x80\x98\x1b[01m\x1b[Kstd::unique_ptr<_Tp, _Dp>\x1b[m\x1b[K\xe2\x80\x99\n'}
+[50.588017] (mrs_uav_flightforge_simulator) StderrLine: {'line': b' 1281 | te_wall_timer(std::chrono::duration<double>(1.0 / drs_params_.rgb_depth_rate), std::bind(&FlightforgeSimulator::timerDepth, this), cbgrp_sensors_\x1b[01;36m\x1b[K)\x1b[m\x1b[K;\n'}
+[50.589057] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'      |                                                                                                                                                  \x1b[01;36m\x1b[K^\x1b[m\x1b[K\n'}
+[50.589729] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'\n'}
+[50.590432] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'\x1b[01m\x1b[K/usr/include/c++/13/bits/shared_ptr.h:414:19:\x1b[m\x1b[K \x1b[01;36m\x1b[Knote: \x1b[m\x1b[Kcandidate: \xe2\x80\x98\x1b[01m\x1b[Kstd::shared_ptr<_Tp>& std::shared_ptr<_Tp>::\x1b[01;32m\x1b[Koperator=\x1b[m\x1b[K(const std::shared_ptr<_Tp>&) \x1b[35m\x1b[K[with _Tp = mrs_lib::ThreadTimer]\x1b[m\x1b[K\x1b[m\x1b[K\xe2\x80\x99\n'}
+[50.591074] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'  414 |       shared_ptr& \x1b[01;36m\x1b[Koperator\x1b[m\x1b[K=(const shared_ptr&) noexcept = default;\n'}
+[50.591763] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'      |                   \x1b[01;36m\x1b[K^~~~~~~~\x1b[m\x1b[K\n'}
+[50.592669] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'\x1b[01m\x1b[K/usr/include/c++/13/bits/shared_ptr.h:414:29:\x1b[m\x1b[K \x1b[01;36m\x1b[Knote: \x1b[m\x1b[K  no known conversion for argument 1 from \xe2\x80\x98\x1b[01m\x1b[Krclcpp::WallTimer<std::_Bind<void (mrs_uav_flightforge_simulator::FlightforgeSimulator::*(mrs_uav_flightforge_simulator::FlightforgeSimulator*))()>, 0>::SharedPtr\x1b[m\x1b[K\xe2\x80\x99 {aka \xe2\x80\x98\x1b[01m\x1b[Kstd::shared_ptr<rclcpp::WallTimer<std::_Bind<void (mrs_uav_flightforge_simulator::FlightforgeSimulator::*(mrs_uav_flightforge_simulator::FlightforgeSimulator*))()>, 0> >\x1b[m\x1b[K\xe2\x80\x99} to \xe2\x80\x98\x1b[01m\x1b[Kconst std::shared_ptr<mrs_lib::ThreadTimer>&\x1b[m\x1b[K\xe2\x80\x99\n'}
+[50.593341] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'  414 |       shared_ptr& operator=(\x1b[01;36m\x1b[Kconst shared_ptr&\x1b[m\x1b[K) noexcept = default;\n'}
+[50.594109] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'      |                             \x1b[01;36m\x1b[K^~~~~~~~~~~~~~~~~\x1b[m\x1b[K\n'}
+[50.594889] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'\x1b[01m\x1b[K/usr/include/c++/13/bits/shared_ptr.h:438:7:\x1b[m\x1b[K \x1b[01;36m\x1b[Knote: \x1b[m\x1b[Kcandidate: \xe2\x80\x98\x1b[01m\x1b[Kstd::shared_ptr<_Tp>& std::shared_ptr<_Tp>::\x1b[01;32m\x1b[Koperator=\x1b[m\x1b[K(std::shared_ptr<_Tp>&&) \x1b[35m\x1b[K[with _Tp = mrs_lib::ThreadTimer]\x1b[m\x1b[K\x1b[m\x1b[K\xe2\x80\x99\n'}
+[50.595538] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'  438 |       \x1b[01;36m\x1b[Koperator\x1b[m\x1b[K=(shared_ptr&& __r) noexcept\n'}
+[50.596175] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'      |       \x1b[01;36m\x1b[K^~~~~~~~\x1b[m\x1b[K\n'}
+[50.596840] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'\x1b[01m\x1b[K/usr/include/c++/13/bits/shared_ptr.h:438:30:\x1b[m\x1b[K \x1b[01;36m\x1b[Knote: \x1b[m\x1b[K  no known conversion for argument 1 from \xe2\x80\x98\x1b[01m\x1b[Krclcpp::WallTimer<std::_Bind<void (mrs_uav_flightforge_simulator::FlightforgeSimulator::*(mrs_uav_flightforge_simulator::FlightforgeSimulator*))()>, 0>::SharedPtr\x1b[m\x1b[K\xe2\x80\x99 {aka \xe2\x80\x98\x1b[01m\x1b[Kstd::shared_ptr<rclcpp::WallTimer<std::_Bind<void (mrs_uav_flightforge_simulator::FlightforgeSimulator::*(mrs_uav_flightforge_simulator::FlightforgeSimulator*))()>, 0> >\x1b[m\x1b[K\xe2\x80\x99} to \xe2\x80\x98\x1b[01m\x1b[Kstd::shared_ptr<mrs_lib::ThreadTimer>&&\x1b[m\x1b[K\xe2\x80\x99\n'}
+[50.597524] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'  438 |       operator=(\x1b[01;36m\x1b[Kshared_ptr&& __r\x1b[m\x1b[K) noexcept\n'}
+[50.598207] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'      |                 \x1b[01;36m\x1b[K~~~~~~~~~~~~~^~~\x1b[m\x1b[K\n'}
+[50.685511] (-) TimerEvent: {}
+[50.786128] (-) TimerEvent: {}
+[50.886788] (-) TimerEvent: {}
+[50.987410] (-) TimerEvent: {}
+[51.088124] (-) TimerEvent: {}
+[51.188854] (-) TimerEvent: {}
+[51.289457] (-) TimerEvent: {}
+[51.390094] (-) TimerEvent: {}
+[51.490850] (-) TimerEvent: {}
+[51.591548] (-) TimerEvent: {}
+[51.692218] (-) TimerEvent: {}
+[51.792808] (-) TimerEvent: {}
+[51.893476] (-) TimerEvent: {}
+[51.994133] (-) TimerEvent: {}
+[52.094789] (-) TimerEvent: {}
+[52.195386] (-) TimerEvent: {}
+[52.296020] (-) TimerEvent: {}
+[52.396665] (-) TimerEvent: {}
+[52.497416] (-) TimerEvent: {}
+[52.598160] (-) TimerEvent: {}
+[52.698869] (-) TimerEvent: {}
+[52.799490] (-) TimerEvent: {}
+[52.900185] (-) TimerEvent: {}
+[53.000797] (-) TimerEvent: {}
+[53.101516] (-) TimerEvent: {}
+[53.202162] (-) TimerEvent: {}
+[53.302822] (-) TimerEvent: {}
+[53.403427] (-) TimerEvent: {}
+[53.504004] (-) TimerEvent: {}
+[53.604598] (-) TimerEvent: {}
+[53.705262] (-) TimerEvent: {}
+[53.805927] (-) TimerEvent: {}
+[53.906610] (-) TimerEvent: {}
+[54.007281] (-) TimerEvent: {}
+[54.107967] (-) TimerEvent: {}
+[54.208545] (-) TimerEvent: {}
+[54.309228] (-) TimerEvent: {}
+[54.409870] (-) TimerEvent: {}
+[54.510626] (-) TimerEvent: {}
+[54.611192] (-) TimerEvent: {}
+[54.717815] (-) TimerEvent: {}
+[54.818443] (-) TimerEvent: {}
+[54.919107] (-) TimerEvent: {}
+[55.019785] (-) TimerEvent: {}
+[55.120549] (-) TimerEvent: {}
+[55.221248] (-) TimerEvent: {}
+[55.322007] (-) TimerEvent: {}
+[55.422746] (-) TimerEvent: {}
+[55.523428] (-) TimerEvent: {}
+[55.624294] (-) TimerEvent: {}
+[55.724988] (-) TimerEvent: {}
+[55.825684] (-) TimerEvent: {}
+[55.926288] (-) TimerEvent: {}
+[56.026958] (-) TimerEvent: {}
+[56.127571] (-) TimerEvent: {}
+[56.228363] (-) TimerEvent: {}
+[56.329416] (-) TimerEvent: {}
+[56.430131] (-) TimerEvent: {}
+[56.530772] (-) TimerEvent: {}
+[56.631434] (-) TimerEvent: {}
+[56.732070] (-) TimerEvent: {}
+[56.832718] (-) TimerEvent: {}
+[56.933273] (-) TimerEvent: {}
+[57.033866] (-) TimerEvent: {}
+[57.134554] (-) TimerEvent: {}
+[57.235201] (-) TimerEvent: {}
+[57.335856] (-) TimerEvent: {}
+[57.436527] (-) TimerEvent: {}
+[57.537195] (-) TimerEvent: {}
+[57.637838] (-) TimerEvent: {}
+[57.738642] (-) TimerEvent: {}
+[57.839296] (-) TimerEvent: {}
+[57.939966] (-) TimerEvent: {}
+[58.040664] (-) TimerEvent: {}
+[58.141333] (-) TimerEvent: {}
+[58.242177] (-) TimerEvent: {}
+[58.342814] (-) TimerEvent: {}
+[58.443469] (-) TimerEvent: {}
+[58.544287] (-) TimerEvent: {}
+[58.644977] (-) TimerEvent: {}
+[58.745651] (-) TimerEvent: {}
+[58.846323] (-) TimerEvent: {}
+[58.946965] (-) TimerEvent: {}
+[59.047605] (-) TimerEvent: {}
+[59.148354] (-) TimerEvent: {}
+[59.249195] (-) TimerEvent: {}
+[59.349852] (-) TimerEvent: {}
+[59.450797] (-) TimerEvent: {}
+[59.551469] (-) TimerEvent: {}
+[59.652215] (-) TimerEvent: {}
+[59.752851] (-) TimerEvent: {}
+[59.853427] (-) TimerEvent: {}
+[59.953991] (-) TimerEvent: {}
+[60.054684] (-) TimerEvent: {}
+[60.155437] (-) TimerEvent: {}
+[60.256090] (-) TimerEvent: {}
+[60.356730] (-) TimerEvent: {}
+[60.457415] (-) TimerEvent: {}
+[60.558071] (-) TimerEvent: {}
+[60.658747] (-) TimerEvent: {}
+[60.759400] (-) TimerEvent: {}
+[60.860006] (-) TimerEvent: {}
+[60.960734] (-) TimerEvent: {}
+[61.061483] (-) TimerEvent: {}
+[61.162203] (-) TimerEvent: {}
+[61.262835] (-) TimerEvent: {}
+[61.363435] (-) TimerEvent: {}
+[61.464161] (-) TimerEvent: {}
+[61.564876] (-) TimerEvent: {}
+[61.665625] (-) TimerEvent: {}
+[61.766378] (-) TimerEvent: {}
+[61.867178] (-) TimerEvent: {}
+[61.967774] (-) TimerEvent: {}
+[62.068552] (-) TimerEvent: {}
+[62.169225] (-) TimerEvent: {}
+[62.269887] (-) TimerEvent: {}
+[62.370504] (-) TimerEvent: {}
+[62.471186] (-) TimerEvent: {}
+[62.571930] (-) TimerEvent: {}
+[62.672631] (-) TimerEvent: {}
+[62.773285] (-) TimerEvent: {}
+[62.894423] (-) TimerEvent: {}
+[62.995099] (-) TimerEvent: {}
+[63.095844] (-) TimerEvent: {}
+[63.196596] (-) TimerEvent: {}
+[63.297632] (-) TimerEvent: {}
+[63.398326] (-) TimerEvent: {}
+[63.499051] (-) TimerEvent: {}
+[63.599644] (-) TimerEvent: {}
+[63.700448] (-) TimerEvent: {}
+[63.801184] (-) TimerEvent: {}
+[63.901885] (-) TimerEvent: {}
+[64.002502] (-) TimerEvent: {}
+[64.103187] (-) TimerEvent: {}
+[64.203766] (-) TimerEvent: {}
+[64.304354] (-) TimerEvent: {}
+[64.405041] (-) TimerEvent: {}
+[64.505768] (-) TimerEvent: {}
+[64.606411] (-) TimerEvent: {}
+[64.707090] (-) TimerEvent: {}
+[64.807695] (-) TimerEvent: {}
+[64.908295] (-) TimerEvent: {}
+[65.008907] (-) TimerEvent: {}
+[65.109670] (-) TimerEvent: {}
+[65.210750] (-) TimerEvent: {}
+[65.311405] (-) TimerEvent: {}
+[65.412160] (-) TimerEvent: {}
+[65.512861] (-) TimerEvent: {}
+[65.811796] (-) TimerEvent: {}
+[65.912485] (-) TimerEvent: {}
+[66.013057] (-) TimerEvent: {}
+[66.113609] (-) TimerEvent: {}
+[66.214202] (-) TimerEvent: {}
+[66.314854] (-) TimerEvent: {}
+[66.415507] (-) TimerEvent: {}
+[66.516157] (-) TimerEvent: {}
+[66.616828] (-) TimerEvent: {}
+[66.717515] (-) TimerEvent: {}
+[66.818248] (-) TimerEvent: {}
+[66.919105] (-) TimerEvent: {}
+[67.041742] (-) TimerEvent: {}
+[67.142372] (-) TimerEvent: {}
+[67.242972] (-) TimerEvent: {}
+[67.343572] (-) TimerEvent: {}
+[67.444269] (-) TimerEvent: {}
+[67.544955] (-) TimerEvent: {}
+[67.645632] (-) TimerEvent: {}
+[67.746234] (-) TimerEvent: {}
+[67.846881] (-) TimerEvent: {}
+[67.947696] (-) TimerEvent: {}
+[68.048268] (-) TimerEvent: {}
+[68.148970] (-) TimerEvent: {}
+[68.249695] (-) TimerEvent: {}
+[68.415344] (-) TimerEvent: {}
+[68.516010] (-) TimerEvent: {}
+[68.616722] (-) TimerEvent: {}
+[68.717484] (-) TimerEvent: {}
+[68.818214] (-) TimerEvent: {}
+[68.918904] (-) TimerEvent: {}
+[69.019706] (-) TimerEvent: {}
+[69.120648] (-) TimerEvent: {}
+[69.221287] (-) TimerEvent: {}
+[69.321882] (-) TimerEvent: {}
+[69.422579] (-) TimerEvent: {}
+[69.523251] (-) TimerEvent: {}
+[69.624426] (-) TimerEvent: {}
+[70.010233] (-) TimerEvent: {}
+[70.110917] (-) TimerEvent: {}
+[70.211656] (-) TimerEvent: {}
+[70.312328] (-) TimerEvent: {}
+[70.412900] (-) TimerEvent: {}
+[70.513474] (-) TimerEvent: {}
+[70.614070] (-) TimerEvent: {}
+[70.714761] (-) TimerEvent: {}
+[70.815470] (-) TimerEvent: {}
+[70.916036] (-) TimerEvent: {}
+[71.016816] (-) TimerEvent: {}
+[71.192049] (-) TimerEvent: {}
+[71.292625] (-) TimerEvent: {}
+[71.393260] (-) TimerEvent: {}
+[71.493839] (-) TimerEvent: {}
+[71.594491] (-) TimerEvent: {}
+[71.695039] (-) TimerEvent: {}
+[71.795704] (-) TimerEvent: {}
+[71.896464] (-) TimerEvent: {}
+[71.997146] (-) TimerEvent: {}
+[72.097867] (-) TimerEvent: {}
+[72.198517] (-) TimerEvent: {}
+[72.299182] (-) TimerEvent: {}
+[72.555166] (-) TimerEvent: {}
+[72.656009] (-) TimerEvent: {}
+[72.756693] (-) TimerEvent: {}
+[72.857449] (-) TimerEvent: {}
+[72.958124] (-) TimerEvent: {}
+[73.058814] (-) TimerEvent: {}
+[73.159487] (-) TimerEvent: {}
+[73.260156] (-) TimerEvent: {}
+[73.360812] (-) TimerEvent: {}
+[73.461511] (-) TimerEvent: {}
+[73.562104] (-) TimerEvent: {}
+[73.662719] (-) TimerEvent: {}
+[73.813905] (-) TimerEvent: {}
+[73.914488] (-) TimerEvent: {}
+[74.015074] (-) TimerEvent: {}
+[74.115730] (-) TimerEvent: {}
+[74.216406] (-) TimerEvent: {}
+[74.317112] (-) TimerEvent: {}
+[74.417807] (-) TimerEvent: {}
+[74.518735] (-) TimerEvent: {}
+[74.619452] (-) TimerEvent: {}
+[74.720162] (-) TimerEvent: {}
+[74.820814] (-) TimerEvent: {}
+[74.921504] (-) TimerEvent: {}
+[75.022222] (-) TimerEvent: {}
+[75.123088] (-) TimerEvent: {}
+[75.223831] (-) TimerEvent: {}
+[75.324717] (-) TimerEvent: {}
+[75.420986] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'gmake[2]: *** [CMakeFiles/MrsUavFlightforgeSimulator_FlightforgeSimulator.dir/build.make:76: CMakeFiles/MrsUavFlightforgeSimulator_FlightforgeSimulator.dir/src/flightforge_simulator.cpp.o] Error 1\n'}
+[75.423989] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'gmake[1]: *** [CMakeFiles/Makefile2:654: CMakeFiles/MrsUavFlightforgeSimulator_FlightforgeSimulator.dir/all] Error 2\n'}
+[75.427313] (-) TimerEvent: {}
+[75.428515] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'gmake: *** [Makefile:146: all] Error 2\n'}
+[75.429220] (mrs_uav_flightforge_simulator) CommandEnded: {'returncode': 2}
+[75.527436] (-) TimerEvent: {}
+[75.627966] (-) TimerEvent: {}
+[75.728447] (-) TimerEvent: {}
+[75.828882] (-) TimerEvent: {}
+[75.929544] (-) TimerEvent: {}
+[76.030075] (-) TimerEvent: {}
+[76.131025] (-) TimerEvent: {}
+[76.153180] (mrs_uav_flightforge_simulator) JobEnded: {'identifier': 'mrs_uav_flightforge_simulator', 'rc': 2}
+[76.164331] (-) EventReactorShutdown: {}

@@ -1,0 +1,102 @@
+[0.266s] DEBUG:colcon:Command line arguments: ['/usr/bin/colcon', 'build']
+[0.267s] DEBUG:colcon:Parsed command line arguments: Namespace(log_base=None, log_level=None, verb_name='build', build_base='build', install_base='install', merge_install=False, symlink_install=False, test_result_base=None, continue_on_error=False, executor='parallel', parallel_workers=16, event_handlers=None, ignore_user_meta=False, metas=['./colcon.meta'], base_paths=['.'], packages_ignore=None, packages_ignore_regex=None, paths=None, packages_up_to=None, packages_up_to_regex=None, packages_above=None, packages_above_and_dependencies=None, packages_above_depth=None, packages_select_by_dep=None, packages_skip_by_dep=None, packages_skip_up_to=None, packages_select_build_failed=False, packages_skip_build_finished=False, packages_select_test_failures=False, packages_skip_test_passed=False, packages_select=None, packages_skip=None, packages_select_regex=None, packages_skip_regex=None, packages_start=None, packages_end=None, allow_overriding=[], cmake_args=None, cmake_target=None, cmake_target_skip_unavailable=False, cmake_clean_cache=False, cmake_clean_first=False, cmake_force_configure=False, ament_cmake_args=None, catkin_cmake_args=None, catkin_skip_building_tests=False, mixin_files=None, mixin=None, verb_parser=<colcon_mixin.mixin.mixin_argument.MixinArgumentDecorator object at 0x7f9db9421e50>, verb_extension=<colcon_core.verb.build.BuildVerb object at 0x7f9db95865a0>, main=<bound method BuildVerb.main of <colcon_core.verb.build.BuildVerb object at 0x7f9db95865a0>>, mixin_verb=('build',))
+[0.348s] Level 1:colcon.colcon_core.package_discovery:discover_packages(colcon_meta) check parameters
+[0.349s] Level 1:colcon.colcon_core.package_discovery:discover_packages(recursive) check parameters
+[0.349s] Level 1:colcon.colcon_core.package_discovery:discover_packages(ignore) check parameters
+[0.349s] Level 1:colcon.colcon_core.package_discovery:discover_packages(path) check parameters
+[0.349s] Level 1:colcon.colcon_core.package_discovery:discover_packages(colcon_meta) discover
+[0.350s] Level 1:colcon.colcon_core.package_discovery:discover_packages(recursive) discover
+[0.350s] INFO:colcon.colcon_core.package_discovery:Crawling recursively for packages in '/mnt/d/ros/mrs_uav_flightforge_simulator'
+[0.351s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['ignore', 'ignore_ament_install']
+[0.351s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'ignore'
+[0.352s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'ignore_ament_install'
+[0.353s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['colcon_pkg']
+[0.353s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'colcon_pkg'
+[0.353s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['colcon_meta']
+[0.353s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'colcon_meta'
+[0.354s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['ros']
+[0.354s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'ros'
+[0.392s] DEBUG:colcon.colcon_core.package_identification:Package '.' with type 'ros.ament_cmake' and name 'mrs_uav_flightforge_simulator'
+[0.392s] Level 1:colcon.colcon_core.package_discovery:discover_packages(recursive) using defaults
+[0.392s] Level 1:colcon.colcon_core.package_discovery:discover_packages(ignore) discover
+[0.392s] Level 1:colcon.colcon_core.package_discovery:discover_packages(ignore) using defaults
+[0.392s] Level 1:colcon.colcon_core.package_discovery:discover_packages(path) discover
+[0.393s] Level 1:colcon.colcon_core.package_discovery:discover_packages(path) using defaults
+[0.419s] Level 1:colcon.colcon_core.package_discovery:discover_packages(prefix_path) check parameters
+[0.420s] Level 1:colcon.colcon_core.package_discovery:discover_packages(prefix_path) discover
+[0.425s] DEBUG:colcon.colcon_installed_package_information.package_discovery:Found 416 installed packages in /opt/ros/jazzy
+[0.427s] Level 1:colcon.colcon_core.package_discovery:discover_packages(prefix_path) using defaults
+[0.486s] WARNING:colcon.colcon_core.package_selection:Some selected packages are already built in one or more underlay workspaces:
+	'mrs_uav_flightforge_simulator' is in: /opt/ros/jazzy
+If a package in a merged underlay workspace is overridden and it installs headers, then all packages in the overlay must sort their include directories by workspace order. Failure to do so may result in build failures or undefined behavior at run time.
+If the overridden package is used by another package in any underlay, then the overriding package in the overlay must be API and ABI compatible or undefined behavior at run time may occur.
+
+If you understand the risks and want to override a package anyways, add the following to the command line:
+	--allow-overriding mrs_uav_flightforge_simulator
+
+This may be promoted to an error in a future release of colcon-override-check.
+[0.488s] Level 5:colcon.colcon_core.verb:set package 'mrs_uav_flightforge_simulator' build argument 'cmake_args' from command line to 'None'
+[0.488s] Level 5:colcon.colcon_core.verb:set package 'mrs_uav_flightforge_simulator' build argument 'cmake_target' from command line to 'None'
+[0.488s] Level 5:colcon.colcon_core.verb:set package 'mrs_uav_flightforge_simulator' build argument 'cmake_target_skip_unavailable' from command line to 'False'
+[0.488s] Level 5:colcon.colcon_core.verb:set package 'mrs_uav_flightforge_simulator' build argument 'cmake_clean_cache' from command line to 'False'
+[0.488s] Level 5:colcon.colcon_core.verb:set package 'mrs_uav_flightforge_simulator' build argument 'cmake_clean_first' from command line to 'False'
+[0.489s] Level 5:colcon.colcon_core.verb:set package 'mrs_uav_flightforge_simulator' build argument 'cmake_force_configure' from command line to 'False'
+[0.489s] Level 5:colcon.colcon_core.verb:set package 'mrs_uav_flightforge_simulator' build argument 'ament_cmake_args' from command line to 'None'
+[0.489s] Level 5:colcon.colcon_core.verb:set package 'mrs_uav_flightforge_simulator' build argument 'catkin_cmake_args' from command line to 'None'
+[0.489s] Level 5:colcon.colcon_core.verb:set package 'mrs_uav_flightforge_simulator' build argument 'catkin_skip_building_tests' from command line to 'False'
+[0.489s] DEBUG:colcon.colcon_core.verb:Building package 'mrs_uav_flightforge_simulator' with the following arguments: {'ament_cmake_args': None, 'build_base': '/mnt/d/ros/mrs_uav_flightforge_simulator/build/mrs_uav_flightforge_simulator', 'catkin_cmake_args': None, 'catkin_skip_building_tests': False, 'cmake_args': None, 'cmake_clean_cache': False, 'cmake_clean_first': False, 'cmake_force_configure': False, 'cmake_target': None, 'cmake_target_skip_unavailable': False, 'install_base': '/mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator', 'merge_install': False, 'path': '/mnt/d/ros/mrs_uav_flightforge_simulator', 'symlink_install': False, 'test_result_base': None}
+[0.490s] INFO:colcon.colcon_core.executor:Executing jobs using 'parallel' executor
+[0.491s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:run_until_complete
+[0.491s] INFO:colcon.colcon_ros.task.ament_cmake.build:Building ROS package in '/mnt/d/ros/mrs_uav_flightforge_simulator' with build type 'ament_cmake'
+[0.491s] INFO:colcon.colcon_cmake.task.cmake.build:Building CMake package in '/mnt/d/ros/mrs_uav_flightforge_simulator'
+[0.498s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_core.shell.bat': Not used on non-Windows systems
+[0.499s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[0.499s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[0.571s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/mnt/d/ros/mrs_uav_flightforge_simulator/build/mrs_uav_flightforge_simulator': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --build /mnt/d/ros/mrs_uav_flightforge_simulator/build/mrs_uav_flightforge_simulator -- -j16 -l16
+[71.445s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/mnt/d/ros/mrs_uav_flightforge_simulator/build/mrs_uav_flightforge_simulator' returned '2': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --build /mnt/d/ros/mrs_uav_flightforge_simulator/build/mrs_uav_flightforge_simulator -- -j16 -l16
+[71.464s] Level 1:colcon.colcon_core.environment:create_environment_scripts_only(mrs_uav_flightforge_simulator)
+[71.472s] Level 1:colcon.colcon_core.environment:checking '/mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator' for CMake module files
+[71.750s] Level 1:colcon.colcon_core.environment:checking '/mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator' for CMake config files
+[71.960s] Level 1:colcon.colcon_core.shell:create_environment_hook('mrs_uav_flightforge_simulator', 'cmake_prefix_path')
+[71.961s] INFO:colcon.colcon_core.shell:Creating environment hook '/mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/hook/cmake_prefix_path.ps1'
+[71.977s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/hook/cmake_prefix_path.dsv'
+[71.992s] INFO:colcon.colcon_core.shell:Creating environment hook '/mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/hook/cmake_prefix_path.sh'
+[72.011s] Level 1:colcon.colcon_core.environment:checking '/mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib'
+[72.015s] Level 1:colcon.colcon_core.shell:create_environment_hook('mrs_uav_flightforge_simulator', 'ld_library_path_lib')
+[72.015s] INFO:colcon.colcon_core.shell:Creating environment hook '/mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/hook/ld_library_path_lib.ps1'
+[72.030s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/hook/ld_library_path_lib.dsv'
+[72.044s] INFO:colcon.colcon_core.shell:Creating environment hook '/mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/hook/ld_library_path_lib.sh'
+[72.058s] Level 1:colcon.colcon_core.environment:checking '/mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/bin'
+[72.060s] Level 1:colcon.colcon_core.environment:checking '/mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib/pkgconfig/mrs_uav_flightforge_simulator.pc'
+[72.062s] Level 1:colcon.colcon_core.environment:checking '/mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib/python3.12/site-packages'
+[72.066s] Level 1:colcon.colcon_core.shell:create_environment_hook('mrs_uav_flightforge_simulator', 'pythonpath')
+[72.066s] INFO:colcon.colcon_core.shell:Creating environment hook '/mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/hook/pythonpath.ps1'
+[72.081s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/hook/pythonpath.dsv'
+[72.097s] INFO:colcon.colcon_core.shell:Creating environment hook '/mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/hook/pythonpath.sh'
+[72.115s] Level 1:colcon.colcon_core.environment:checking '/mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/bin'
+[72.117s] INFO:colcon.colcon_core.shell:Creating package script '/mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/package.ps1'
+[72.131s] INFO:colcon.colcon_core.shell:Creating package descriptor '/mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/package.dsv'
+[72.144s] INFO:colcon.colcon_core.shell:Creating package script '/mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/package.sh'
+[72.158s] INFO:colcon.colcon_core.shell:Creating package script '/mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/package.bash'
+[72.170s] INFO:colcon.colcon_core.shell:Creating package script '/mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/package.zsh'
+[72.184s] Level 1:colcon.colcon_core.environment:create_file_with_runtime_dependencies(/mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/colcon-core/packages/mrs_uav_flightforge_simulator)
+[72.203s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:closing loop
+[72.204s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:loop closed
+[72.204s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:run_until_complete finished with '2'
+[72.204s] DEBUG:colcon.colcon_core.event_reactor:joining thread
+[72.248s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_notification.desktop_notification.notify_send': Could not find 'notify-send'
+[72.248s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_notification.desktop_notification.terminal_notifier': Not used on non-Darwin systems
+[72.249s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_notification.desktop_notification.win32': Not used on non-Windows systems
+[72.249s] INFO:colcon.colcon_notification.desktop_notification:Sending desktop notification using 'notify2'
+[72.258s] DEBUG:colcon.colcon_notification.desktop_notification.notify2:Failed to initialize notify2: org.freedesktop.DBus.Error.ServiceUnknown: The name org.freedesktop.Notifications was not provided by any .service files
+[72.259s] DEBUG:colcon.colcon_core.event_reactor:joined thread
+[72.259s] INFO:colcon.colcon_core.shell:Creating prefix script '/mnt/d/ros/mrs_uav_flightforge_simulator/install/local_setup.ps1'
+[72.265s] INFO:colcon.colcon_core.shell:Creating prefix util module '/mnt/d/ros/mrs_uav_flightforge_simulator/install/_local_setup_util_ps1.py'
+[72.272s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/mnt/d/ros/mrs_uav_flightforge_simulator/install/setup.ps1'
+[72.278s] INFO:colcon.colcon_core.shell:Creating prefix script '/mnt/d/ros/mrs_uav_flightforge_simulator/install/local_setup.sh'
+[72.283s] INFO:colcon.colcon_core.shell:Creating prefix util module '/mnt/d/ros/mrs_uav_flightforge_simulator/install/_local_setup_util_sh.py'
+[72.289s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/mnt/d/ros/mrs_uav_flightforge_simulator/install/setup.sh'
+[72.295s] INFO:colcon.colcon_core.shell:Creating prefix script '/mnt/d/ros/mrs_uav_flightforge_simulator/install/local_setup.bash'
+[72.300s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/mnt/d/ros/mrs_uav_flightforge_simulator/install/setup.bash'
+[72.306s] INFO:colcon.colcon_core.shell:Creating prefix script '/mnt/d/ros/mrs_uav_flightforge_simulator/install/local_setup.zsh'
+[72.312s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/mnt/d/ros/mrs_uav_flightforge_simulator/install/setup.zsh'

@@ -1,0 +1,221 @@
+[0.000000] (-) TimerEvent: {}
+[0.000573] (mrs_uav_flightforge_simulator) JobQueued: {'identifier': 'mrs_uav_flightforge_simulator', 'dependencies': OrderedDict()}
+[0.002185] (mrs_uav_flightforge_simulator) JobStarted: {'identifier': 'mrs_uav_flightforge_simulator'}
+[0.054370] (mrs_uav_flightforge_simulator) JobProgress: {'identifier': 'mrs_uav_flightforge_simulator', 'progress': 'cmake'}
+[0.097846] (-) TimerEvent: {}
+[0.116224] (mrs_uav_flightforge_simulator) Command: {'cmd': ['/usr/bin/cmake', '/mnt/d/ros/mrs_uav_flightforge_simulator', '-DCMAKE_INSTALL_PREFIX=/mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator'], 'cwd': '/mnt/d/ros/mrs_uav_flightforge_simulator/build/mrs_uav_flightforge_simulator', 'env': OrderedDict({'GZ_SIM_SYSTEM_PLUGIN_PATH': '/opt/ros/jazzy/lib/mrs_gazebo_common_resources', 'LESSOPEN': '| /usr/bin/lesspipe %s', 'GZ_SIM_RESOURCE_PATH': '/opt/ros/jazzy/share', 'USER': 'aidar', 'GZ_CONFIG_PATH': '/opt/ros/jazzy/opt/gz_sim_vendor/share/gz:/opt/ros/jazzy/opt/sdformat_vendor/share/gz:/opt/ros/jazzy/opt/gz_gui_vendor/share/gz:/opt/ros/jazzy/opt/gz_transport_vendor/share/gz:/opt/ros/jazzy/opt/gz_rendering_vendor/share/gz:/opt/ros/jazzy/opt/gz_plugin_vendor/share/gz:/opt/ros/jazzy/opt/gz_fuel_tools_vendor/share/gz:/opt/ros/jazzy/opt/gz_msgs_vendor/share/gz:/opt/ros/jazzy/opt/gz_common_vendor/share/gz', 'SHLVL': '1', 'LD_LIBRARY_PATH': '/opt/ros/jazzy/opt/zenoh_cpp_vendor/lib:/opt/ros/jazzy/opt/gz_sim_vendor/lib:/opt/ros/jazzy/opt/gz_sensors_vendor/lib:/opt/ros/jazzy/opt/gz_physics_vendor/lib:/opt/ros/jazzy/opt/sdformat_vendor/lib:/opt/ros/jazzy/opt/rviz_ogre_vendor/lib:/opt/ros/jazzy/lib/x86_64-linux-gnu:/opt/ros/jazzy/opt/gz_gui_vendor/lib:/opt/ros/jazzy/opt/gz_transport_vendor/lib:/opt/ros/jazzy/opt/gz_rendering_vendor/lib:/opt/ros/jazzy/opt/gz_plugin_vendor/lib:/opt/ros/jazzy/opt/gz_fuel_tools_vendor/lib:/opt/ros/jazzy/opt/gz_msgs_vendor/lib:/opt/ros/jazzy/opt/gz_common_vendor/lib:/opt/ros/jazzy/opt/gz_math_vendor/lib:/opt/ros/jazzy/opt/gz_utils_vendor/lib:/opt/ros/jazzy/opt/gz_tools_vendor/lib:/opt/ros/jazzy/opt/gz_ogre_next_vendor/lib:/opt/ros/jazzy/opt/gz_dartsim_vendor/lib:/opt/ros/jazzy/opt/gz_cmake_vendor/lib:/opt/ros/jazzy/lib', 'HOME': '/home/aidar', 'OLDPWD': '/mnt/d/ros', 'ROS_PYTHON_VERSION': '3', 'WSL_DISTRO_NAME': 'Ubuntu', 'DEBUGINFOD_URLS': 'https://debuginfod.ubuntu.com', 'WAYLAND_DISPLAY': 'wayland-0', 'ROS_DISTRO': 'jazzy', 'LOGNAME': 'aidar', 'NAME': 'Agent', 'WSL_INTEROP': '/run/WSL/10_interop', 'IGN_GAZEBO_MODEL_PATH': '/opt/ros/jazzy/share', 'PULSE_SERVER': 'unix:/mnt/wslg/PulseServer', '_': '/usr/bin/colcon', 'ROS_VERSION': '2', 'TERM': 'xterm-256color', 'GAZEBO_MODEL_PATH': '/opt/ros/jazzy/share', 'PATH': '/home/aidar/.local/bin:/opt/ros/jazzy/opt/gz_msgs_vendor/bin:/opt/ros/jazzy/opt/gz_tools_vendor/bin:/opt/ros/jazzy/opt/gz_ogre_next_vendor/bin:/opt/ros/jazzy/bin:/home/aidar/autotools/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/lib/wsl/lib:/mnt/c/Program Files/WindowsApps/MicrosoftCorporationII.WindowsSubsystemForLinux_2.3.26.0_x64__8wekyb3d8bbwe:/mnt/c/Windows/system32:/mnt/c/Windows:/mnt/c/Windows/System32/Wbem:/mnt/c/Windows/System32/WindowsPowerShell/v1.0/:/mnt/c/Windows/System32/OpenSSH/:/mnt/c/Program Files (x86)/NVIDIA Corporation/PhysX/Common:/mnt/c/WINDOWS/system32:/mnt/c/WINDOWS:/mnt/c/WINDOWS/System32/Wbem:/mnt/c/WINDOWS/System32/WindowsPowerShell/v1.0/:/mnt/c/WINDOWS/System32/OpenSSH/:/mnt/c/Program Files/Microsoft SQL Server/150/Tools/Binn/:/mnt/c/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/:/mnt/c/Program Files/dotnet/:/mnt/c/Program Files/NVIDIA Corporation/NVIDIA app/NvDLISR:/mnt/d/CMAKE/bin:/mnt/d/Git/cmd:/mnt/d/Git LFS:/mnt/c/ProgramData/chocolatey/bin:/mnt/d/Windows Kits/10/Windows Performance Toolkit/:/mnt/d/pgrframeworkvs2019/pgrframework/bin:/mnt/d/Microsoft_VS_Code/Microsoft VS Code/bin:/mnt/c/Users/helst/AppData/Local/JetBrains/Toolbox/scripts', 'XDG_RUNTIME_DIR': '/mnt/wslg/runtime-dir', 'DISPLAY': ':0', 'LANG': 'C.UTF-8', 'LS_COLORS': 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=00:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.avif=01;35:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:*~=00;90:*#=00;90:*.bak=00;90:*.crdownload=00;90:*.dpkg-dist=00;90:*.dpkg-new=00;90:*.dpkg-old=00;90:*.dpkg-tmp=00;90:*.old=00;90:*.orig=00;90:*.part=00;90:*.rej=00;90:*.rpmnew=00;90:*.rpmorig=00;90:*.rpmsave=00;90:*.swp=00;90:*.tmp=00;90:*.ucf-dist=00;90:*.ucf-new=00;90:*.ucf-old=00;90:', 'AMENT_PREFIX_PATH': '/opt/ros/jazzy', 'SHELL': '/bin/bash', 'LESSCLOSE': '/usr/bin/lesspipe %s %s', 'IGN_GAZEBO_RESOURCE_PATH': '/opt/ros/jazzy/share', 'GAZEBO_RESOURCE_PATH': '/opt/ros/jazzy/share', 'ROS_AUTOMATIC_DISCOVERY_RANGE': 'SUBNET', 'PWD': '/mnt/d/ros/mrs_uav_flightforge_simulator/build/mrs_uav_flightforge_simulator', 'PYTHONPATH': '/opt/ros/jazzy/lib/python3.12/site-packages', 'COLCON': '1', 'WSL2_GUI_APPS_ENABLED': '1', 'HOSTTYPE': 'x86_64', 'CMAKE_PREFIX_PATH': '/opt/ros/jazzy:/opt/ros/jazzy/opt/gz_sim_vendor:/opt/ros/jazzy/opt/gz_sensors_vendor:/opt/ros/jazzy/opt/gz_physics_vendor:/opt/ros/jazzy/opt/sdformat_vendor:/opt/ros/jazzy/opt/gz_gui_vendor:/opt/ros/jazzy/opt/gz_transport_vendor:/opt/ros/jazzy/opt/gz_rendering_vendor:/opt/ros/jazzy/opt/gz_plugin_vendor:/opt/ros/jazzy/opt/gz_fuel_tools_vendor:/opt/ros/jazzy/opt/gz_msgs_vendor:/opt/ros/jazzy/opt/gz_common_vendor:/opt/ros/jazzy/opt/gz_math_vendor:/opt/ros/jazzy/opt/gz_utils_vendor:/opt/ros/jazzy/opt/gz_tools_vendor:/opt/ros/jazzy/opt/gz_ogre_next_vendor:/opt/ros/jazzy/opt/gz_dartsim_vendor:/opt/ros/jazzy/opt/gz_cmake_vendor', 'WSLENV': ''}), 'shell': False}
+[0.198041] (-) TimerEvent: {}
+[0.299098] (-) TimerEvent: {}
+[0.375197] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Found rclcpp: 28.1.16 (/opt/ros/jazzy/share/rclcpp/cmake)\n'}
+[0.399367] (-) TimerEvent: {}
+[0.441542] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Found Python3: /usr/bin/python3 (found version "3.12.3") found components: Interpreter \n'}
+[0.499461] (-) TimerEvent: {}
+[0.600278] (-) TimerEvent: {}
+[0.701296] (-) TimerEvent: {}
+[0.802128] (-) TimerEvent: {}
+[0.902980] (-) TimerEvent: {}
+[1.004154] (-) TimerEvent: {}
+[1.105179] (-) TimerEvent: {}
+[1.206217] (-) TimerEvent: {}
+[1.306911] (-) TimerEvent: {}
+[1.312053] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Found rosidl_generator_c: 4.6.7 (/opt/ros/jazzy/share/rosidl_generator_c/cmake)\n'}
+[1.387345] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Found rosidl_generator_cpp: 4.6.7 (/opt/ros/jazzy/share/rosidl_generator_cpp/cmake)\n'}
+[1.407022] (-) TimerEvent: {}
+[1.481866] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c\n'}
+[1.507160] (-) TimerEvent: {}
+[1.607928] (-) TimerEvent: {}
+[1.618454] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp\n'}
+[1.708094] (-) TimerEvent: {}
+[1.808867] (-) TimerEvent: {}
+[1.909594] (-) TimerEvent: {}
+[1.990473] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Found rmw_implementation_cmake: 7.3.3 (/opt/ros/jazzy/share/rmw_implementation_cmake/cmake)\n'}
+[2.009726] (-) TimerEvent: {}
+[2.014072] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Found rmw_fastrtps_cpp: 8.4.3 (/opt/ros/jazzy/share/rmw_fastrtps_cpp/cmake)\n'}
+[2.109916] (-) TimerEvent: {}
+[2.211006] (-) TimerEvent: {}
+[2.311833] (-) TimerEvent: {}
+[2.412744] (-) TimerEvent: {}
+[2.513635] (-) TimerEvent: {}
+[2.614733] (-) TimerEvent: {}
+[2.680133] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b"-- Using RMW implementation 'rmw_fastrtps_cpp' as default\n"}
+[2.714853] (-) TimerEvent: {}
+[2.815606] (-) TimerEvent: {}
+[2.916688] (-) TimerEvent: {}
+[3.017464] (-) TimerEvent: {}
+[3.118230] (-) TimerEvent: {}
+[3.135617] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Found rclcpp_components: 28.1.16 (/opt/ros/jazzy/share/rclcpp_components/cmake)\n'}
+[3.218396] (-) TimerEvent: {}
+[3.291922] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Found mrs_lib: 2.0.0 (/opt/ros/jazzy/share/mrs_lib/cmake)\n'}
+[3.318572] (-) TimerEvent: {}
+[3.419641] (-) TimerEvent: {}
+[3.520532] (-) TimerEvent: {}
+[3.621549] (-) TimerEvent: {}
+[3.722627] (-) TimerEvent: {}
+[3.821918] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Found eigen3_cmake_module: 0.3.0 (/opt/ros/jazzy/share/eigen3_cmake_module/cmake)\n'}
+[3.823687] (-) TimerEvent: {}
+[3.835205] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Ensuring Eigen3 include directory is part of orocos-kdl CMake target\n'}
+[3.923877] (-) TimerEvent: {}
+[4.024595] (-) TimerEvent: {}
+[4.125422] (-) TimerEvent: {}
+[4.227118] (-) TimerEvent: {}
+[4.328190] (-) TimerEvent: {}
+[4.415644] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Found mrs_uav_hw_api: 2.0.0 (/opt/ros/jazzy/share/mrs_uav_hw_api/cmake)\n'}
+[4.428404] (-) TimerEvent: {}
+[4.529356] (-) TimerEvent: {}
+[4.617550] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Found mrs_multirotor_simulator: 2.0.0 (/opt/ros/jazzy/share/mrs_multirotor_simulator/cmake)\n'}
+[4.629566] (-) TimerEvent: {}
+[4.699264] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Found image_transport: 5.1.7 (/opt/ros/jazzy/share/image_transport/cmake)\n'}
+[4.722178] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Found cv_bridge: 4.1.0 (/opt/ros/jazzy/share/cv_bridge/cmake)\n'}
+[4.729609] (-) TimerEvent: {}
+[4.765165] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Found pcl_ros: 2.6.2 (/opt/ros/jazzy/share/pcl_ros/cmake)\n'}
+[4.829824] (-) TimerEvent: {}
+[4.930626] (-) TimerEvent: {}
+[5.022723] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'\x1b[33mCMake Warning (dev) at /usr/lib/x86_64-linux-gnu/cmake/pcl/Modules/FindFLANN.cmake:45 (find_package):\n'}
+[5.024505] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'  Policy CMP0144 is not set: find_package uses upper-case <PACKAGENAME>_ROOT\n'}
+[5.025932] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'  variables.  Run "cmake --help-policy CMP0144" for policy details.  Use the\n'}
+[5.027416] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'  cmake_policy command to set the policy and suppress this warning.\n'}
+[5.028772] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'\n'}
+[5.030200] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'  CMake variable FLANN_ROOT is set to:\n'}
+[5.031766] (-) TimerEvent: {}
+[5.032263] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'\n'}
+[5.033826] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'    /usr\n'}
+[5.035439] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'\n'}
+[5.036955] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'  For compatibility, find_package is ignoring the variable, but code in a\n'}
+[5.038422] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'  .cmake module might still use it.\n'}
+[5.039851] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'Call Stack (most recent call first):\n'}
+[5.041191] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'  /usr/lib/x86_64-linux-gnu/cmake/pcl/PCLConfig.cmake:261 (find_package)\n'}
+[5.042491] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'  /usr/lib/x86_64-linux-gnu/cmake/pcl/PCLConfig.cmake:306 (find_flann)\n'}
+[5.043866] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'  /usr/lib/x86_64-linux-gnu/cmake/pcl/PCLConfig.cmake:570 (find_external_library)\n'}
+[5.045439] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'  /opt/ros/jazzy/share/pcl_conversions/cmake/ament_cmake_export_dependencies-extras.cmake:21 (find_package)\n'}
+[5.046902] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'  /opt/ros/jazzy/share/pcl_conversions/cmake/pcl_conversionsConfig.cmake:41 (include)\n'}
+[5.048474] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'  /opt/ros/jazzy/share/pcl_ros/cmake/ament_cmake_export_dependencies-extras.cmake:21 (find_package)\n'}
+[5.049934] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'  /opt/ros/jazzy/share/pcl_ros/cmake/pcl_rosConfig.cmake:41 (include)\n'}
+[5.051424] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'  CMakeLists.txt:62 (find_package)\n'}
+[5.052982] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'This warning is for project developers.  Use -Wno-dev to suppress it.\n'}
+[5.054519] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'\x1b[0m\n'}
+[5.055896] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Found flann version 1.9.2\n'}
+[5.131959] (-) TimerEvent: {}
+[5.232802] (-) TimerEvent: {}
+[5.334152] (-) TimerEvent: {}
+[5.435095] (-) TimerEvent: {}
+[5.535893] (-) TimerEvent: {}
+[5.636591] (-) TimerEvent: {}
+[5.737448] (-) TimerEvent: {}
+[5.838450] (-) TimerEvent: {}
+[5.939289] (-) TimerEvent: {}
+[6.040109] (-) TimerEvent: {}
+[6.141221] (-) TimerEvent: {}
+[6.242156] (-) TimerEvent: {}
+[6.342889] (-) TimerEvent: {}
+[6.443658] (-) TimerEvent: {}
+[6.544484] (-) TimerEvent: {}
+[6.645203] (-) TimerEvent: {}
+[6.745949] (-) TimerEvent: {}
+[6.846697] (-) TimerEvent: {}
+[6.947471] (-) TimerEvent: {}
+[7.048271] (-) TimerEvent: {}
+[7.149146] (-) TimerEvent: {}
+[7.249873] (-) TimerEvent: {}
+[7.350997] (-) TimerEvent: {}
+[7.451798] (-) TimerEvent: {}
+[7.552679] (-) TimerEvent: {}
+[7.653631] (-) TimerEvent: {}
+[7.755119] (-) TimerEvent: {}
+[7.855897] (-) TimerEvent: {}
+[7.956640] (-) TimerEvent: {}
+[8.057509] (-) TimerEvent: {}
+[8.158246] (-) TimerEvent: {}
+[8.259062] (-) TimerEvent: {}
+[8.359895] (-) TimerEvent: {}
+[8.460832] (-) TimerEvent: {}
+[8.561622] (-) TimerEvent: {}
+[8.662465] (-) TimerEvent: {}
+[8.763220] (-) TimerEvent: {}
+[8.863973] (-) TimerEvent: {}
+[8.964829] (-) TimerEvent: {}
+[9.065662] (-) TimerEvent: {}
+[9.166438] (-) TimerEvent: {}
+[9.267247] (-) TimerEvent: {}
+[9.368231] (-) TimerEvent: {}
+[9.468965] (-) TimerEvent: {}
+[9.569892] (-) TimerEvent: {}
+[9.670621] (-) TimerEvent: {}
+[9.771887] (-) TimerEvent: {}
+[9.872922] (-) TimerEvent: {}
+[9.973684] (-) TimerEvent: {}
+[10.074601] (-) TimerEvent: {}
+[10.175323] (-) TimerEvent: {}
+[10.276110] (-) TimerEvent: {}
+[10.376898] (-) TimerEvent: {}
+[10.477688] (-) TimerEvent: {}
+[10.578389] (-) TimerEvent: {}
+[10.679250] (-) TimerEvent: {}
+[10.780377] (-) TimerEvent: {}
+[10.881113] (-) TimerEvent: {}
+[10.981820] (-) TimerEvent: {}
+[11.082795] (-) TimerEvent: {}
+[11.183661] (-) TimerEvent: {}
+[11.284686] (-) TimerEvent: {}
+[11.385514] (-) TimerEvent: {}
+[11.486222] (-) TimerEvent: {}
+[11.586970] (-) TimerEvent: {}
+[11.687826] (-) TimerEvent: {}
+[11.788625] (-) TimerEvent: {}
+[11.889380] (-) TimerEvent: {}
+[11.990198] (-) TimerEvent: {}
+[12.090934] (-) TimerEvent: {}
+[12.191750] (-) TimerEvent: {}
+[12.292491] (-) TimerEvent: {}
+[12.393251] (-) TimerEvent: {}
+[12.493986] (-) TimerEvent: {}
+[12.594715] (-) TimerEvent: {}
+[12.695474] (-) TimerEvent: {}
+[12.796499] (-) TimerEvent: {}
+[12.897325] (-) TimerEvent: {}
+[12.998123] (-) TimerEvent: {}
+[13.098850] (-) TimerEvent: {}
+[13.200002] (-) TimerEvent: {}
+[13.300783] (-) TimerEvent: {}
+[13.401635] (-) TimerEvent: {}
+[13.502900] (-) TimerEvent: {}
+[13.603658] (-) TimerEvent: {}
+[13.704458] (-) TimerEvent: {}
+[13.805185] (-) TimerEvent: {}
+[13.905905] (-) TimerEvent: {}
+[14.006811] (-) TimerEvent: {}
+[14.107525] (-) TimerEvent: {}
+[14.208279] (-) TimerEvent: {}
+[14.309076] (-) TimerEvent: {}
+[14.409820] (-) TimerEvent: {}
+[14.510556] (-) TimerEvent: {}
+[14.611290] (-) TimerEvent: {}
+[14.712007] (-) TimerEvent: {}
+[14.812776] (-) TimerEvent: {}
+[14.913503] (-) TimerEvent: {}
+[15.014520] (-) TimerEvent: {}
+[15.115309] (-) TimerEvent: {}
+[15.216036] (-) TimerEvent: {}
+[15.316871] (-) TimerEvent: {}
+[15.417746] (-) TimerEvent: {}
+[15.518498] (-) TimerEvent: {}
+[15.619268] (-) TimerEvent: {}
+[15.720228] (-) TimerEvent: {}
+[15.820982] (-) TimerEvent: {}
+[15.921651] (-) TimerEvent: {}
+[16.022503] (-) TimerEvent: {}
+[16.123198] (-) TimerEvent: {}
+[16.224053] (-) TimerEvent: {}
+[16.324898] (-) TimerEvent: {}
+[16.425710] (-) TimerEvent: {}
+[16.526411] (-) TimerEvent: {}
+[16.627274] (-) TimerEvent: {}
+[16.728078] (-) TimerEvent: {}
+[16.829085] (-) TimerEvent: {}
+[16.929829] (-) TimerEvent: {}
+[17.000688] (mrs_uav_flightforge_simulator) CommandEnded: {'returncode': -2}
+[17.030399] (-) TimerEvent: {}
+[17.131160] (-) TimerEvent: {}
+[17.231850] (-) TimerEvent: {}
+[17.332713] (-) TimerEvent: {}
+[17.385613] (mrs_uav_flightforge_simulator) JobEnded: {'identifier': 'mrs_uav_flightforge_simulator', 'rc': 'SIGINT'}
+[17.398269] (-) EventReactorShutdown: {}

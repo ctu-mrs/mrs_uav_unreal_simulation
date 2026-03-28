@@ -1,0 +1,43 @@
+[0.135s] Invoking command in '/mnt/d/ros/mrs_uav_flightforge_simulator/build/mrs_uav_flightforge_simulator': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake /mnt/d/ros/mrs_uav_flightforge_simulator -DCMAKE_INSTALL_PREFIX=/mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator
+[0.374s] -- Found rclcpp: 28.1.16 (/opt/ros/jazzy/share/rclcpp/cmake)
+[0.441s] -- Found Python3: /usr/bin/python3 (found version "3.12.3") found components: Interpreter 
+[1.310s] -- Found rosidl_generator_c: 4.6.7 (/opt/ros/jazzy/share/rosidl_generator_c/cmake)
+[1.386s] -- Found rosidl_generator_cpp: 4.6.7 (/opt/ros/jazzy/share/rosidl_generator_cpp/cmake)
+[1.481s] -- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+[1.617s] -- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+[1.989s] -- Found rmw_implementation_cmake: 7.3.3 (/opt/ros/jazzy/share/rmw_implementation_cmake/cmake)
+[2.013s] -- Found rmw_fastrtps_cpp: 8.4.3 (/opt/ros/jazzy/share/rmw_fastrtps_cpp/cmake)
+[2.682s] -- Using RMW implementation 'rmw_fastrtps_cpp' as default
+[3.134s] -- Found rclcpp_components: 28.1.16 (/opt/ros/jazzy/share/rclcpp_components/cmake)
+[3.291s] -- Found mrs_lib: 2.0.0 (/opt/ros/jazzy/share/mrs_lib/cmake)
+[3.821s] -- Found eigen3_cmake_module: 0.3.0 (/opt/ros/jazzy/share/eigen3_cmake_module/cmake)
+[3.834s] -- Ensuring Eigen3 include directory is part of orocos-kdl CMake target
+[4.414s] -- Found mrs_uav_hw_api: 2.0.0 (/opt/ros/jazzy/share/mrs_uav_hw_api/cmake)
+[4.616s] -- Found mrs_multirotor_simulator: 2.0.0 (/opt/ros/jazzy/share/mrs_multirotor_simulator/cmake)
+[4.698s] -- Found image_transport: 5.1.7 (/opt/ros/jazzy/share/image_transport/cmake)
+[4.721s] -- Found cv_bridge: 4.1.0 (/opt/ros/jazzy/share/cv_bridge/cmake)
+[4.764s] -- Found pcl_ros: 2.6.2 (/opt/ros/jazzy/share/pcl_ros/cmake)
+[5.021s] [33mCMake Warning (dev) at /usr/lib/x86_64-linux-gnu/cmake/pcl/Modules/FindFLANN.cmake:45 (find_package):
+[5.023s]   Policy CMP0144 is not set: find_package uses upper-case <PACKAGENAME>_ROOT
+[5.024s]   variables.  Run "cmake --help-policy CMP0144" for policy details.  Use the
+[5.026s]   cmake_policy command to set the policy and suppress this warning.
+[5.027s] 
+[5.029s]   CMake variable FLANN_ROOT is set to:
+[5.031s] 
+[5.032s]     /usr
+[5.034s] 
+[5.035s]   For compatibility, find_package is ignoring the variable, but code in a
+[5.037s]   .cmake module might still use it.
+[5.038s] Call Stack (most recent call first):
+[5.040s]   /usr/lib/x86_64-linux-gnu/cmake/pcl/PCLConfig.cmake:261 (find_package)
+[5.041s]   /usr/lib/x86_64-linux-gnu/cmake/pcl/PCLConfig.cmake:306 (find_flann)
+[5.042s]   /usr/lib/x86_64-linux-gnu/cmake/pcl/PCLConfig.cmake:570 (find_external_library)
+[5.044s]   /opt/ros/jazzy/share/pcl_conversions/cmake/ament_cmake_export_dependencies-extras.cmake:21 (find_package)
+[5.045s]   /opt/ros/jazzy/share/pcl_conversions/cmake/pcl_conversionsConfig.cmake:41 (include)
+[5.047s]   /opt/ros/jazzy/share/pcl_ros/cmake/ament_cmake_export_dependencies-extras.cmake:21 (find_package)
+[5.048s]   /opt/ros/jazzy/share/pcl_ros/cmake/pcl_rosConfig.cmake:41 (include)
+[5.050s]   CMakeLists.txt:62 (find_package)
+[5.052s] This warning is for project developers.  Use -Wno-dev to suppress it.
+[5.053s] [0m
+[5.054s] -- Found flann version 1.9.2
+[16.999s] Invoked command in '/mnt/d/ros/mrs_uav_flightforge_simulator/build/mrs_uav_flightforge_simulator' returned '-2': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake /mnt/d/ros/mrs_uav_flightforge_simulator -DCMAKE_INSTALL_PREFIX=/mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator

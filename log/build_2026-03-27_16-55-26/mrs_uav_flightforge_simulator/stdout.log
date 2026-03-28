@@ -1,0 +1,60 @@
+-- Found rclcpp: 28.1.16 (/opt/ros/jazzy/share/rclcpp/cmake)
+-- Found Python3: /usr/bin/python3 (found version "3.12.3") found components: Interpreter 
+-- Found rosidl_generator_c: 4.6.7 (/opt/ros/jazzy/share/rosidl_generator_c/cmake)
+-- Found rosidl_generator_cpp: 4.6.7 (/opt/ros/jazzy/share/rosidl_generator_cpp/cmake)
+-- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+-- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+-- Found rmw_implementation_cmake: 7.3.3 (/opt/ros/jazzy/share/rmw_implementation_cmake/cmake)
+-- Found rmw_fastrtps_cpp: 8.4.3 (/opt/ros/jazzy/share/rmw_fastrtps_cpp/cmake)
+-- Using RMW implementation 'rmw_fastrtps_cpp' as default
+-- Found rclcpp_components: 28.1.16 (/opt/ros/jazzy/share/rclcpp_components/cmake)
+-- Found mrs_lib: 2.0.0 (/opt/ros/jazzy/share/mrs_lib/cmake)
+-- Found eigen3_cmake_module: 0.3.0 (/opt/ros/jazzy/share/eigen3_cmake_module/cmake)
+-- Ensuring Eigen3 include directory is part of orocos-kdl CMake target
+-- Found mrs_uav_hw_api: 2.0.0 (/opt/ros/jazzy/share/mrs_uav_hw_api/cmake)
+-- Found mrs_multirotor_simulator: 2.0.0 (/opt/ros/jazzy/share/mrs_multirotor_simulator/cmake)
+-- Found image_transport: 5.1.7 (/opt/ros/jazzy/share/image_transport/cmake)
+-- Found cv_bridge: 4.1.0 (/opt/ros/jazzy/share/cv_bridge/cmake)
+-- Found pcl_ros: 2.6.2 (/opt/ros/jazzy/share/pcl_ros/cmake)
+-- Found flann version 1.9.2
+-- OpenNI found (version: 1.5.4.0, include: /usr/include/ni, lib: /usr/lib/libOpenNI.so;libusb::libusb)
+-- OpenNI2 found (version: 2.2.0.33, include: /usr/include/openni2, lib: /usr/lib/x86_64-linux-gnu/libOpenNI2.so;libusb::libusb)
+-- OpenNI found (version: 1.5.4.0, include: /usr/include/ni, lib: /usr/lib/libOpenNI.so;libusb::libusb)
+-- OpenNI2 found (version: 2.2.0.33, include: /usr/include/openni2, lib: /usr/lib/x86_64-linux-gnu/libOpenNI2.so;libusb::libusb)
+-- Found Qhull version 8.0.2
+-- OpenNI found (version: 1.5.4.0, include: /usr/include/ni, lib: /usr/lib/libOpenNI.so;libusb::libusb)
+-- Found rosidl_default_generators: 1.6.0 (/opt/ros/jazzy/share/rosidl_default_generators/cmake)
+-- Found rosidl_adapter: 4.6.7 (/opt/ros/jazzy/share/rosidl_adapter/cmake)
+-- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+-- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+-- Found python_cmake_module: 0.11.1 (/opt/ros/jazzy/share/python_cmake_module/cmake)
+-- Found Python3: /usr/bin/python3 (found version "3.12.3") found components: Interpreter Development NumPy Development.Module Development.Embed 
+-- Configuring done (58.5s)
+-- Generating done (2.6s)
+-- Build files have been written to: /mnt/d/ros/mrs_uav_flightforge_simulator/build/mrs_uav_flightforge_simulator
+[  2%] Built target mrs_uav_flightforge_simulator__rosidl_generator_type_description
+[  4%] Built target mrs_uav_flightforge_simulator__cpp
+[ 16%] Built target mrs_uav_flightforge_simulator__rosidl_generator_c
+[ 16%] Built target ament_cmake_python_copy_mrs_uav_flightforge_simulator
+[ 26%] Built target MrsUavFlightforgeSimulator_FlightforgeConnector
+[ 33%] Built target mrs_uav_flightforge_simulator__rosidl_typesupport_c
+[ 40%] Built target mrs_uav_flightforge_simulator__rosidl_typesupport_introspection_c
+[ 47%] Built target mrs_uav_flightforge_simulator__rosidl_typesupport_cpp
+[ 54%] Built target mrs_uav_flightforge_simulator__rosidl_typesupport_introspection_cpp
+[ 69%] Built target mrs_uav_flightforge_simulator__rosidl_typesupport_fastrtps_c
+[ 69%] Built target mrs_uav_flightforge_simulator__rosidl_typesupport_fastrtps_cpp
+[ 69%] Built target mrs_uav_flightforge_simulator
+[ 73%] Built target MrsUavFlightforgeSimulator_HwApiPlugin
+[ 76%] Built target mrs_uav_flightforge_simulator__py
+running egg_info
+writing mrs_uav_flightforge_simulator.egg-info/PKG-INFO
+writing dependency_links to mrs_uav_flightforge_simulator.egg-info/dependency_links.txt
+writing top-level names to mrs_uav_flightforge_simulator.egg-info/top_level.txt
+reading manifest file 'mrs_uav_flightforge_simulator.egg-info/SOURCES.txt'
+writing manifest file 'mrs_uav_flightforge_simulator.egg-info/SOURCES.txt'
+[ 76%] Built target ament_cmake_python_build_mrs_uav_flightforge_simulator_egg
+[ 80%] Built target mrs_uav_flightforge_simulator__rosidl_generator_py
+[ 95%] Built target mrs_uav_flightforge_simulator_s__rosidl_typesupport_c
+[ 95%] Built target mrs_uav_flightforge_simulator_s__rosidl_typesupport_fastrtps_c
+[ 95%] Built target mrs_uav_flightforge_simulator_s__rosidl_typesupport_introspection_c
+[ 97%] [32mBuilding CXX object CMakeFiles/MrsUavFlightforgeSimulator_FlightforgeSimulator.dir/src/flightforge_simulator.cpp.o[0m

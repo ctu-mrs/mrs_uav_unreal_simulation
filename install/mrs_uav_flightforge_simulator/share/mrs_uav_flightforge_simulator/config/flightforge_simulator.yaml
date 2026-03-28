@@ -1,0 +1,277 @@
+mrs_uav_flightforge_simulator:
+
+  # the rate of stepping the simulation
+  simulation_rate: 100.0 # Hz
+
+  # the rate of publishing of /clock
+  clock_rate:      400.0 # Hz, should be >= simulation_rate, ideally in whole multiples of simulation_rate
+
+  realtime_factor: 1.0 # [-]
+
+  dynamic_rtf: true
+
+  collisions:
+    enabled: true
+    crash: true
+
+    # if crash==false, then the collisions are elastic
+    rebounce: 100.0
+
+  # when true, the simulation time will get initialized from wall time
+  sim_time_from_wall_time: true
+
+  # Set mutual visibilitiy and collision of UAVs
+  uavs_mutual_visibility: true
+
+  #  0 - LOW
+  #  1 - MEDIUM
+  #  2 - HIGH
+  #  4 - EPIC
+  #  5 - CINEMATIC
+  graphics_settings: "low"
+
+  # 0 -  VALLEY
+  # 1 -  FOREST (only in the full version)
+  # 2 -  INFINITE_FOREST (only in the full version)
+  # 3 -  WAREHOUSE
+  # 4 -  CAVE
+  # 5 -  ERDING_AIRBASE (only in the full version)
+  # 6 -  TEMESVAR (only in the full version)
+  world_name: "valley"
+
+  #  {"sunny", 0},
+  #  {"cloudy", 1},
+  #  {"foggy", 2},
+  #  {"rain", 3},
+  #  {"rain_light", 4},
+  #  {"rain_thunderstorm", 5},
+  #  {"sand_dust_calm", 6},
+  #  {"sand_dust_storm", 7},
+  #  {"snow", 8},
+  #  {"snow_blizzards", 9}
+  weather_type: "cloudy"
+
+  daytime:
+    hour: 18
+    minute: 25
+
+  ############ Only Forest Procedural Generation settings ############
+
+  # Choose cluttered difficulties from 1 [high] to 10 [low]
+  ueds_forest_density: 6
+
+  # Choose Hilly Level from 1 [totally flat] to 5 [the most hilly]
+  ueds_forest_hilly_level: 3
+
+  ####################################################################
+
+  sensors:
+
+    rangefinder:
+
+      enabled: true
+      rate: 10.0 # [Hz]
+
+    lidar:
+
+      enabled: false
+      livox: false
+
+      rate: 10.0 # [Hz]
+
+      horizontal_fov_left: 180.0 # [deg]
+      horizontal_fov_right: 180.0 # [deg]
+
+      vertical_fov_up: 45.0 # [deg]
+      vertical_fov_down: 45.0 # [deg]
+
+      horizontal_rays: 128 # [-]
+      vertical_rays: 64 # [-]
+
+      offset:
+        x: 0.0 # [m]
+        y: 0.0 # [m]
+        z: 0.25 # [m]
+
+      # TODO which convention?
+      rotation:
+        pitch: 0.0 # [deg]
+        roll: 0.0 # [deg]
+        yaw: 0.0 # [deg]
+
+      beam_length: 20.0 # [m]
+
+      noise:
+
+        enabled: true
+
+        std_at_1m: 0.01 # [m]
+        std_slope: 0.2 # [-] # multiplies std_at_1m for each meter of measured distances
+
+      show_beams: false # TODO broken
+
+      lidar_segmented:
+        enabled: false
+        rate: 10.0 # [Hz]
+
+      lidar_intensity:
+        enabled: false
+        rate: 10.0 # [Hz]
+
+        values:
+          grass: 50
+          road: 7
+          tree: 90
+          building: 70
+          fence: 40
+          dirt_road: 30
+          other: 155
+
+        noise:
+          enabled: true
+          std_at_1m: 0.59 # [-]
+          std_slope: 0.81 # [-] # multiplies std_at_1m for each meter of measured distances
+
+    rgb:
+
+      enabled: false
+
+      rate: 30.0 # [Hz]
+
+      enable_hdr: true
+      enable_temporal_aa: true
+      enable_raytracing: true
+
+      width: 640 # [px]
+      height: 480 # [px]
+      fov: 120.0 # [deg]
+
+      offset:
+        x: 0.14 # [m]
+        y: 0.0 # [m]
+        z: 0.0 # [m]
+
+      # TODO which Tait-Bryan convention is it in?
+      rotation:
+        pitch: 0.0 # [deg]
+        yaw: 0.0 # [deg]
+        roll: 0.0 # [deg]
+
+      enable_motion_blur: true
+      motion_blur_amount: 0.5 # [0.0 - 1.0]
+      motion_blur_distortion: 50.0 # [0-100]
+
+      rgb_segmented:
+        enabled: false
+        rate: 5.0 # [Hz]
+
+      depth:
+        enabled: false
+        rate: 10.0 # [Hz]
+
+    stereo:
+
+      enabled: false
+
+      rate: 10.0 # [Hz]
+
+      enable_hdr: true
+      enable_temporal_aa: true
+      enable_raytracing: true
+
+      baseline: 0.1 # [m]
+
+      width: 640 # [px]
+      height: 480 # [px]
+      fov: 90.0 # [deg]
+
+      offset:
+        x: 0.14 # [m]
+        y: 0.0 # [m]
+        z: 0.0 # [m]
+
+      # TODO which Tait-Bryan convention is it in?
+      rotation:
+        pitch: 20.0 # [deg]
+        yaw: 0.0 # [deg]
+        roll: 0.0 # [deg]
+
+# randomization of the initial conditions around the desired spawn point
+randomization:
+
+  enabled: false
+
+  bounds:
+    x: 15.0
+    y: 15.0
+    z: 15.0
+
+# * when enabled, this will place a temporary patch of ground just under the spawn location
+# * this patch will disappear after the total_thrust > 0.9*hover_thrust
+individual_takeoff_platform:
+  enabled: false
+
+ground:
+  enabled: true
+  z: 0.0 # [m]
+
+iterate_without_input: true
+
+input_timeout: 1.0 # [s]
+
+g: 9.81 # [ms^-2]
+
+subscribers:
+
+  # used for feedforward
+  tracker_cmd:
+    enabled: false
+
+  position_cmd:
+    enabled: false
+
+  velocity_hdg_cmd:
+    enabled: false
+
+  velocity_hdg_rate_cmd:
+    enabled: false
+
+  acceleration_hdg_cmd:
+    enabled: false
+
+  acceleration_hdg_rate_cmd:
+    enabled: false
+
+  attitude_cmd:
+    enabled: false
+
+  attitude_rate_cmd:
+    enabled: true
+
+  control_group_cmd:
+    enabled: false
+
+  actuators_group_cmd:
+    enabled: false
+
+publishers:
+
+  odometry:
+    enabled: true
+
+  rangefinder:
+    enabled: true
+
+  imu:
+    enabled: true
+
+frames:
+  world:
+    name: "simulator_origin"
+    prefix_with_uav_name: false
+  fcu:
+    name: "fcu"
+    publish_tf: false
+  rangefinder:
+    name: "garmin"
+    publish_tf: true

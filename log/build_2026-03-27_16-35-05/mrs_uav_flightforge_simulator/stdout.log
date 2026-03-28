@@ -1,0 +1,30 @@
+[  2%] Built target mrs_uav_flightforge_simulator__rosidl_generator_type_description
+[  4%] Built target mrs_uav_flightforge_simulator__cpp
+[  7%] [32mBuilding CXX object CMakeFiles/MrsUavFlightforgeSimulator_FlightforgeConnector.dir/src/flight_forge_connector/socket_client.cpp.o[0m
+[ 11%] Built target MrsUavFlightforgeSimulator_HwApiPlugin
+[ 14%] [32mBuilding CXX object CMakeFiles/MrsUavFlightforgeSimulator_FlightforgeConnector.dir/src/flight_forge_connector/flight_forge_connector.cpp.o[0m
+[ 16%] [32mBuilding CXX object CMakeFiles/MrsUavFlightforgeSimulator_FlightforgeConnector.dir/src/flight_forge_connector/game_mode_controller.cpp.o[0m
+[ 28%] Built target mrs_uav_flightforge_simulator__rosidl_generator_c
+[ 42%] Built target mrs_uav_flightforge_simulator__rosidl_typesupport_c
+[ 42%] Built target mrs_uav_flightforge_simulator__rosidl_typesupport_cpp
+[ 64%] Built target mrs_uav_flightforge_simulator__rosidl_typesupport_introspection_c
+[ 71%] Built target mrs_uav_flightforge_simulator__rosidl_typesupport_fastrtps_cpp
+[ 71%] Built target mrs_uav_flightforge_simulator__rosidl_typesupport_fastrtps_c
+[ 71%] Built target mrs_uav_flightforge_simulator__rosidl_typesupport_introspection_cpp
+[ 71%] Built target mrs_uav_flightforge_simulator
+[ 71%] Built target ament_cmake_python_copy_mrs_uav_flightforge_simulator
+[ 73%] Built target mrs_uav_flightforge_simulator__py
+[ 78%] Built target mrs_uav_flightforge_simulator__rosidl_generator_py
+running egg_info
+writing mrs_uav_flightforge_simulator.egg-info/PKG-INFO
+writing dependency_links to mrs_uav_flightforge_simulator.egg-info/dependency_links.txt
+writing top-level names to mrs_uav_flightforge_simulator.egg-info/top_level.txt
+[ 92%] Built target mrs_uav_flightforge_simulator_s__rosidl_typesupport_c
+[ 92%] Built target mrs_uav_flightforge_simulator_s__rosidl_typesupport_introspection_c
+[ 92%] Built target mrs_uav_flightforge_simulator_s__rosidl_typesupport_fastrtps_c
+reading manifest file 'mrs_uav_flightforge_simulator.egg-info/SOURCES.txt'
+writing manifest file 'mrs_uav_flightforge_simulator.egg-info/SOURCES.txt'
+[ 92%] Built target ament_cmake_python_build_mrs_uav_flightforge_simulator_egg
+[ 95%] [32m[1mLinking CXX shared library libMrsUavFlightforgeSimulator_FlightforgeConnector.so[0m
+[ 95%] Built target MrsUavFlightforgeSimulator_FlightforgeConnector
+[ 97%] [32mBuilding CXX object CMakeFiles/MrsUavFlightforgeSimulator_FlightforgeSimulator.dir/src/flightforge_simulator.cpp.o[0m

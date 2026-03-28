@@ -1,0 +1,18 @@
+// generated from rosidl_adapter/resource/srv.idl.em
+// with input from mrs_uav_flightforge_simulator/srv/SetOrientation.srv
+// generated code does not contain a copyright notice
+
+#include "geometry_msgs/msg/QuaternionStamped.idl"
+
+module mrs_uav_flightforge_simulator {
+  module srv {
+    struct SetOrientation_Request {
+      geometry_msgs::msg::QuaternionStamped quaternion;
+    };
+    struct SetOrientation_Response {
+      boolean success;
+
+      string message;
+    };
+  };
+};

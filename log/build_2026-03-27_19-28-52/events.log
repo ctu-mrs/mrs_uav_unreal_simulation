@@ -1,0 +1,1223 @@
+[0.000000] (-) TimerEvent: {}
+[0.000495] (mrs_uav_flightforge_simulator) JobQueued: {'identifier': 'mrs_uav_flightforge_simulator', 'dependencies': OrderedDict()}
+[0.000763] (mrs_uav_flightforge_simulator) JobStarted: {'identifier': 'mrs_uav_flightforge_simulator'}
+[0.022163] (mrs_uav_flightforge_simulator) JobProgress: {'identifier': 'mrs_uav_flightforge_simulator', 'progress': 'cmake'}
+[0.043491] (mrs_uav_flightforge_simulator) JobProgress: {'identifier': 'mrs_uav_flightforge_simulator', 'progress': 'build'}
+[0.049664] (mrs_uav_flightforge_simulator) Command: {'cmd': ['/usr/bin/cmake', '--build', '/mnt/d/ros/mrs_uav_flightforge_simulator/build/mrs_uav_flightforge_simulator', '--', '-j16', '-l16'], 'cwd': '/mnt/d/ros/mrs_uav_flightforge_simulator/build/mrs_uav_flightforge_simulator', 'env': OrderedDict({'GZ_SIM_SYSTEM_PLUGIN_PATH': '/opt/ros/jazzy/lib/mrs_gazebo_common_resources', 'LESSOPEN': '| /usr/bin/lesspipe %s', 'GZ_SIM_RESOURCE_PATH': '/opt/ros/jazzy/share', 'USER': 'aidar', 'GZ_CONFIG_PATH': '/opt/ros/jazzy/opt/gz_sim_vendor/share/gz:/opt/ros/jazzy/opt/sdformat_vendor/share/gz:/opt/ros/jazzy/opt/gz_gui_vendor/share/gz:/opt/ros/jazzy/opt/gz_transport_vendor/share/gz:/opt/ros/jazzy/opt/gz_rendering_vendor/share/gz:/opt/ros/jazzy/opt/gz_plugin_vendor/share/gz:/opt/ros/jazzy/opt/gz_fuel_tools_vendor/share/gz:/opt/ros/jazzy/opt/gz_msgs_vendor/share/gz:/opt/ros/jazzy/opt/gz_common_vendor/share/gz', 'SHLVL': '1', 'LD_LIBRARY_PATH': '/opt/ros/jazzy/opt/zenoh_cpp_vendor/lib:/opt/ros/jazzy/opt/gz_sim_vendor/lib:/opt/ros/jazzy/opt/gz_sensors_vendor/lib:/opt/ros/jazzy/opt/gz_physics_vendor/lib:/opt/ros/jazzy/opt/sdformat_vendor/lib:/opt/ros/jazzy/opt/rviz_ogre_vendor/lib:/opt/ros/jazzy/lib/x86_64-linux-gnu:/opt/ros/jazzy/opt/gz_gui_vendor/lib:/opt/ros/jazzy/opt/gz_transport_vendor/lib:/opt/ros/jazzy/opt/gz_rendering_vendor/lib:/opt/ros/jazzy/opt/gz_plugin_vendor/lib:/opt/ros/jazzy/opt/gz_fuel_tools_vendor/lib:/opt/ros/jazzy/opt/gz_msgs_vendor/lib:/opt/ros/jazzy/opt/gz_common_vendor/lib:/opt/ros/jazzy/opt/gz_math_vendor/lib:/opt/ros/jazzy/opt/gz_utils_vendor/lib:/opt/ros/jazzy/opt/gz_tools_vendor/lib:/opt/ros/jazzy/opt/gz_ogre_next_vendor/lib:/opt/ros/jazzy/opt/gz_dartsim_vendor/lib:/opt/ros/jazzy/opt/gz_cmake_vendor/lib:/opt/ros/jazzy/lib', 'WT_PROFILE_ID': '{61c54bbd-c2c6-5271-96e7-009a87ff44bf}', 'HOME': '/home/aidar', 'OLDPWD': '/mnt/c/Users/helst', 'ROS_PYTHON_VERSION': '3', 'WSL_DISTRO_NAME': 'Ubuntu', 'DEBUGINFOD_URLS': 'https://debuginfod.ubuntu.com', 'WAYLAND_DISPLAY': 'wayland-0', 'ROS_DISTRO': 'jazzy', 'LOGNAME': 'aidar', 'NAME': 'Agent', 'WSL_INTEROP': '/run/WSL/18169_interop', 'IGN_GAZEBO_MODEL_PATH': '/opt/ros/jazzy/share', 'PULSE_SERVER': 'unix:/mnt/wslg/PulseServer', '_': '/usr/bin/colcon', 'ROS_VERSION': '2', 'TERM': 'xterm-256color', 'GAZEBO_MODEL_PATH': '/opt/ros/jazzy/share', 'PATH': '/home/aidar/.local/bin:/opt/ros/jazzy/opt/gz_msgs_vendor/bin:/opt/ros/jazzy/opt/gz_tools_vendor/bin:/opt/ros/jazzy/opt/gz_ogre_next_vendor/bin:/opt/ros/jazzy/bin:/home/aidar/autotools/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/lib/wsl/lib:/mnt/c/Windows/system32:/mnt/c/Windows:/mnt/c/Windows/System32/Wbem:/mnt/c/Windows/System32/WindowsPowerShell/v1.0/:/mnt/c/Windows/System32/OpenSSH/:/mnt/c/Program Files (x86)/NVIDIA Corporation/PhysX/Common:/mnt/c/WINDOWS/system32:/mnt/c/WINDOWS:/mnt/c/WINDOWS/System32/Wbem:/mnt/c/WINDOWS/System32/WindowsPowerShell/v1.0/:/mnt/c/WINDOWS/System32/OpenSSH/:/mnt/c/Program Files/Microsoft SQL Server/150/Tools/Binn/:/mnt/c/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/:/mnt/c/Program Files/dotnet/:/mnt/c/Program Files/NVIDIA Corporation/NVIDIA app/NvDLISR:/mnt/d/CMAKE/bin:/mnt/d/Git/cmd:/mnt/d/Git LFS:/mnt/c/ProgramData/chocolatey/bin:/mnt/d/Windows Kits/10/Windows Performance Toolkit/:/mnt/d/pgrframeworkvs2019/pgrframework/bin:/mnt/d/Microsoft_VS_Code/Microsoft VS Code/bin:/mnt/c/Users/helst/AppData/Local/JetBrains/Toolbox/scripts', 'WT_SESSION': '2a8cc0e1-958d-4697-8aa9-9e9e6fd16536', 'XDG_RUNTIME_DIR': '/mnt/wslg/runtime-dir', 'DISPLAY': ':0', 'LANG': 'C.UTF-8', 'LS_COLORS': 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=00:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.avif=01;35:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:*~=00;90:*#=00;90:*.bak=00;90:*.crdownload=00;90:*.dpkg-dist=00;90:*.dpkg-new=00;90:*.dpkg-old=00;90:*.dpkg-tmp=00;90:*.old=00;90:*.orig=00;90:*.part=00;90:*.rej=00;90:*.rpmnew=00;90:*.rpmorig=00;90:*.rpmsave=00;90:*.swp=00;90:*.tmp=00;90:*.ucf-dist=00;90:*.ucf-new=00;90:*.ucf-old=00;90:', 'AMENT_PREFIX_PATH': '/opt/ros/jazzy', 'SHELL': '/bin/bash', 'LESSCLOSE': '/usr/bin/lesspipe %s %s', 'IGN_GAZEBO_RESOURCE_PATH': '/opt/ros/jazzy/share', 'GAZEBO_RESOURCE_PATH': '/opt/ros/jazzy/share', 'ROS_AUTOMATIC_DISCOVERY_RANGE': 'SUBNET', 'PWD': '/mnt/d/ros/mrs_uav_flightforge_simulator/build/mrs_uav_flightforge_simulator', 'PYTHONPATH': '/opt/ros/jazzy/lib/python3.12/site-packages', 'COLCON': '1', 'WSL2_GUI_APPS_ENABLED': '1', 'HOSTTYPE': 'x86_64', 'CMAKE_PREFIX_PATH': '/opt/ros/jazzy:/opt/ros/jazzy/opt/gz_sim_vendor:/opt/ros/jazzy/opt/gz_sensors_vendor:/opt/ros/jazzy/opt/gz_physics_vendor:/opt/ros/jazzy/opt/sdformat_vendor:/opt/ros/jazzy/opt/gz_gui_vendor:/opt/ros/jazzy/opt/gz_transport_vendor:/opt/ros/jazzy/opt/gz_rendering_vendor:/opt/ros/jazzy/opt/gz_plugin_vendor:/opt/ros/jazzy/opt/gz_fuel_tools_vendor:/opt/ros/jazzy/opt/gz_msgs_vendor:/opt/ros/jazzy/opt/gz_common_vendor:/opt/ros/jazzy/opt/gz_math_vendor:/opt/ros/jazzy/opt/gz_utils_vendor:/opt/ros/jazzy/opt/gz_tools_vendor:/opt/ros/jazzy/opt/gz_ogre_next_vendor:/opt/ros/jazzy/opt/gz_dartsim_vendor:/opt/ros/jazzy/opt/gz_cmake_vendor', 'WSLENV': 'WT_SESSION:WT_PROFILE_ID:'}), 'shell': False}
+[0.098244] (-) TimerEvent: {}
+[0.198713] (-) TimerEvent: {}
+[0.299274] (-) TimerEvent: {}
+[0.312613] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'[  2%] Built target mrs_uav_flightforge_simulator__rosidl_generator_type_description\n'}
+[0.379547] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'[  7%] Built target MrsUavFlightforgeSimulator_HwApiPlugin\n'}
+[0.399404] (-) TimerEvent: {}
+[0.428643] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'[  9%] Built target mrs_uav_flightforge_simulator__cpp\n'}
+[0.496187] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'[ 19%] Built target MrsUavFlightforgeSimulator_FlightforgeConnector\n'}
+[0.499512] (-) TimerEvent: {}
+[0.546213] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'[ 30%] Built target mrs_uav_flightforge_simulator__rosidl_generator_c\n'}
+[0.599699] (-) TimerEvent: {}
+[0.700298] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'[ 45%] Built target mrs_uav_flightforge_simulator__rosidl_typesupport_c\n'}
+[0.701642] (-) TimerEvent: {}
+[0.702110] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'[ 45%] Built target mrs_uav_flightforge_simulator__rosidl_typesupport_cpp\n'}
+[0.726229] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'[ 69%] Built target mrs_uav_flightforge_simulator__rosidl_typesupport_introspection_cpp\n'}
+[0.727432] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'[ 69%] Built target mrs_uav_flightforge_simulator__rosidl_typesupport_fastrtps_c\n'}
+[0.728231] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'[ 69%] Built target mrs_uav_flightforge_simulator__rosidl_typesupport_introspection_c\n'}
+[0.733107] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'[ 73%] Built target mrs_uav_flightforge_simulator__rosidl_typesupport_fastrtps_cpp\n'}
+[0.791048] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'[ 73%] Built target mrs_uav_flightforge_simulator\n'}
+[0.801782] (-) TimerEvent: {}
+[0.813582] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'[ 73%] Built target ament_cmake_python_copy_mrs_uav_flightforge_simulator\n'}
+[0.901912] (-) TimerEvent: {}
+[0.903996] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'[ 76%] Built target mrs_uav_flightforge_simulator__py\n'}
+[1.002045] (-) TimerEvent: {}
+[1.019668] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'[ 80%] Built target mrs_uav_flightforge_simulator__rosidl_generator_py\n'}
+[1.102176] (-) TimerEvent: {}
+[1.135211] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'running egg_info\n'}
+[1.136820] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'[ 90%] Built target mrs_uav_flightforge_simulator_s__rosidl_typesupport_introspection_c\n'}
+[1.139107] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'[ 90%] Built target mrs_uav_flightforge_simulator_s__rosidl_typesupport_c\n'}
+[1.154844] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'[ 95%] Built target mrs_uav_flightforge_simulator_s__rosidl_typesupport_fastrtps_c\n'}
+[1.162387] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'writing mrs_uav_flightforge_simulator.egg-info/PKG-INFO\n'}
+[1.167013] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'writing dependency_links to mrs_uav_flightforge_simulator.egg-info/dependency_links.txt\n'}
+[1.173327] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'writing top-level names to mrs_uav_flightforge_simulator.egg-info/top_level.txt\n'}
+[1.202302] (-) TimerEvent: {}
+[1.272822] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b"reading manifest file 'mrs_uav_flightforge_simulator.egg-info/SOURCES.txt'\n"}
+[1.302442] (-) TimerEvent: {}
+[1.312019] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b"writing manifest file 'mrs_uav_flightforge_simulator.egg-info/SOURCES.txt'\n"}
+[1.347942] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'[ 95%] Built target ament_cmake_python_build_mrs_uav_flightforge_simulator_egg\n'}
+[1.402567] (-) TimerEvent: {}
+[1.503128] (-) TimerEvent: {}
+[1.603637] (-) TimerEvent: {}
+[1.704161] (-) TimerEvent: {}
+[1.804654] (-) TimerEvent: {}
+[1.905115] (-) TimerEvent: {}
+[2.005617] (-) TimerEvent: {}
+[2.106087] (-) TimerEvent: {}
+[2.206679] (-) TimerEvent: {}
+[2.234669] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'[ 97%] \x1b[32mBuilding CXX object CMakeFiles/MrsUavFlightforgeSimulator_FlightforgeSimulator.dir/src/flightforge_simulator.cpp.o\x1b[0m\n'}
+[2.306805] (-) TimerEvent: {}
+[2.407339] (-) TimerEvent: {}
+[2.507866] (-) TimerEvent: {}
+[2.608333] (-) TimerEvent: {}
+[2.708866] (-) TimerEvent: {}
+[2.809502] (-) TimerEvent: {}
+[2.910032] (-) TimerEvent: {}
+[3.010545] (-) TimerEvent: {}
+[3.111296] (-) TimerEvent: {}
+[3.211854] (-) TimerEvent: {}
+[3.312412] (-) TimerEvent: {}
+[3.412882] (-) TimerEvent: {}
+[3.513465] (-) TimerEvent: {}
+[3.614006] (-) TimerEvent: {}
+[3.714624] (-) TimerEvent: {}
+[3.815090] (-) TimerEvent: {}
+[3.915564] (-) TimerEvent: {}
+[4.016046] (-) TimerEvent: {}
+[4.116551] (-) TimerEvent: {}
+[4.217043] (-) TimerEvent: {}
+[4.317517] (-) TimerEvent: {}
+[4.418064] (-) TimerEvent: {}
+[4.518534] (-) TimerEvent: {}
+[4.619071] (-) TimerEvent: {}
+[4.719583] (-) TimerEvent: {}
+[4.820077] (-) TimerEvent: {}
+[4.920713] (-) TimerEvent: {}
+[5.021265] (-) TimerEvent: {}
+[5.121761] (-) TimerEvent: {}
+[5.222445] (-) TimerEvent: {}
+[5.322967] (-) TimerEvent: {}
+[5.423443] (-) TimerEvent: {}
+[5.524076] (-) TimerEvent: {}
+[5.624645] (-) TimerEvent: {}
+[5.725210] (-) TimerEvent: {}
+[5.825692] (-) TimerEvent: {}
+[5.926261] (-) TimerEvent: {}
+[6.026805] (-) TimerEvent: {}
+[6.127466] (-) TimerEvent: {}
+[6.227988] (-) TimerEvent: {}
+[6.328565] (-) TimerEvent: {}
+[6.429155] (-) TimerEvent: {}
+[6.529630] (-) TimerEvent: {}
+[6.630099] (-) TimerEvent: {}
+[6.730768] (-) TimerEvent: {}
+[6.831509] (-) TimerEvent: {}
+[6.932076] (-) TimerEvent: {}
+[7.032659] (-) TimerEvent: {}
+[7.133197] (-) TimerEvent: {}
+[7.233692] (-) TimerEvent: {}
+[7.334330] (-) TimerEvent: {}
+[7.434863] (-) TimerEvent: {}
+[7.535399] (-) TimerEvent: {}
+[7.635951] (-) TimerEvent: {}
+[7.736446] (-) TimerEvent: {}
+[7.836935] (-) TimerEvent: {}
+[7.937479] (-) TimerEvent: {}
+[8.037939] (-) TimerEvent: {}
+[8.138410] (-) TimerEvent: {}
+[8.238933] (-) TimerEvent: {}
+[8.339530] (-) TimerEvent: {}
+[8.440018] (-) TimerEvent: {}
+[8.540518] (-) TimerEvent: {}
+[8.640992] (-) TimerEvent: {}
+[8.741506] (-) TimerEvent: {}
+[8.842043] (-) TimerEvent: {}
+[8.942517] (-) TimerEvent: {}
+[9.043017] (-) TimerEvent: {}
+[9.143516] (-) TimerEvent: {}
+[9.244057] (-) TimerEvent: {}
+[9.344633] (-) TimerEvent: {}
+[9.445126] (-) TimerEvent: {}
+[9.545596] (-) TimerEvent: {}
+[9.646125] (-) TimerEvent: {}
+[9.746698] (-) TimerEvent: {}
+[9.847472] (-) TimerEvent: {}
+[9.947938] (-) TimerEvent: {}
+[10.048440] (-) TimerEvent: {}
+[10.148919] (-) TimerEvent: {}
+[10.249425] (-) TimerEvent: {}
+[10.349903] (-) TimerEvent: {}
+[10.450329] (-) TimerEvent: {}
+[10.550951] (-) TimerEvent: {}
+[10.651559] (-) TimerEvent: {}
+[10.752198] (-) TimerEvent: {}
+[10.852653] (-) TimerEvent: {}
+[10.953117] (-) TimerEvent: {}
+[11.053647] (-) TimerEvent: {}
+[11.154274] (-) TimerEvent: {}
+[11.254814] (-) TimerEvent: {}
+[11.355374] (-) TimerEvent: {}
+[11.455955] (-) TimerEvent: {}
+[11.556451] (-) TimerEvent: {}
+[11.656927] (-) TimerEvent: {}
+[11.757470] (-) TimerEvent: {}
+[11.857975] (-) TimerEvent: {}
+[11.958474] (-) TimerEvent: {}
+[12.058947] (-) TimerEvent: {}
+[12.159458] (-) TimerEvent: {}
+[12.259936] (-) TimerEvent: {}
+[12.360432] (-) TimerEvent: {}
+[12.460997] (-) TimerEvent: {}
+[12.561511] (-) TimerEvent: {}
+[12.662018] (-) TimerEvent: {}
+[12.762534] (-) TimerEvent: {}
+[12.863062] (-) TimerEvent: {}
+[12.963585] (-) TimerEvent: {}
+[13.064098] (-) TimerEvent: {}
+[13.164635] (-) TimerEvent: {}
+[13.265093] (-) TimerEvent: {}
+[13.365598] (-) TimerEvent: {}
+[13.466064] (-) TimerEvent: {}
+[13.566759] (-) TimerEvent: {}
+[13.667344] (-) TimerEvent: {}
+[13.767939] (-) TimerEvent: {}
+[13.868444] (-) TimerEvent: {}
+[13.968926] (-) TimerEvent: {}
+[14.069478] (-) TimerEvent: {}
+[14.170004] (-) TimerEvent: {}
+[14.270514] (-) TimerEvent: {}
+[14.371145] (-) TimerEvent: {}
+[14.471646] (-) TimerEvent: {}
+[14.572136] (-) TimerEvent: {}
+[14.672642] (-) TimerEvent: {}
+[14.773130] (-) TimerEvent: {}
+[14.873632] (-) TimerEvent: {}
+[14.974129] (-) TimerEvent: {}
+[15.074634] (-) TimerEvent: {}
+[15.175111] (-) TimerEvent: {}
+[15.275581] (-) TimerEvent: {}
+[15.376060] (-) TimerEvent: {}
+[15.476519] (-) TimerEvent: {}
+[15.576997] (-) TimerEvent: {}
+[15.677590] (-) TimerEvent: {}
+[15.778122] (-) TimerEvent: {}
+[15.878648] (-) TimerEvent: {}
+[15.979227] (-) TimerEvent: {}
+[16.079742] (-) TimerEvent: {}
+[16.180266] (-) TimerEvent: {}
+[16.280767] (-) TimerEvent: {}
+[16.381283] (-) TimerEvent: {}
+[16.481788] (-) TimerEvent: {}
+[16.582389] (-) TimerEvent: {}
+[16.682956] (-) TimerEvent: {}
+[16.783419] (-) TimerEvent: {}
+[16.883938] (-) TimerEvent: {}
+[16.984550] (-) TimerEvent: {}
+[17.085241] (-) TimerEvent: {}
+[17.185726] (-) TimerEvent: {}
+[17.286264] (-) TimerEvent: {}
+[17.386870] (-) TimerEvent: {}
+[17.487435] (-) TimerEvent: {}
+[17.587996] (-) TimerEvent: {}
+[17.688493] (-) TimerEvent: {}
+[17.788992] (-) TimerEvent: {}
+[17.889563] (-) TimerEvent: {}
+[17.990086] (-) TimerEvent: {}
+[18.090679] (-) TimerEvent: {}
+[18.191178] (-) TimerEvent: {}
+[18.291921] (-) TimerEvent: {}
+[18.392486] (-) TimerEvent: {}
+[18.492991] (-) TimerEvent: {}
+[18.593494] (-) TimerEvent: {}
+[18.694026] (-) TimerEvent: {}
+[18.794542] (-) TimerEvent: {}
+[18.895012] (-) TimerEvent: {}
+[18.995517] (-) TimerEvent: {}
+[19.096007] (-) TimerEvent: {}
+[19.196481] (-) TimerEvent: {}
+[19.297009] (-) TimerEvent: {}
+[19.397539] (-) TimerEvent: {}
+[19.498010] (-) TimerEvent: {}
+[19.598613] (-) TimerEvent: {}
+[19.699209] (-) TimerEvent: {}
+[19.799773] (-) TimerEvent: {}
+[19.900265] (-) TimerEvent: {}
+[20.000748] (-) TimerEvent: {}
+[20.101284] (-) TimerEvent: {}
+[20.201852] (-) TimerEvent: {}
+[20.302426] (-) TimerEvent: {}
+[20.402967] (-) TimerEvent: {}
+[20.503479] (-) TimerEvent: {}
+[20.604237] (-) TimerEvent: {}
+[20.704779] (-) TimerEvent: {}
+[20.805305] (-) TimerEvent: {}
+[20.905914] (-) TimerEvent: {}
+[21.006431] (-) TimerEvent: {}
+[21.106912] (-) TimerEvent: {}
+[21.207411] (-) TimerEvent: {}
+[21.307932] (-) TimerEvent: {}
+[21.408483] (-) TimerEvent: {}
+[21.508978] (-) TimerEvent: {}
+[21.609578] (-) TimerEvent: {}
+[21.710094] (-) TimerEvent: {}
+[21.810626] (-) TimerEvent: {}
+[21.911123] (-) TimerEvent: {}
+[22.011592] (-) TimerEvent: {}
+[22.112207] (-) TimerEvent: {}
+[22.212758] (-) TimerEvent: {}
+[22.313292] (-) TimerEvent: {}
+[22.413819] (-) TimerEvent: {}
+[22.514329] (-) TimerEvent: {}
+[22.614916] (-) TimerEvent: {}
+[22.715448] (-) TimerEvent: {}
+[22.815929] (-) TimerEvent: {}
+[22.916458] (-) TimerEvent: {}
+[23.017003] (-) TimerEvent: {}
+[23.117637] (-) TimerEvent: {}
+[23.218126] (-) TimerEvent: {}
+[23.318683] (-) TimerEvent: {}
+[23.419235] (-) TimerEvent: {}
+[23.519717] (-) TimerEvent: {}
+[23.620239] (-) TimerEvent: {}
+[23.720750] (-) TimerEvent: {}
+[23.821238] (-) TimerEvent: {}
+[23.921692] (-) TimerEvent: {}
+[24.022186] (-) TimerEvent: {}
+[24.122757] (-) TimerEvent: {}
+[24.223256] (-) TimerEvent: {}
+[24.323760] (-) TimerEvent: {}
+[24.424373] (-) TimerEvent: {}
+[24.524930] (-) TimerEvent: {}
+[24.625424] (-) TimerEvent: {}
+[24.725991] (-) TimerEvent: {}
+[24.826668] (-) TimerEvent: {}
+[24.927210] (-) TimerEvent: {}
+[25.027976] (-) TimerEvent: {}
+[25.128476] (-) TimerEvent: {}
+[25.229167] (-) TimerEvent: {}
+[25.329627] (-) TimerEvent: {}
+[25.430135] (-) TimerEvent: {}
+[25.530605] (-) TimerEvent: {}
+[25.631196] (-) TimerEvent: {}
+[25.731673] (-) TimerEvent: {}
+[25.832234] (-) TimerEvent: {}
+[25.932731] (-) TimerEvent: {}
+[26.033369] (-) TimerEvent: {}
+[26.133966] (-) TimerEvent: {}
+[26.234517] (-) TimerEvent: {}
+[26.335046] (-) TimerEvent: {}
+[26.435528] (-) TimerEvent: {}
+[26.536048] (-) TimerEvent: {}
+[26.636561] (-) TimerEvent: {}
+[26.737077] (-) TimerEvent: {}
+[26.837577] (-) TimerEvent: {}
+[26.938134] (-) TimerEvent: {}
+[27.038638] (-) TimerEvent: {}
+[27.139278] (-) TimerEvent: {}
+[27.239759] (-) TimerEvent: {}
+[27.340353] (-) TimerEvent: {}
+[27.440864] (-) TimerEvent: {}
+[27.541409] (-) TimerEvent: {}
+[27.641985] (-) TimerEvent: {}
+[27.742507] (-) TimerEvent: {}
+[27.843027] (-) TimerEvent: {}
+[27.943585] (-) TimerEvent: {}
+[28.044114] (-) TimerEvent: {}
+[28.144621] (-) TimerEvent: {}
+[28.245119] (-) TimerEvent: {}
+[28.345582] (-) TimerEvent: {}
+[28.446087] (-) TimerEvent: {}
+[28.546569] (-) TimerEvent: {}
+[28.647216] (-) TimerEvent: {}
+[28.747886] (-) TimerEvent: {}
+[28.848453] (-) TimerEvent: {}
+[28.948941] (-) TimerEvent: {}
+[29.049398] (-) TimerEvent: {}
+[29.149906] (-) TimerEvent: {}
+[29.250471] (-) TimerEvent: {}
+[29.351085] (-) TimerEvent: {}
+[29.451674] (-) TimerEvent: {}
+[29.552266] (-) TimerEvent: {}
+[29.652866] (-) TimerEvent: {}
+[29.753407] (-) TimerEvent: {}
+[29.853882] (-) TimerEvent: {}
+[29.954403] (-) TimerEvent: {}
+[30.054954] (-) TimerEvent: {}
+[30.155430] (-) TimerEvent: {}
+[30.255928] (-) TimerEvent: {}
+[30.356511] (-) TimerEvent: {}
+[30.457013] (-) TimerEvent: {}
+[30.557616] (-) TimerEvent: {}
+[30.658109] (-) TimerEvent: {}
+[30.758664] (-) TimerEvent: {}
+[30.859223] (-) TimerEvent: {}
+[30.959704] (-) TimerEvent: {}
+[31.060215] (-) TimerEvent: {}
+[31.160702] (-) TimerEvent: {}
+[31.261175] (-) TimerEvent: {}
+[31.361644] (-) TimerEvent: {}
+[31.462368] (-) TimerEvent: {}
+[31.562820] (-) TimerEvent: {}
+[31.663347] (-) TimerEvent: {}
+[31.763947] (-) TimerEvent: {}
+[31.864559] (-) TimerEvent: {}
+[31.965075] (-) TimerEvent: {}
+[32.065627] (-) TimerEvent: {}
+[32.166102] (-) TimerEvent: {}
+[32.266586] (-) TimerEvent: {}
+[32.367069] (-) TimerEvent: {}
+[32.467620] (-) TimerEvent: {}
+[32.568117] (-) TimerEvent: {}
+[32.668618] (-) TimerEvent: {}
+[32.769082] (-) TimerEvent: {}
+[32.869596] (-) TimerEvent: {}
+[32.970084] (-) TimerEvent: {}
+[33.070551] (-) TimerEvent: {}
+[33.171010] (-) TimerEvent: {}
+[33.271549] (-) TimerEvent: {}
+[33.372072] (-) TimerEvent: {}
+[33.472639] (-) TimerEvent: {}
+[33.573321] (-) TimerEvent: {}
+[33.673873] (-) TimerEvent: {}
+[33.774499] (-) TimerEvent: {}
+[33.875199] (-) TimerEvent: {}
+[33.975745] (-) TimerEvent: {}
+[34.076343] (-) TimerEvent: {}
+[34.176942] (-) TimerEvent: {}
+[34.277446] (-) TimerEvent: {}
+[34.377941] (-) TimerEvent: {}
+[34.478445] (-) TimerEvent: {}
+[34.578961] (-) TimerEvent: {}
+[34.679512] (-) TimerEvent: {}
+[34.779981] (-) TimerEvent: {}
+[34.880464] (-) TimerEvent: {}
+[34.980961] (-) TimerEvent: {}
+[35.081457] (-) TimerEvent: {}
+[35.182007] (-) TimerEvent: {}
+[35.282477] (-) TimerEvent: {}
+[35.383027] (-) TimerEvent: {}
+[35.483545] (-) TimerEvent: {}
+[35.584167] (-) TimerEvent: {}
+[35.684704] (-) TimerEvent: {}
+[35.785170] (-) TimerEvent: {}
+[35.885638] (-) TimerEvent: {}
+[35.986219] (-) TimerEvent: {}
+[36.086805] (-) TimerEvent: {}
+[36.187631] (-) TimerEvent: {}
+[36.288121] (-) TimerEvent: {}
+[36.388801] (-) TimerEvent: {}
+[36.489298] (-) TimerEvent: {}
+[36.589832] (-) TimerEvent: {}
+[36.690293] (-) TimerEvent: {}
+[36.790849] (-) TimerEvent: {}
+[36.891421] (-) TimerEvent: {}
+[36.991950] (-) TimerEvent: {}
+[37.092452] (-) TimerEvent: {}
+[37.192958] (-) TimerEvent: {}
+[37.293472] (-) TimerEvent: {}
+[37.393985] (-) TimerEvent: {}
+[37.494537] (-) TimerEvent: {}
+[37.595051] (-) TimerEvent: {}
+[37.695498] (-) TimerEvent: {}
+[37.796073] (-) TimerEvent: {}
+[37.896653] (-) TimerEvent: {}
+[37.997200] (-) TimerEvent: {}
+[38.097837] (-) TimerEvent: {}
+[38.198568] (-) TimerEvent: {}
+[38.299322] (-) TimerEvent: {}
+[38.399976] (-) TimerEvent: {}
+[38.500589] (-) TimerEvent: {}
+[38.601223] (-) TimerEvent: {}
+[38.701774] (-) TimerEvent: {}
+[38.802480] (-) TimerEvent: {}
+[38.903077] (-) TimerEvent: {}
+[39.003556] (-) TimerEvent: {}
+[39.104083] (-) TimerEvent: {}
+[39.204599] (-) TimerEvent: {}
+[39.305172] (-) TimerEvent: {}
+[39.405753] (-) TimerEvent: {}
+[39.506250] (-) TimerEvent: {}
+[39.606792] (-) TimerEvent: {}
+[39.707382] (-) TimerEvent: {}
+[39.807903] (-) TimerEvent: {}
+[39.908411] (-) TimerEvent: {}
+[40.008892] (-) TimerEvent: {}
+[40.109390] (-) TimerEvent: {}
+[40.209898] (-) TimerEvent: {}
+[40.310461] (-) TimerEvent: {}
+[40.411052] (-) TimerEvent: {}
+[40.511541] (-) TimerEvent: {}
+[40.612142] (-) TimerEvent: {}
+[40.712769] (-) TimerEvent: {}
+[40.813581] (-) TimerEvent: {}
+[40.914336] (-) TimerEvent: {}
+[41.015049] (-) TimerEvent: {}
+[41.115736] (-) TimerEvent: {}
+[41.216379] (-) TimerEvent: {}
+[41.317025] (-) TimerEvent: {}
+[41.417631] (-) TimerEvent: {}
+[41.518323] (-) TimerEvent: {}
+[41.619016] (-) TimerEvent: {}
+[41.719653] (-) TimerEvent: {}
+[41.820336] (-) TimerEvent: {}
+[41.920991] (-) TimerEvent: {}
+[42.021771] (-) TimerEvent: {}
+[42.122341] (-) TimerEvent: {}
+[42.223011] (-) TimerEvent: {}
+[42.323658] (-) TimerEvent: {}
+[42.424453] (-) TimerEvent: {}
+[42.525103] (-) TimerEvent: {}
+[42.625792] (-) TimerEvent: {}
+[42.726385] (-) TimerEvent: {}
+[42.827043] (-) TimerEvent: {}
+[42.927710] (-) TimerEvent: {}
+[43.028532] (-) TimerEvent: {}
+[43.129231] (-) TimerEvent: {}
+[43.229887] (-) TimerEvent: {}
+[43.330608] (-) TimerEvent: {}
+[43.431275] (-) TimerEvent: {}
+[43.532080] (-) TimerEvent: {}
+[43.632738] (-) TimerEvent: {}
+[43.733463] (-) TimerEvent: {}
+[43.834180] (-) TimerEvent: {}
+[43.934955] (-) TimerEvent: {}
+[44.035685] (-) TimerEvent: {}
+[44.136319] (-) TimerEvent: {}
+[44.237091] (-) TimerEvent: {}
+[44.337922] (-) TimerEvent: {}
+[44.438766] (-) TimerEvent: {}
+[44.539595] (-) TimerEvent: {}
+[44.640409] (-) TimerEvent: {}
+[44.741302] (-) TimerEvent: {}
+[44.842056] (-) TimerEvent: {}
+[44.942944] (-) TimerEvent: {}
+[45.043584] (-) TimerEvent: {}
+[45.144256] (-) TimerEvent: {}
+[45.244845] (-) TimerEvent: {}
+[45.345533] (-) TimerEvent: {}
+[45.446088] (-) TimerEvent: {}
+[45.546650] (-) TimerEvent: {}
+[45.647257] (-) TimerEvent: {}
+[45.747912] (-) TimerEvent: {}
+[45.848571] (-) TimerEvent: {}
+[45.949222] (-) TimerEvent: {}
+[46.049889] (-) TimerEvent: {}
+[46.150578] (-) TimerEvent: {}
+[46.251328] (-) TimerEvent: {}
+[46.351992] (-) TimerEvent: {}
+[46.452759] (-) TimerEvent: {}
+[46.553431] (-) TimerEvent: {}
+[46.654304] (-) TimerEvent: {}
+[46.754928] (-) TimerEvent: {}
+[46.855529] (-) TimerEvent: {}
+[46.956190] (-) TimerEvent: {}
+[47.056759] (-) TimerEvent: {}
+[47.157340] (-) TimerEvent: {}
+[47.258079] (-) TimerEvent: {}
+[47.358725] (-) TimerEvent: {}
+[47.459431] (-) TimerEvent: {}
+[47.560052] (-) TimerEvent: {}
+[47.660827] (-) TimerEvent: {}
+[47.761429] (-) TimerEvent: {}
+[47.804515] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'In file included from \x1b[01m\x1b[K/mnt/d/ros/mrs_uav_flightforge_simulator/include/flight_forge_connector/socket_client.h:17\x1b[m\x1b[K,\n'}
+[47.805905] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/mnt/d/ros/mrs_uav_flightforge_simulator/include/flight_forge_connector/flight_forge_connector.h:10\x1b[m\x1b[K,\n'}
+[47.806629] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/mnt/d/ros/mrs_uav_flightforge_simulator/src/flightforge_simulator.cpp:40\x1b[m\x1b[K:\n'}
+[47.807446] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'\x1b[01m\x1b[K/mnt/d/ros/mrs_uav_flightforge_simulator/include/kissnet/kissnet.hpp:403:41:\x1b[m\x1b[K \x1b[01;35m\x1b[Kwarning: \x1b[m\x1b[Kmissing initializer for member \xe2\x80\x98\x1b[01m\x1b[Ksockaddr_storage::__ss_padding\x1b[m\x1b[K\xe2\x80\x99 [\x1b[01;35m\x1b[K\x1b]8;;https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wmissing-field-initializers\x07-Wmissing-field-initializers\x1b]8;;\x07\x1b[m\x1b[K]\n'}
+[47.808273] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'  403 |             sockaddr_storage adrinf = {0\x1b[01;35m\x1b[K}\x1b[m\x1b[K;\n'}
+[47.809716] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'      |                                         \x1b[01;35m\x1b[K^\x1b[m\x1b[K\n'}
+[47.810386] (mrs_uav_flightforge_simulator) StderrLine: {'line': b'\x1b[01m\x1b[K/mnt/d/ros/mrs_uav_flightforge_simulator/include/kissnet/kissnet.hpp:403:41:\x1b[m\x1b[K \x1b[01;35m\x1b[Kwarning: \x1b[m\x1b[Kmissing initializer for member \xe2\x80\x98\x1b[01m\x1b[Ksockaddr_storage::__ss_align\x1b[m\x1b[K\xe2\x80\x99 [\x1b[01;35m\x1b[K\x1b]8;;https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wmissing-field-initializers\x07-Wmissing-field-initializers\x1b]8;;\x07\x1b[m\x1b[K]\n'}
+[47.861570] (-) TimerEvent: {}
+[47.962215] (-) TimerEvent: {}
+[48.062898] (-) TimerEvent: {}
+[48.163473] (-) TimerEvent: {}
+[48.264254] (-) TimerEvent: {}
+[48.364897] (-) TimerEvent: {}
+[48.465527] (-) TimerEvent: {}
+[48.566195] (-) TimerEvent: {}
+[48.666996] (-) TimerEvent: {}
+[48.767739] (-) TimerEvent: {}
+[48.868430] (-) TimerEvent: {}
+[48.969058] (-) TimerEvent: {}
+[49.069755] (-) TimerEvent: {}
+[49.170407] (-) TimerEvent: {}
+[49.271108] (-) TimerEvent: {}
+[49.371820] (-) TimerEvent: {}
+[49.472492] (-) TimerEvent: {}
+[49.573163] (-) TimerEvent: {}
+[49.674040] (-) TimerEvent: {}
+[49.774717] (-) TimerEvent: {}
+[49.875285] (-) TimerEvent: {}
+[49.975878] (-) TimerEvent: {}
+[50.076548] (-) TimerEvent: {}
+[50.177219] (-) TimerEvent: {}
+[50.277927] (-) TimerEvent: {}
+[50.378537] (-) TimerEvent: {}
+[50.479239] (-) TimerEvent: {}
+[50.579861] (-) TimerEvent: {}
+[50.680620] (-) TimerEvent: {}
+[50.781278] (-) TimerEvent: {}
+[50.881917] (-) TimerEvent: {}
+[50.982568] (-) TimerEvent: {}
+[51.083210] (-) TimerEvent: {}
+[51.183895] (-) TimerEvent: {}
+[51.284506] (-) TimerEvent: {}
+[51.385122] (-) TimerEvent: {}
+[51.485736] (-) TimerEvent: {}
+[51.586362] (-) TimerEvent: {}
+[51.687028] (-) TimerEvent: {}
+[51.787703] (-) TimerEvent: {}
+[51.888360] (-) TimerEvent: {}
+[51.988993] (-) TimerEvent: {}
+[52.089564] (-) TimerEvent: {}
+[52.190131] (-) TimerEvent: {}
+[52.290671] (-) TimerEvent: {}
+[52.391330] (-) TimerEvent: {}
+[52.492099] (-) TimerEvent: {}
+[52.592741] (-) TimerEvent: {}
+[52.693449] (-) TimerEvent: {}
+[52.794049] (-) TimerEvent: {}
+[52.894808] (-) TimerEvent: {}
+[52.995506] (-) TimerEvent: {}
+[53.096074] (-) TimerEvent: {}
+[53.196705] (-) TimerEvent: {}
+[53.297252] (-) TimerEvent: {}
+[53.397845] (-) TimerEvent: {}
+[53.498555] (-) TimerEvent: {}
+[53.599128] (-) TimerEvent: {}
+[53.699762] (-) TimerEvent: {}
+[53.800373] (-) TimerEvent: {}
+[53.901034] (-) TimerEvent: {}
+[54.001804] (-) TimerEvent: {}
+[54.102478] (-) TimerEvent: {}
+[54.203158] (-) TimerEvent: {}
+[54.303856] (-) TimerEvent: {}
+[54.404479] (-) TimerEvent: {}
+[54.505063] (-) TimerEvent: {}
+[54.605725] (-) TimerEvent: {}
+[54.706342] (-) TimerEvent: {}
+[54.806932] (-) TimerEvent: {}
+[54.907511] (-) TimerEvent: {}
+[55.008188] (-) TimerEvent: {}
+[55.108937] (-) TimerEvent: {}
+[55.209549] (-) TimerEvent: {}
+[55.310205] (-) TimerEvent: {}
+[55.410798] (-) TimerEvent: {}
+[55.511385] (-) TimerEvent: {}
+[55.611975] (-) TimerEvent: {}
+[55.712750] (-) TimerEvent: {}
+[55.813389] (-) TimerEvent: {}
+[55.914020] (-) TimerEvent: {}
+[56.014716] (-) TimerEvent: {}
+[56.115382] (-) TimerEvent: {}
+[56.215937] (-) TimerEvent: {}
+[56.316548] (-) TimerEvent: {}
+[56.417147] (-) TimerEvent: {}
+[56.517697] (-) TimerEvent: {}
+[56.618488] (-) TimerEvent: {}
+[56.719206] (-) TimerEvent: {}
+[56.819902] (-) TimerEvent: {}
+[56.920584] (-) TimerEvent: {}
+[57.021342] (-) TimerEvent: {}
+[57.122011] (-) TimerEvent: {}
+[57.222758] (-) TimerEvent: {}
+[57.323579] (-) TimerEvent: {}
+[57.424227] (-) TimerEvent: {}
+[57.524900] (-) TimerEvent: {}
+[57.625455] (-) TimerEvent: {}
+[57.726134] (-) TimerEvent: {}
+[57.826761] (-) TimerEvent: {}
+[57.927438] (-) TimerEvent: {}
+[58.028152] (-) TimerEvent: {}
+[58.128708] (-) TimerEvent: {}
+[58.229457] (-) TimerEvent: {}
+[58.330147] (-) TimerEvent: {}
+[58.430930] (-) TimerEvent: {}
+[58.531499] (-) TimerEvent: {}
+[58.632240] (-) TimerEvent: {}
+[58.732927] (-) TimerEvent: {}
+[58.833581] (-) TimerEvent: {}
+[58.934420] (-) TimerEvent: {}
+[59.035203] (-) TimerEvent: {}
+[59.135772] (-) TimerEvent: {}
+[59.236334] (-) TimerEvent: {}
+[59.336892] (-) TimerEvent: {}
+[59.437735] (-) TimerEvent: {}
+[59.538308] (-) TimerEvent: {}
+[59.639121] (-) TimerEvent: {}
+[59.739724] (-) TimerEvent: {}
+[59.840501] (-) TimerEvent: {}
+[59.941198] (-) TimerEvent: {}
+[60.041897] (-) TimerEvent: {}
+[60.142455] (-) TimerEvent: {}
+[60.243109] (-) TimerEvent: {}
+[60.343675] (-) TimerEvent: {}
+[60.444505] (-) TimerEvent: {}
+[60.545067] (-) TimerEvent: {}
+[60.645926] (-) TimerEvent: {}
+[60.746517] (-) TimerEvent: {}
+[60.847338] (-) TimerEvent: {}
+[60.947966] (-) TimerEvent: {}
+[61.048666] (-) TimerEvent: {}
+[61.149358] (-) TimerEvent: {}
+[61.250183] (-) TimerEvent: {}
+[61.350812] (-) TimerEvent: {}
+[61.451622] (-) TimerEvent: {}
+[61.552311] (-) TimerEvent: {}
+[61.652985] (-) TimerEvent: {}
+[61.753591] (-) TimerEvent: {}
+[61.854305] (-) TimerEvent: {}
+[61.954925] (-) TimerEvent: {}
+[62.055480] (-) TimerEvent: {}
+[62.156071] (-) TimerEvent: {}
+[62.256709] (-) TimerEvent: {}
+[62.357324] (-) TimerEvent: {}
+[62.457926] (-) TimerEvent: {}
+[62.558616] (-) TimerEvent: {}
+[62.659339] (-) TimerEvent: {}
+[62.760022] (-) TimerEvent: {}
+[62.860689] (-) TimerEvent: {}
+[62.961405] (-) TimerEvent: {}
+[63.062077] (-) TimerEvent: {}
+[63.162776] (-) TimerEvent: {}
+[63.263346] (-) TimerEvent: {}
+[63.364045] (-) TimerEvent: {}
+[63.464763] (-) TimerEvent: {}
+[63.565386] (-) TimerEvent: {}
+[63.665988] (-) TimerEvent: {}
+[63.766636] (-) TimerEvent: {}
+[63.867296] (-) TimerEvent: {}
+[63.967956] (-) TimerEvent: {}
+[64.068528] (-) TimerEvent: {}
+[64.169184] (-) TimerEvent: {}
+[64.269848] (-) TimerEvent: {}
+[64.370432] (-) TimerEvent: {}
+[64.471188] (-) TimerEvent: {}
+[64.571777] (-) TimerEvent: {}
+[64.672403] (-) TimerEvent: {}
+[64.773074] (-) TimerEvent: {}
+[64.873662] (-) TimerEvent: {}
+[64.974291] (-) TimerEvent: {}
+[65.074867] (-) TimerEvent: {}
+[65.175515] (-) TimerEvent: {}
+[65.330617] (-) TimerEvent: {}
+[65.431171] (-) TimerEvent: {}
+[65.531943] (-) TimerEvent: {}
+[65.632656] (-) TimerEvent: {}
+[65.733257] (-) TimerEvent: {}
+[65.833939] (-) TimerEvent: {}
+[65.934693] (-) TimerEvent: {}
+[66.035238] (-) TimerEvent: {}
+[66.135818] (-) TimerEvent: {}
+[66.236360] (-) TimerEvent: {}
+[66.336941] (-) TimerEvent: {}
+[66.437711] (-) TimerEvent: {}
+[66.538281] (-) TimerEvent: {}
+[66.666236] (-) TimerEvent: {}
+[66.766919] (-) TimerEvent: {}
+[66.867673] (-) TimerEvent: {}
+[66.968387] (-) TimerEvent: {}
+[67.068991] (-) TimerEvent: {}
+[67.169659] (-) TimerEvent: {}
+[67.270211] (-) TimerEvent: {}
+[67.370852] (-) TimerEvent: {}
+[67.471487] (-) TimerEvent: {}
+[67.572300] (-) TimerEvent: {}
+[67.672963] (-) TimerEvent: {}
+[67.773530] (-) TimerEvent: {}
+[67.874271] (-) TimerEvent: {}
+[67.974927] (-) TimerEvent: {}
+[68.075501] (-) TimerEvent: {}
+[68.176126] (-) TimerEvent: {}
+[68.276785] (-) TimerEvent: {}
+[68.377453] (-) TimerEvent: {}
+[68.478189] (-) TimerEvent: {}
+[68.578786] (-) TimerEvent: {}
+[68.679416] (-) TimerEvent: {}
+[68.779984] (-) TimerEvent: {}
+[68.880612] (-) TimerEvent: {}
+[68.981175] (-) TimerEvent: {}
+[69.081808] (-) TimerEvent: {}
+[69.182360] (-) TimerEvent: {}
+[69.283035] (-) TimerEvent: {}
+[69.402765] (-) TimerEvent: {}
+[69.503419] (-) TimerEvent: {}
+[69.604204] (-) TimerEvent: {}
+[69.704833] (-) TimerEvent: {}
+[69.805610] (-) TimerEvent: {}
+[69.906316] (-) TimerEvent: {}
+[70.007280] (-) TimerEvent: {}
+[70.108020] (-) TimerEvent: {}
+[70.208784] (-) TimerEvent: {}
+[70.309462] (-) TimerEvent: {}
+[70.410169] (-) TimerEvent: {}
+[70.510870] (-) TimerEvent: {}
+[70.611595] (-) TimerEvent: {}
+[70.784084] (-) TimerEvent: {}
+[70.884699] (-) TimerEvent: {}
+[70.985307] (-) TimerEvent: {}
+[71.085895] (-) TimerEvent: {}
+[71.186528] (-) TimerEvent: {}
+[71.287121] (-) TimerEvent: {}
+[71.387829] (-) TimerEvent: {}
+[71.488425] (-) TimerEvent: {}
+[71.589062] (-) TimerEvent: {}
+[71.689770] (-) TimerEvent: {}
+[71.790439] (-) TimerEvent: {}
+[71.891100] (-) TimerEvent: {}
+[71.991645] (-) TimerEvent: {}
+[72.139449] (-) TimerEvent: {}
+[72.240069] (-) TimerEvent: {}
+[72.340710] (-) TimerEvent: {}
+[72.441441] (-) TimerEvent: {}
+[72.542104] (-) TimerEvent: {}
+[72.642768] (-) TimerEvent: {}
+[72.743343] (-) TimerEvent: {}
+[72.844000] (-) TimerEvent: {}
+[72.944704] (-) TimerEvent: {}
+[73.045355] (-) TimerEvent: {}
+[73.146056] (-) TimerEvent: {}
+[73.246713] (-) TimerEvent: {}
+[73.347542] (-) TimerEvent: {}
+[73.607053] (-) TimerEvent: {}
+[73.707698] (-) TimerEvent: {}
+[73.808460] (-) TimerEvent: {}
+[73.909118] (-) TimerEvent: {}
+[74.009762] (-) TimerEvent: {}
+[74.110457] (-) TimerEvent: {}
+[74.211050] (-) TimerEvent: {}
+[74.311695] (-) TimerEvent: {}
+[74.412332] (-) TimerEvent: {}
+[74.512920] (-) TimerEvent: {}
+[74.613564] (-) TimerEvent: {}
+[74.714167] (-) TimerEvent: {}
+[74.814804] (-) TimerEvent: {}
+[74.915380] (-) TimerEvent: {}
+[75.015931] (-) TimerEvent: {}
+[75.116528] (-) TimerEvent: {}
+[75.217106] (-) TimerEvent: {}
+[75.317807] (-) TimerEvent: {}
+[75.418389] (-) TimerEvent: {}
+[75.518993] (-) TimerEvent: {}
+[75.619595] (-) TimerEvent: {}
+[75.720298] (-) TimerEvent: {}
+[75.820925] (-) TimerEvent: {}
+[75.921531] (-) TimerEvent: {}
+[76.022227] (-) TimerEvent: {}
+[76.122955] (-) TimerEvent: {}
+[76.223582] (-) TimerEvent: {}
+[76.324162] (-) TimerEvent: {}
+[76.424746] (-) TimerEvent: {}
+[76.525327] (-) TimerEvent: {}
+[76.625959] (-) TimerEvent: {}
+[76.726570] (-) TimerEvent: {}
+[76.827326] (-) TimerEvent: {}
+[76.927979] (-) TimerEvent: {}
+[77.028735] (-) TimerEvent: {}
+[77.129420] (-) TimerEvent: {}
+[77.230054] (-) TimerEvent: {}
+[77.330696] (-) TimerEvent: {}
+[77.431322] (-) TimerEvent: {}
+[77.531965] (-) TimerEvent: {}
+[77.632607] (-) TimerEvent: {}
+[77.733188] (-) TimerEvent: {}
+[77.833893] (-) TimerEvent: {}
+[77.934579] (-) TimerEvent: {}
+[78.035157] (-) TimerEvent: {}
+[78.135758] (-) TimerEvent: {}
+[78.236414] (-) TimerEvent: {}
+[78.337109] (-) TimerEvent: {}
+[78.437792] (-) TimerEvent: {}
+[78.538428] (-) TimerEvent: {}
+[78.639190] (-) TimerEvent: {}
+[78.739811] (-) TimerEvent: {}
+[78.840661] (-) TimerEvent: {}
+[78.941318] (-) TimerEvent: {}
+[79.042073] (-) TimerEvent: {}
+[79.142743] (-) TimerEvent: {}
+[79.243449] (-) TimerEvent: {}
+[79.344186] (-) TimerEvent: {}
+[79.444761] (-) TimerEvent: {}
+[79.545363] (-) TimerEvent: {}
+[79.646001] (-) TimerEvent: {}
+[79.746559] (-) TimerEvent: {}
+[79.847223] (-) TimerEvent: {}
+[79.947793] (-) TimerEvent: {}
+[80.048436] (-) TimerEvent: {}
+[80.149055] (-) TimerEvent: {}
+[80.249622] (-) TimerEvent: {}
+[80.350245] (-) TimerEvent: {}
+[80.450906] (-) TimerEvent: {}
+[80.551597] (-) TimerEvent: {}
+[80.652278] (-) TimerEvent: {}
+[80.752927] (-) TimerEvent: {}
+[80.853627] (-) TimerEvent: {}
+[80.954280] (-) TimerEvent: {}
+[81.054859] (-) TimerEvent: {}
+[81.155425] (-) TimerEvent: {}
+[81.255888] (-) TimerEvent: {}
+[81.356361] (-) TimerEvent: {}
+[81.456837] (-) TimerEvent: {}
+[81.557356] (-) TimerEvent: {}
+[81.657877] (-) TimerEvent: {}
+[81.758340] (-) TimerEvent: {}
+[81.858834] (-) TimerEvent: {}
+[81.959359] (-) TimerEvent: {}
+[82.059900] (-) TimerEvent: {}
+[82.160496] (-) TimerEvent: {}
+[82.260935] (-) TimerEvent: {}
+[82.361415] (-) TimerEvent: {}
+[82.461996] (-) TimerEvent: {}
+[82.562568] (-) TimerEvent: {}
+[82.663082] (-) TimerEvent: {}
+[82.763571] (-) TimerEvent: {}
+[82.864088] (-) TimerEvent: {}
+[82.964685] (-) TimerEvent: {}
+[83.065182] (-) TimerEvent: {}
+[83.165669] (-) TimerEvent: {}
+[83.266134] (-) TimerEvent: {}
+[83.366636] (-) TimerEvent: {}
+[83.467110] (-) TimerEvent: {}
+[83.567625] (-) TimerEvent: {}
+[83.644031] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'[100%] \x1b[32m\x1b[1mLinking CXX shared library libMrsUavFlightforgeSimulator_FlightforgeSimulator.so\x1b[0m\n'}
+[83.667704] (-) TimerEvent: {}
+[83.768293] (-) TimerEvent: {}
+[83.868873] (-) TimerEvent: {}
+[83.969452] (-) TimerEvent: {}
+[84.069966] (-) TimerEvent: {}
+[84.170517] (-) TimerEvent: {}
+[84.271031] (-) TimerEvent: {}
+[84.371612] (-) TimerEvent: {}
+[84.472159] (-) TimerEvent: {}
+[84.572672] (-) TimerEvent: {}
+[84.673146] (-) TimerEvent: {}
+[84.773629] (-) TimerEvent: {}
+[84.874141] (-) TimerEvent: {}
+[84.974662] (-) TimerEvent: {}
+[85.075173] (-) TimerEvent: {}
+[85.175648] (-) TimerEvent: {}
+[85.276122] (-) TimerEvent: {}
+[85.376641] (-) TimerEvent: {}
+[85.477141] (-) TimerEvent: {}
+[85.577769] (-) TimerEvent: {}
+[85.678458] (-) TimerEvent: {}
+[85.779238] (-) TimerEvent: {}
+[85.880100] (-) TimerEvent: {}
+[85.980782] (-) TimerEvent: {}
+[86.081519] (-) TimerEvent: {}
+[86.182203] (-) TimerEvent: {}
+[86.282821] (-) TimerEvent: {}
+[86.383596] (-) TimerEvent: {}
+[86.484449] (-) TimerEvent: {}
+[86.585203] (-) TimerEvent: {}
+[86.685875] (-) TimerEvent: {}
+[86.786539] (-) TimerEvent: {}
+[86.887231] (-) TimerEvent: {}
+[86.987944] (-) TimerEvent: {}
+[87.088678] (-) TimerEvent: {}
+[87.189350] (-) TimerEvent: {}
+[87.290087] (-) TimerEvent: {}
+[87.390772] (-) TimerEvent: {}
+[87.491459] (-) TimerEvent: {}
+[87.592208] (-) TimerEvent: {}
+[87.692839] (-) TimerEvent: {}
+[87.793403] (-) TimerEvent: {}
+[87.893918] (-) TimerEvent: {}
+[87.994527] (-) TimerEvent: {}
+[88.095089] (-) TimerEvent: {}
+[88.195580] (-) TimerEvent: {}
+[88.296066] (-) TimerEvent: {}
+[88.396564] (-) TimerEvent: {}
+[88.497141] (-) TimerEvent: {}
+[88.597778] (-) TimerEvent: {}
+[88.698291] (-) TimerEvent: {}
+[88.798873] (-) TimerEvent: {}
+[88.899371] (-) TimerEvent: {}
+[88.999862] (-) TimerEvent: {}
+[89.100342] (-) TimerEvent: {}
+[89.200913] (-) TimerEvent: {}
+[89.301430] (-) TimerEvent: {}
+[89.401932] (-) TimerEvent: {}
+[89.502473] (-) TimerEvent: {}
+[89.602964] (-) TimerEvent: {}
+[89.703409] (-) TimerEvent: {}
+[89.803976] (-) TimerEvent: {}
+[89.904469] (-) TimerEvent: {}
+[90.004975] (-) TimerEvent: {}
+[90.105468] (-) TimerEvent: {}
+[90.205911] (-) TimerEvent: {}
+[90.306411] (-) TimerEvent: {}
+[90.406907] (-) TimerEvent: {}
+[90.507444] (-) TimerEvent: {}
+[90.607936] (-) TimerEvent: {}
+[90.708514] (-) TimerEvent: {}
+[90.808994] (-) TimerEvent: {}
+[90.909465] (-) TimerEvent: {}
+[91.009924] (-) TimerEvent: {}
+[91.110520] (-) TimerEvent: {}
+[91.211030] (-) TimerEvent: {}
+[91.311597] (-) TimerEvent: {}
+[91.412072] (-) TimerEvent: {}
+[91.512634] (-) TimerEvent: {}
+[91.613157] (-) TimerEvent: {}
+[91.713659] (-) TimerEvent: {}
+[91.814193] (-) TimerEvent: {}
+[91.914786] (-) TimerEvent: {}
+[92.015291] (-) TimerEvent: {}
+[92.115769] (-) TimerEvent: {}
+[92.216258] (-) TimerEvent: {}
+[92.316766] (-) TimerEvent: {}
+[92.417285] (-) TimerEvent: {}
+[92.518000] (-) TimerEvent: {}
+[92.618495] (-) TimerEvent: {}
+[92.718977] (-) TimerEvent: {}
+[92.819485] (-) TimerEvent: {}
+[92.919943] (-) TimerEvent: {}
+[92.964792] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'[100%] Built target MrsUavFlightforgeSimulator_FlightforgeSimulator\n'}
+[93.020095] (-) TimerEvent: {}
+[93.120600] (-) TimerEvent: {}
+[93.142737] (mrs_uav_flightforge_simulator) CommandEnded: {'returncode': 0}
+[93.162810] (mrs_uav_flightforge_simulator) JobProgress: {'identifier': 'mrs_uav_flightforge_simulator', 'progress': 'install'}
+[93.178293] (mrs_uav_flightforge_simulator) Command: {'cmd': ['/usr/bin/cmake', '--install', '/mnt/d/ros/mrs_uav_flightforge_simulator/build/mrs_uav_flightforge_simulator'], 'cwd': '/mnt/d/ros/mrs_uav_flightforge_simulator/build/mrs_uav_flightforge_simulator', 'env': OrderedDict({'GZ_SIM_SYSTEM_PLUGIN_PATH': '/opt/ros/jazzy/lib/mrs_gazebo_common_resources', 'LESSOPEN': '| /usr/bin/lesspipe %s', 'GZ_SIM_RESOURCE_PATH': '/opt/ros/jazzy/share', 'USER': 'aidar', 'GZ_CONFIG_PATH': '/opt/ros/jazzy/opt/gz_sim_vendor/share/gz:/opt/ros/jazzy/opt/sdformat_vendor/share/gz:/opt/ros/jazzy/opt/gz_gui_vendor/share/gz:/opt/ros/jazzy/opt/gz_transport_vendor/share/gz:/opt/ros/jazzy/opt/gz_rendering_vendor/share/gz:/opt/ros/jazzy/opt/gz_plugin_vendor/share/gz:/opt/ros/jazzy/opt/gz_fuel_tools_vendor/share/gz:/opt/ros/jazzy/opt/gz_msgs_vendor/share/gz:/opt/ros/jazzy/opt/gz_common_vendor/share/gz', 'SHLVL': '1', 'LD_LIBRARY_PATH': '/opt/ros/jazzy/opt/zenoh_cpp_vendor/lib:/opt/ros/jazzy/opt/gz_sim_vendor/lib:/opt/ros/jazzy/opt/gz_sensors_vendor/lib:/opt/ros/jazzy/opt/gz_physics_vendor/lib:/opt/ros/jazzy/opt/sdformat_vendor/lib:/opt/ros/jazzy/opt/rviz_ogre_vendor/lib:/opt/ros/jazzy/lib/x86_64-linux-gnu:/opt/ros/jazzy/opt/gz_gui_vendor/lib:/opt/ros/jazzy/opt/gz_transport_vendor/lib:/opt/ros/jazzy/opt/gz_rendering_vendor/lib:/opt/ros/jazzy/opt/gz_plugin_vendor/lib:/opt/ros/jazzy/opt/gz_fuel_tools_vendor/lib:/opt/ros/jazzy/opt/gz_msgs_vendor/lib:/opt/ros/jazzy/opt/gz_common_vendor/lib:/opt/ros/jazzy/opt/gz_math_vendor/lib:/opt/ros/jazzy/opt/gz_utils_vendor/lib:/opt/ros/jazzy/opt/gz_tools_vendor/lib:/opt/ros/jazzy/opt/gz_ogre_next_vendor/lib:/opt/ros/jazzy/opt/gz_dartsim_vendor/lib:/opt/ros/jazzy/opt/gz_cmake_vendor/lib:/opt/ros/jazzy/lib', 'WT_PROFILE_ID': '{61c54bbd-c2c6-5271-96e7-009a87ff44bf}', 'HOME': '/home/aidar', 'OLDPWD': '/mnt/c/Users/helst', 'ROS_PYTHON_VERSION': '3', 'WSL_DISTRO_NAME': 'Ubuntu', 'DEBUGINFOD_URLS': 'https://debuginfod.ubuntu.com', 'WAYLAND_DISPLAY': 'wayland-0', 'ROS_DISTRO': 'jazzy', 'LOGNAME': 'aidar', 'NAME': 'Agent', 'WSL_INTEROP': '/run/WSL/18169_interop', 'IGN_GAZEBO_MODEL_PATH': '/opt/ros/jazzy/share', 'PULSE_SERVER': 'unix:/mnt/wslg/PulseServer', '_': '/usr/bin/colcon', 'ROS_VERSION': '2', 'TERM': 'xterm-256color', 'GAZEBO_MODEL_PATH': '/opt/ros/jazzy/share', 'PATH': '/home/aidar/.local/bin:/opt/ros/jazzy/opt/gz_msgs_vendor/bin:/opt/ros/jazzy/opt/gz_tools_vendor/bin:/opt/ros/jazzy/opt/gz_ogre_next_vendor/bin:/opt/ros/jazzy/bin:/home/aidar/autotools/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/lib/wsl/lib:/mnt/c/Windows/system32:/mnt/c/Windows:/mnt/c/Windows/System32/Wbem:/mnt/c/Windows/System32/WindowsPowerShell/v1.0/:/mnt/c/Windows/System32/OpenSSH/:/mnt/c/Program Files (x86)/NVIDIA Corporation/PhysX/Common:/mnt/c/WINDOWS/system32:/mnt/c/WINDOWS:/mnt/c/WINDOWS/System32/Wbem:/mnt/c/WINDOWS/System32/WindowsPowerShell/v1.0/:/mnt/c/WINDOWS/System32/OpenSSH/:/mnt/c/Program Files/Microsoft SQL Server/150/Tools/Binn/:/mnt/c/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/:/mnt/c/Program Files/dotnet/:/mnt/c/Program Files/NVIDIA Corporation/NVIDIA app/NvDLISR:/mnt/d/CMAKE/bin:/mnt/d/Git/cmd:/mnt/d/Git LFS:/mnt/c/ProgramData/chocolatey/bin:/mnt/d/Windows Kits/10/Windows Performance Toolkit/:/mnt/d/pgrframeworkvs2019/pgrframework/bin:/mnt/d/Microsoft_VS_Code/Microsoft VS Code/bin:/mnt/c/Users/helst/AppData/Local/JetBrains/Toolbox/scripts', 'WT_SESSION': '2a8cc0e1-958d-4697-8aa9-9e9e6fd16536', 'XDG_RUNTIME_DIR': '/mnt/wslg/runtime-dir', 'DISPLAY': ':0', 'LANG': 'C.UTF-8', 'LS_COLORS': 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=00:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.avif=01;35:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:*~=00;90:*#=00;90:*.bak=00;90:*.crdownload=00;90:*.dpkg-dist=00;90:*.dpkg-new=00;90:*.dpkg-old=00;90:*.dpkg-tmp=00;90:*.old=00;90:*.orig=00;90:*.part=00;90:*.rej=00;90:*.rpmnew=00;90:*.rpmorig=00;90:*.rpmsave=00;90:*.swp=00;90:*.tmp=00;90:*.ucf-dist=00;90:*.ucf-new=00;90:*.ucf-old=00;90:', 'AMENT_PREFIX_PATH': '/opt/ros/jazzy', 'SHELL': '/bin/bash', 'LESSCLOSE': '/usr/bin/lesspipe %s %s', 'IGN_GAZEBO_RESOURCE_PATH': '/opt/ros/jazzy/share', 'GAZEBO_RESOURCE_PATH': '/opt/ros/jazzy/share', 'ROS_AUTOMATIC_DISCOVERY_RANGE': 'SUBNET', 'PWD': '/mnt/d/ros/mrs_uav_flightforge_simulator/build/mrs_uav_flightforge_simulator', 'PYTHONPATH': '/opt/ros/jazzy/lib/python3.12/site-packages', 'COLCON': '1', 'WSL2_GUI_APPS_ENABLED': '1', 'HOSTTYPE': 'x86_64', 'CMAKE_PREFIX_PATH': '/opt/ros/jazzy:/opt/ros/jazzy/opt/gz_sim_vendor:/opt/ros/jazzy/opt/gz_sensors_vendor:/opt/ros/jazzy/opt/gz_physics_vendor:/opt/ros/jazzy/opt/sdformat_vendor:/opt/ros/jazzy/opt/gz_gui_vendor:/opt/ros/jazzy/opt/gz_transport_vendor:/opt/ros/jazzy/opt/gz_rendering_vendor:/opt/ros/jazzy/opt/gz_plugin_vendor:/opt/ros/jazzy/opt/gz_fuel_tools_vendor:/opt/ros/jazzy/opt/gz_msgs_vendor:/opt/ros/jazzy/opt/gz_common_vendor:/opt/ros/jazzy/opt/gz_math_vendor:/opt/ros/jazzy/opt/gz_utils_vendor:/opt/ros/jazzy/opt/gz_tools_vendor:/opt/ros/jazzy/opt/gz_ogre_next_vendor:/opt/ros/jazzy/opt/gz_dartsim_vendor:/opt/ros/jazzy/opt/gz_cmake_vendor', 'WSLENV': 'WT_SESSION:WT_PROFILE_ID:'}), 'shell': False}
+[93.195995] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Install configuration: ""\n'}
+[93.220732] (-) TimerEvent: {}
+[93.221323] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/ament_index/resource_index/rosidl_interfaces/mrs_uav_flightforge_simulator\n'}
+[93.245340] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/srv/SetOrientation.json\n'}
+[93.257793] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator\n'}
+[93.277850] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/msg\n'}
+[93.305887] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/msg/rosidl_generator_c__visibility_control.h\n'}
+[93.320833] (-) TimerEvent: {}
+[93.322956] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/srv\n'}
+[93.348839] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/srv/detail\n'}
+[93.382005] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/srv/detail/set_orientation__description.c\n'}
+[93.408416] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/srv/detail/set_orientation__functions.c\n'}
+[93.420941] (-) TimerEvent: {}
+[93.434632] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/srv/detail/set_orientation__functions.h\n'}
+[93.460755] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/srv/detail/set_orientation__struct.h\n'}
+[93.486237] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Installing: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/srv/detail/set_orientation__type_support.c\n'}
+[93.521098] (-) TimerEvent: {}
+[93.580621] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/srv/detail/set_orientation__type_support.h\n'}
+[93.603263] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/srv/set_orientation.h\n'}
+[93.616716] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/environment/library_path.sh\n'}
+[93.621182] (-) TimerEvent: {}
+[93.634498] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/environment/library_path.dsv\n'}
+[93.661358] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib/libmrs_uav_flightforge_simulator__rosidl_generator_c.so\n'}
+[93.689884] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator\n'}
+[93.710575] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/msg\n'}
+[93.721285] (-) TimerEvent: {}
+[93.738481] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/msg/rosidl_typesupport_fastrtps_c__visibility_control.h\n'}
+[93.755349] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/srv\n'}
+[93.780875] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/srv/detail\n'}
+[93.814032] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/srv/detail/set_orientation__rosidl_typesupport_fastrtps_c.h\n'}
+[93.821408] (-) TimerEvent: {}
+[93.844633] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib/libmrs_uav_flightforge_simulator__rosidl_typesupport_fastrtps_c.so\n'}
+[93.876330] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator\n'}
+[93.898418] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/msg\n'}
+[93.921524] (-) TimerEvent: {}
+[93.928313] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/msg/rosidl_generator_cpp__visibility_control.hpp\n'}
+[93.946178] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/srv\n'}
+[93.972562] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/srv/detail\n'}
+[94.007325] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/srv/detail/set_orientation__builder.hpp\n'}
+[94.021649] (-) TimerEvent: {}
+[94.034438] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/srv/detail/set_orientation__struct.hpp\n'}
+[94.061995] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/srv/detail/set_orientation__traits.hpp\n'}
+[94.088939] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/srv/detail/set_orientation__type_support.hpp\n'}
+[94.113075] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/srv/set_orientation.hpp\n'}
+[94.121776] (-) TimerEvent: {}
+[94.130170] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator\n'}
+[94.153441] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/msg\n'}
+[94.183501] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/msg/rosidl_typesupport_fastrtps_cpp__visibility_control.h\n'}
+[94.201426] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/srv\n'}
+[94.221889] (-) TimerEvent: {}
+[94.226920] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/srv/detail\n'}
+[94.258678] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/srv/detail/dds_fastrtps\n'}
+[94.293844] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/srv/detail/set_orientation__rosidl_typesupport_fastrtps_cpp.hpp\n'}
+[94.322020] (-) TimerEvent: {}
+[94.322960] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib/libmrs_uav_flightforge_simulator__rosidl_typesupport_fastrtps_cpp.so\n'}
+[94.352682] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator\n'}
+[94.373294] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/msg\n'}
+[94.400310] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/msg/rosidl_typesupport_introspection_c__visibility_control.h\n'}
+[94.417462] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/srv\n'}
+[94.422117] (-) TimerEvent: {}
+[94.443354] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/srv/detail\n'}
+[94.475561] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/srv/detail/set_orientation__rosidl_typesupport_introspection_c.h\n'}
+[94.500576] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Installing: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/srv/detail/set_orientation__type_support.c\n'}
+[94.522252] (-) TimerEvent: {}
+[94.598041] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib/libmrs_uav_flightforge_simulator__rosidl_typesupport_introspection_c.so\n'}
+[94.622372] (-) TimerEvent: {}
+[94.636326] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib/libmrs_uav_flightforge_simulator__rosidl_typesupport_c.so\n'}
+[94.662469] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator\n'}
+[94.683472] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/srv\n'}
+[94.709299] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/srv/detail\n'}
+[94.722467] (-) TimerEvent: {}
+[94.742851] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/srv/detail/set_orientation__rosidl_typesupport_introspection_cpp.hpp\n'}
+[94.770357] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/include/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator/srv/detail/set_orientation__type_support.cpp\n'}
+[94.798659] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib/libmrs_uav_flightforge_simulator__rosidl_typesupport_introspection_cpp.so\n'}
+[94.822619] (-) TimerEvent: {}
+[94.842728] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib/libmrs_uav_flightforge_simulator__rosidl_typesupport_cpp.so\n'}
+[94.877505] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/environment/pythonpath.sh\n'}
+[94.895377] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/environment/pythonpath.dsv\n'}
+[94.909718] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib/python3.12/site-packages/mrs_uav_flightforge_simulator-2.0.0-py3.12.egg-info\n'}
+[94.922710] (-) TimerEvent: {}
+[94.934710] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Installing: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib/python3.12/site-packages/mrs_uav_flightforge_simulator-2.0.0-py3.12.egg-info/dependency_links.txt\n'}
+[94.998390] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Installing: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib/python3.12/site-packages/mrs_uav_flightforge_simulator-2.0.0-py3.12.egg-info/PKG-INFO\n'}
+[95.022880] (-) TimerEvent: {}
+[95.062087] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Installing: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib/python3.12/site-packages/mrs_uav_flightforge_simulator-2.0.0-py3.12.egg-info/SOURCES.txt\n'}
+[95.122997] (-) TimerEvent: {}
+[95.125525] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Installing: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib/python3.12/site-packages/mrs_uav_flightforge_simulator-2.0.0-py3.12.egg-info/top_level.txt\n'}
+[95.188755] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib/python3.12/site-packages/mrs_uav_flightforge_simulator\n'}
+[95.210151] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib/python3.12/site-packages/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator_s__rosidl_typesupport_c.so\n'}
+[95.223143] (-) TimerEvent: {}
+[95.227188] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib/python3.12/site-packages/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator_s__rosidl_typesupport_fastrtps_c.so\n'}
+[95.244317] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib/python3.12/site-packages/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator_s__rosidl_typesupport_introspection_c.so\n'}
+[95.259848] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib/python3.12/site-packages/mrs_uav_flightforge_simulator/srv\n'}
+[95.286822] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib/python3.12/site-packages/mrs_uav_flightforge_simulator/srv/_set_orientation.py\n'}
+[95.307911] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib/python3.12/site-packages/mrs_uav_flightforge_simulator/srv/_set_orientation_s.c\n'}
+[95.323257] (-) TimerEvent: {}
+[95.329086] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib/python3.12/site-packages/mrs_uav_flightforge_simulator/srv/__init__.py\n'}
+[95.346776] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib/python3.12/site-packages/mrs_uav_flightforge_simulator/_mrs_uav_flightforge_simulator_s.ep.rosidl_typesupport_c.c\n'}
+[95.363122] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib/python3.12/site-packages/mrs_uav_flightforge_simulator/_mrs_uav_flightforge_simulator_s.ep.rosidl_typesupport_fastrtps_c.c\n'}
+[95.379977] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib/python3.12/site-packages/mrs_uav_flightforge_simulator/_mrs_uav_flightforge_simulator_s.ep.rosidl_typesupport_introspection_c.c\n'}
+[95.396330] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib/python3.12/site-packages/mrs_uav_flightforge_simulator/__init__.py\n'}
+[95.423365] (-) TimerEvent: {}
+[95.521166] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b"Listing '/mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib/python3.12/site-packages/mrs_uav_flightforge_simulator'...\n"}
+[95.522110] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b"Listing '/mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib/python3.12/site-packages/mrs_uav_flightforge_simulator/srv'...\n"}
+[95.523446] (-) TimerEvent: {}
+[95.569797] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib/python3.12/site-packages/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator_s__rosidl_typesupport_fastrtps_c.so\n'}
+[95.623603] (-) TimerEvent: {}
+[95.649261] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib/python3.12/site-packages/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator_s__rosidl_typesupport_introspection_c.so\n'}
+[95.723731] (-) TimerEvent: {}
+[95.727283] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib/python3.12/site-packages/mrs_uav_flightforge_simulator/mrs_uav_flightforge_simulator_s__rosidl_typesupport_c.so\n'}
+[95.790308] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib/libmrs_uav_flightforge_simulator__rosidl_generator_py.so\n'}
+[95.823863] (-) TimerEvent: {}
+[95.832857] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/srv/SetOrientation.idl\n'}
+[95.851652] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/srv/SetOrientation.srv\n'}
+[95.865249] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/plugins.xml\n'}
+[95.891201] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib/libMrsUavFlightforgeSimulator_FlightforgeConnector.so\n'}
+[95.918853] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Installing: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib/libMrsUavFlightforgeSimulator_FlightforgeSimulator.so\n'}
+[95.923947] (-) TimerEvent: {}
+[96.024548] (-) TimerEvent: {}
+[96.125066] (-) TimerEvent: {}
+[96.225544] (-) TimerEvent: {}
+[96.326012] (-) TimerEvent: {}
+[96.426500] (-) TimerEvent: {}
+[96.479406] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Set non-toolchain portion of runtime path of "/mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib/libMrsUavFlightforgeSimulator_FlightforgeSimulator.so" to ""\n'}
+[96.499707] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/lib/libMrsUavFlightforgeSimulator_HwApiPlugin.so\n'}
+[96.521376] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/./include\n'}
+[96.526591] (-) TimerEvent: {}
+[96.534342] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/./include/cereal\n'}
+[96.543771] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/./include/flight_forge_connector\n'}
+[96.553588] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/./include/kissnet\n'}
+[96.561821] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/launch\n'}
+[96.581974] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/launch/flightforge_simulator.launch.py\n'}
+[96.596999] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/launch/hw_api.launch.py\n'}
+[96.608528] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/config\n'}
+[96.626761] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/config/flightforge_simulator.yaml\n'}
+[96.627588] (-) TimerEvent: {}
+[96.641620] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/config/hw_api.yaml\n'}
+[96.656681] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/config/uavs.yaml\n'}
+[96.667517] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux\n'}
+[96.685066] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone\n'}
+[96.704419] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/.mrs_status_display_config~\n'}
+[96.722410] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/build\n'}
+[96.727714] (-) TimerEvent: {}
+[96.749309] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/build/.built_by\n'}
+[96.769673] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/build/COLCON_IGNORE\n'}
+[96.790374] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/config\n'}
+[96.818107] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/config/automatic_start.yaml\n'}
+[96.827829] (-) TimerEvent: {}
+[96.839500] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/config/custom_config.yaml\n'}
+[96.861119] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/config/network_config.yaml\n'}
+[96.882998] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/config/simulator.yaml\n'}
+[96.904921] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/config/world_config.yaml\n'}
+[96.922713] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/goto.py\n'}
+[96.927955] (-) TimerEvent: {}
+[96.936629] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/install\n'}
+[96.958381] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/install/.colcon_install_layout\n'}
+[96.974763] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/install/COLCON_IGNORE\n'}
+[96.993175] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/install/local_setup.bash\n'}
+[97.012864] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/install/local_setup.ps1\n'}
+[97.028101] (-) TimerEvent: {}
+[97.032741] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/install/local_setup.sh\n'}
+[97.053736] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/install/local_setup.zsh\n'}
+[97.074126] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/install/setup.bash\n'}
+[97.093417] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/install/setup.ps1\n'}
+[97.114068] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/install/setup.sh\n'}
+[97.128241] (-) TimerEvent: {}
+[97.136102] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/install/setup.zsh\n'}
+[97.158492] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/install/_local_setup_util_ps1.py\n'}
+[97.181278] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/install/_local_setup_util_sh.py\n'}
+[97.198556] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/kill.sh\n'}
+[97.213844] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/layout.json\n'}
+[97.228359] (-) TimerEvent: {}
+[97.229992] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/log\n'}
+[97.257641] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/log/build_2026-03-27_16-50-15\n'}
+[97.290349] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/log/build_2026-03-27_16-50-15/events.log\n'}
+[97.316332] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/log/build_2026-03-27_16-50-15/logger_all.log\n'}
+[97.328490] (-) TimerEvent: {}
+[97.339951] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/log/build_2026-03-27_16-50-21\n'}
+[97.373375] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/log/build_2026-03-27_16-50-21/events.log\n'}
+[97.399229] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/log/build_2026-03-27_16-50-21/logger_all.log\n'}
+[97.420754] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/log/COLCON_IGNORE\n'}
+[97.428605] (-) TimerEvent: {}
+[97.443095] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/log/latest\n'}
+[97.457597] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/log/latest_build\n'}
+[97.467788] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/path.py\n'}
+[97.484003] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/rviz.rviz\n'}
+[97.499055] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/session.yml\n'}
+[97.512690] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/start.sh\n'}
+[97.528586] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/tmux/one_drone/takeoff.sh\n'}
+[97.529516] (-) TimerEvent: {}
+[97.544185] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/srv\n'}
+[97.564581] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/srv/SetOrientation.srv\n'}
+[97.597728] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/ament_index/resource_index/package_run_dependencies/mrs_uav_flightforge_simulator\n'}
+[97.628238] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/ament_index/resource_index/parent_prefix_path/mrs_uav_flightforge_simulator\n'}
+[97.629605] (-) TimerEvent: {}
+[97.641250] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/environment/ament_prefix_path.sh\n'}
+[97.659397] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/environment/ament_prefix_path.dsv\n'}
+[97.671469] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/environment/path.sh\n'}
+[97.688884] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/environment/path.dsv\n'}
+[97.704459] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/local_setup.bash\n'}
+[97.719548] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/local_setup.sh\n'}
+[97.729721] (-) TimerEvent: {}
+[97.734515] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/local_setup.zsh\n'}
+[97.749076] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/local_setup.dsv\n'}
+[97.763839] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Installing: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/package.dsv\n'}
+[97.824491] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/ament_index/resource_index/packages/mrs_uav_flightforge_simulator\n'}
+[97.829823] (-) TimerEvent: {}
+[97.855790] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/ament_index/resource_index/mrs_uav_hw_api__pluginlib__plugin/mrs_uav_flightforge_simulator\n'}
+[97.893988] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/cmake/export_mrs_uav_flightforge_simulator__rosidl_generator_cExport.cmake\n'}
+[97.918496] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/cmake/export_mrs_uav_flightforge_simulator__rosidl_generator_cExport-noconfig.cmake\n'}
+[97.929933] (-) TimerEvent: {}
+[97.953364] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/cmake/export_mrs_uav_flightforge_simulator__rosidl_typesupport_fastrtps_cExport.cmake\n'}
+[97.976242] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/cmake/export_mrs_uav_flightforge_simulator__rosidl_typesupport_fastrtps_cExport-noconfig.cmake\n'}
+[98.009866] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/cmake/export_mrs_uav_flightforge_simulator__rosidl_generator_cppExport.cmake\n'}
+[98.030051] (-) TimerEvent: {}
+[98.043918] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/cmake/export_mrs_uav_flightforge_simulator__rosidl_typesupport_fastrtps_cppExport.cmake\n'}
+[98.065810] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/cmake/export_mrs_uav_flightforge_simulator__rosidl_typesupport_fastrtps_cppExport-noconfig.cmake\n'}
+[98.099861] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/cmake/mrs_uav_flightforge_simulator__rosidl_typesupport_introspection_cExport.cmake\n'}
+[98.122514] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/cmake/mrs_uav_flightforge_simulator__rosidl_typesupport_introspection_cExport-noconfig.cmake\n'}
+[98.130152] (-) TimerEvent: {}
+[98.158532] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/cmake/mrs_uav_flightforge_simulator__rosidl_typesupport_cExport.cmake\n'}
+[98.183590] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/cmake/mrs_uav_flightforge_simulator__rosidl_typesupport_cExport-noconfig.cmake\n'}
+[98.220543] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/cmake/mrs_uav_flightforge_simulator__rosidl_typesupport_introspection_cppExport.cmake\n'}
+[98.230263] (-) TimerEvent: {}
+[98.243701] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/cmake/mrs_uav_flightforge_simulator__rosidl_typesupport_introspection_cppExport-noconfig.cmake\n'}
+[98.277872] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/cmake/mrs_uav_flightforge_simulator__rosidl_typesupport_cppExport.cmake\n'}
+[98.300576] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/cmake/mrs_uav_flightforge_simulator__rosidl_typesupport_cppExport-noconfig.cmake\n'}
+[98.330401] (-) TimerEvent: {}
+[98.336243] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/cmake/export_mrs_uav_flightforge_simulator__rosidl_generator_pyExport.cmake\n'}
+[98.358758] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/cmake/export_mrs_uav_flightforge_simulator__rosidl_generator_pyExport-noconfig.cmake\n'}
+[98.393258] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/cmake/export_mrs_uav_flightforge_simulatorExport.cmake\n'}
+[98.415960] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/cmake/export_mrs_uav_flightforge_simulatorExport-noconfig.cmake\n'}
+[98.430515] (-) TimerEvent: {}
+[98.446193] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/ament_index/resource_index/rclcpp_components/mrs_uav_flightforge_simulator\n'}
+[98.464409] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/cmake/rosidl_cmake-extras.cmake\n'}
+[98.482395] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/cmake/ament_cmake_export_dependencies-extras.cmake\n'}
+[98.500284] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/cmake/ament_cmake_export_include_directories-extras.cmake\n'}
+[98.518181] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/cmake/ament_cmake_export_libraries-extras.cmake\n'}
+[98.530635] (-) TimerEvent: {}
+[98.535398] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/cmake/ament_cmake_export_targets-extras.cmake\n'}
+[98.553714] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/cmake/rosidl_cmake_export_typesupport_targets-extras.cmake\n'}
+[98.573940] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/cmake/rosidl_cmake_export_typesupport_libraries-extras.cmake\n'}
+[98.593170] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/cmake/mrs_uav_flightforge_simulatorConfig.cmake\n'}
+[98.609226] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/cmake/mrs_uav_flightforge_simulatorConfig-version.cmake\n'}
+[98.623508] (mrs_uav_flightforge_simulator) StdoutLine: {'line': b'-- Up-to-date: /mnt/d/ros/mrs_uav_flightforge_simulator/install/mrs_uav_flightforge_simulator/share/mrs_uav_flightforge_simulator/package.xml\n'}
+[98.630781] (-) TimerEvent: {}
+[98.640382] (mrs_uav_flightforge_simulator) CommandEnded: {'returncode': 0}
+[98.730897] (-) TimerEvent: {}
+[98.831360] (-) TimerEvent: {}
+[98.931817] (-) TimerEvent: {}
+[99.032260] (-) TimerEvent: {}
+[99.132696] (-) TimerEvent: {}
+[99.233130] (-) TimerEvent: {}
+[99.333727] (-) TimerEvent: {}
+[99.434198] (-) TimerEvent: {}
+[99.534985] (-) TimerEvent: {}
+[99.584745] (mrs_uav_flightforge_simulator) JobEnded: {'identifier': 'mrs_uav_flightforge_simulator', 'rc': 0}
+[99.593250] (-) EventReactorShutdown: {}
