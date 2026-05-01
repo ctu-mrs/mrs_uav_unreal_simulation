@@ -102,7 +102,7 @@ private:
 
   double _simulation_rate_;
   double _clock_rate_;
-  bool   _collisions_ = true;
+  bool   _collisions_ = false;
 
   rclcpp::Time sim_time_;
   rclcpp::Time last_step_time_;
@@ -288,8 +288,8 @@ private:
     bool   rgb_segmented_enabled = false;
     double rgb_segmented_rate    = 10.0;
 
-    bool   rgb_depth_enabled = false;
-    double rgb_depth_rate    = 0.0;
+    bool   depth_enabled = false;
+    double depth_rate    = 0.0;
 
     bool   stereo_enabled            = false;
     double stereo_rate               = 10.0;
@@ -600,6 +600,7 @@ private:
 
   std::vector<double> last_rgb_ue_stamp_;
   std::vector<double> last_rgb_seg_ue_stamp_;
+  std::vector<double> last_depth_ue_stamp_;
   std::vector<double> last_stereo_ue_stamp_;
 
   // | --------- store current camera orientation -------- |
@@ -825,6 +826,9 @@ void FlightforgeSimulator::timerInit() {
 
   dynparam_mgr_->register_param(yaml_prefix + "sensors/rgb/rgb_segmented/enabled", &drs_params_.rgb_segmented_enabled, (std::function<void(const bool&)>)std::bind(&FlightforgeSimulator::callbackRgbSegEnable, this, std::placeholders::_1));
   dynparam_mgr_->register_param(yaml_prefix + "sensors/rgb/rgb_segmented/rate", &drs_params_.rgb_segmented_rate, mrs_lib::DynparamMgr::range_t<double>(1.0, 100.0), (std::function<void(const double&)>)std::bind(&FlightforgeSimulator::callbackRgbSegRate, this, std::placeholders::_1));
+
+  dynparam_mgr_->register_param(yaml_prefix + "sensors/rgb/depth/enabled", &drs_params_.depth_enabled, (std::function<void(const bool&)>)std::bind(&FlightforgeSimulator::callbackDepthEnable, this, std::placeholders::_1));
+  dynparam_mgr_->register_param(yaml_prefix + "sensors/rgb/depth/rate", &drs_params_.depth_rate, mrs_lib::DynparamMgr::range_t<double>(1.0, 100.0), (std::function<void(const double&)>)std::bind(&FlightforgeSimulator::callbackDepthRate, this, std::placeholders::_1));
 
   dynparam_mgr_->register_param(yaml_prefix + "sensors/stereo/enabled", &drs_params_.stereo_enabled, (std::function<void(const bool&)>)std::bind(&FlightforgeSimulator::callbackStereoEnable, this, std::placeholders::_1));
   dynparam_mgr_->register_param(yaml_prefix + "sensors/stereo/rate", &drs_params_.stereo_rate, mrs_lib::DynparamMgr::range_t<double>(1.0, 30.0), (std::function<void(const double&)>)std::bind(&FlightforgeSimulator::callbackStereoRate, this, std::placeholders::_1));
@@ -1090,6 +1094,7 @@ void FlightforgeSimulator::timerInit() {
 
     ph_rgb_camera_info_.push_back(mrs_lib::PublisherHandler<sensor_msgs::msg::CameraInfo>(node_, "/" + uav_name + "/rgb/camera_info"));
     ph_rgb_seg_camera_info_.push_back(mrs_lib::PublisherHandler<sensor_msgs::msg::CameraInfo>(node_, "/" + uav_name + "/rgb_segmented/camera_info"));
+    ph_depth_camera_info_.push_back(mrs_lib::PublisherHandler<sensor_msgs::msg::CameraInfo>(node_, "/" + uav_name + "/depth/camera_info"));
     ph_stereo_left_camera_info_.push_back(mrs_lib::PublisherHandler<sensor_msgs::msg::CameraInfo>(node_, "/" + uav_name + "/stereo/left/camera_info"));
     ph_stereo_right_camera_info_.push_back(mrs_lib::PublisherHandler<sensor_msgs::msg::CameraInfo>(node_, "/" + uav_name + "/stereo/right/camera_info"));
 
@@ -1139,11 +1144,12 @@ void FlightforgeSimulator::timerInit() {
 
       last_rgb_ue_stamp_.push_back(0.0);
       last_rgb_seg_ue_stamp_.push_back(0.0);
+      last_depth_ue_stamp_.push_back(0.0);
 
       if (!res) {
         RCLCPP_ERROR(node_->get_logger(), "failed to set camera config for uav %lu", i + 1);
       } else {
-        RCLCPP_INFO(node_->get_logger(), "camera config set for uav%lu", i + 1);
+        RCLCPP_INFO(node_->get_logger(), "set camera config for uav %lu", i + 1);
       }
     }
 
@@ -1169,7 +1175,7 @@ void FlightforgeSimulator::timerInit() {
       if (!res) {
         RCLCPP_ERROR(node_->get_logger(), "failed to set camera config for uav %lu", i + 1);
       } else {
-        RCLCPP_INFO(node_->get_logger(), "camera config set for uav%lu", i + 1);
+        RCLCPP_INFO(node_->get_logger(), "set camera config for uav %lu", i + 1);
       }
     }
   }
@@ -1275,9 +1281,24 @@ void FlightforgeSimulator::timerInit() {
     timer_rgb_segmented_->start();
   }
 
-  /* if (drs_params_.rgb_depth_rate > 0) { */
-  /*   timer_depth_ = node_->create_wall_timer(std::chrono::duration<double>(1.0 / drs_params_.rgb_depth_rate), std::bind(&FlightforgeSimulator::timerDepth, this), cbgrp_sensors_); */
-  /* } */
+  {
+      std::function<void()> callback_fcn = std::bind(&FlightforgeSimulator::timerDepth, this);
+
+      timer_depth_ = std::make_shared<TimerType>(timer_opts_sensors, rclcpp::Rate(drs_params_.depth_rate, clock_), callback_fcn);
+  }
+
+  if (drs_params_.depth_enabled) {
+      timer_depth_->start();
+  }
+   //if (drs_params_.rgb_depth_rate > 0) { 
+   //    RCLCPP_WARN(node_->get_logger(), "[DEPTH] creating timer");
+
+   //  timer_depth_ = node_->create_wall_timer(std::chrono::duration<double>(1.0 / drs_params_.rgb_depth_rate), std::bind(&FlightforgeSimulator::timerDepth, this), cbgrp_sensors_); 
+   //}
+   //else {
+   //    RCLCPP_WARN(node_->get_logger(), "[DEPTH] failed to create timer");
+
+   //}
 
   // | ----------------------- scope timer ---------------------- |
 
@@ -1296,10 +1317,6 @@ void FlightforgeSimulator::timerInit() {
   RCLCPP_INFO(node_->get_logger(), "initialized");
 
   timer_init_->cancel();
-
-  // test that the node is actually the one I am editing
-  /* kill the node */
-  /* rclcpp::shutdown(); */
 }
 
 //}//}
@@ -1351,12 +1368,6 @@ void FlightforgeSimulator::timerMain() {
     last_step_wall_time_ = now_wall;
   }
 
-  //debug print RCLCPP_INFO_THROTTLED
-
-  RCLCPP_INFO_THROTTLE(node_->get_logger(), *clock_, 5000, "Before crash check");
-
-
-  checkForCrash();
   // step the sim
   {
     const double dt_since_last_step = (sim_time - last_step_time_).seconds();
@@ -1365,10 +1376,7 @@ void FlightforgeSimulator::timerMain() {
 
       for (size_t i = 0; i < uavs_.size(); i++) {
 
-        if (!uavs_[i]->hasCrashed()) {
-          uavs_.at(i)->makeStep(dt_since_last_step, sim_time.seconds());
-
-        }
+        uavs_.at(i)->makeStep(dt_since_last_step, sim_time.seconds());
       }
 
       publishPoses();
@@ -1437,6 +1445,10 @@ void FlightforgeSimulator::timerStatus() {
     highest_fps = drs_params.rgb_segmented_rate;
   }
 
+  if (drs_params.depth_rate > highest_fps) {
+      highest_fps = drs_params.depth_rate;
+  }
+
   if (drs_params.lidar_seg_rate > highest_fps) {
     highest_fps = drs_params.lidar_seg_rate;
   }
@@ -1452,9 +1464,9 @@ void FlightforgeSimulator::timerStatus() {
   timer_main_->cancel();
   timer_main_ = node_->create_wall_timer(std::chrono::duration<double>(1.0 / (_clock_rate_ * desired_rtf)), std::bind(&FlightforgeSimulator::timerMain, this), cbgrp_main_);
 
-  /* if (_collisions_) { */
-  /*   checkForCrash(); */
-  /* } */
+  if (_collisions_) {
+    checkForCrash();
+  }
 
   RCLCPP_INFO(node_->get_logger(), "%s, desired RTF = %.2f, actual RTF = %.2f, FlightForge FPS = %.2f, FlightForge RTF = %.2f", drs_params.paused ? "paused" : "running", drs_params.realtime_factor, actual_rtf, flightforge_fps_, flightforge_rtf);
 
@@ -1838,7 +1850,6 @@ void FlightforgeSimulator::timerIntLidar() {
 /* timerRgb() //{ */
 
 void FlightforgeSimulator::timerRgb() {
-
   if (!is_initialized_) {
     return;
   }
@@ -2053,19 +2064,19 @@ void FlightforgeSimulator::timerDepth() {
       std::tie(res, cameraData, stamp, size) = ueds_connectors_[i]->GetDepthCameraData();
     }
 
-    if (abs(stamp - last_rgb_ue_stamp_.at(i)) < 0.001) {
+    if (abs(stamp - last_depth_ue_stamp_.at(i)) < 0.001) {
       return;
     }
 
-    last_rgb_ue_stamp_.at(i) = stamp;
+    last_depth_ue_stamp_.at(i) = stamp;
 
     if (!res) {
-      RCLCPP_WARN(node_->get_logger(), "failed to obtain depth camera from uav%lu", i + 1);
+      RCLCPP_WARN(node_->get_logger(), "[DEPTH] failed to obtain depth camera from uav%lu", i + 1);
       continue;
     }
 
     if (cameraData.empty()) {
-      RCLCPP_WARN(node_->get_logger(), "depth camera from uav%lu is empty!", i + 1);
+      RCLCPP_WARN(node_->get_logger(), "[DEPTH] depth camera from uav%lu is empty!", i + 1);
       continue;
     }
 
@@ -2077,6 +2088,7 @@ void FlightforgeSimulator::timerDepth() {
 
     msg->header.stamp = flightforgeTimeToSimtime(stamp);
 
+
     ph_imp_depth_[i].publish(msg);
 
     auto camera_info = rgb_camera_info_;
@@ -2084,6 +2096,7 @@ void FlightforgeSimulator::timerDepth() {
     camera_info.header = msg->header;
 
     ph_depth_camera_info_[i].publish(camera_info);
+
   }
 }
 
@@ -2360,7 +2373,7 @@ void FlightforgeSimulator::callbackDepthRate(const double& param_value) {
 
   timer_depth_->setPeriod(std::chrono::duration<double>(1.0 / param_value));
 
-  if (drs_params_.rgb_depth_enabled) {
+  if (drs_params_.depth_enabled) {
     timer_depth_->start();
   }
 
@@ -2495,9 +2508,6 @@ void FlightforgeSimulator::checkForCrash(void) {
     for (size_t i = 0; i < uavs_.size(); i++) {
 
       auto [res, crashed] = ueds_connectors_[i]->GetCrashState();
-
-      // debug print the crash state every 5 seconds
-      RCLCPP_INFO_THROTTLE(node_->get_logger(), *clock_, 5000, "uav%lu crash state: %s", i + 1, crashed ? "CRASHED" : "OK");
 
       /* if the uav has crashed check the rangefinder data to determine if its not just a landing */
       if (crashed) {
