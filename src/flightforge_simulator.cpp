@@ -1367,7 +1367,7 @@ void FlightforgeSimulator::timerMain() {
 
     last_step_wall_time_ = now_wall;
   }
-
+  checkForCrash();
   // step the sim
   {
     const double dt_since_last_step = (sim_time - last_step_time_).seconds();
@@ -1375,8 +1375,9 @@ void FlightforgeSimulator::timerMain() {
     if (dt_since_last_step >= simulation_step_size) {
 
       for (size_t i = 0; i < uavs_.size(); i++) {
-
-        uavs_.at(i)->makeStep(dt_since_last_step, sim_time.seconds());
+        if (!uavs_[i]->hasCrashed()) {
+          uavs_.at(i)->makeStep(dt_since_last_step, sim_time.seconds());
+        }
       }
 
       publishPoses();
@@ -1464,9 +1465,9 @@ void FlightforgeSimulator::timerStatus() {
   timer_main_->cancel();
   timer_main_ = node_->create_wall_timer(std::chrono::duration<double>(1.0 / (_clock_rate_ * desired_rtf)), std::bind(&FlightforgeSimulator::timerMain, this), cbgrp_main_);
 
-  if (_collisions_) {
-    checkForCrash();
-  }
+  /* if (_collisions_) { */
+  /*   checkForCrash(); */
+  /* } */
 
   RCLCPP_INFO(node_->get_logger(), "%s, desired RTF = %.2f, actual RTF = %.2f, FlightForge FPS = %.2f, FlightForge RTF = %.2f", drs_params.paused ? "paused" : "running", drs_params.realtime_factor, actual_rtf, flightforge_fps_, flightforge_rtf);
 
