@@ -102,7 +102,7 @@ private:
 
   double _simulation_rate_;
   double _clock_rate_;
-  bool   _collisions_ = false;
+  bool   _collisions_ = true;
 
   rclcpp::Time sim_time_;
   rclcpp::Time last_step_time_;
