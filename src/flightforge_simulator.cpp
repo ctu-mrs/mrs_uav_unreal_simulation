@@ -289,7 +289,7 @@ private:
     double rgb_segmented_rate    = 10.0;
 
     bool   depth_enabled = false;
-    double depth_rate    = 0.0;
+    double depth_rate    = 10.0;
 
     bool   stereo_enabled            = false;
     double stereo_rate               = 10.0;
@@ -828,7 +828,7 @@ void FlightforgeSimulator::timerInit() {
   dynparam_mgr_->register_param(yaml_prefix + "sensors/rgb/rgb_segmented/rate", &drs_params_.rgb_segmented_rate, mrs_lib::DynparamMgr::range_t<double>(1.0, 100.0), (std::function<void(const double&)>)std::bind(&FlightforgeSimulator::callbackRgbSegRate, this, std::placeholders::_1));
 
   dynparam_mgr_->register_param(yaml_prefix + "sensors/rgb/depth/enabled", &drs_params_.depth_enabled, (std::function<void(const bool&)>)std::bind(&FlightforgeSimulator::callbackDepthEnable, this, std::placeholders::_1));
-  dynparam_mgr_->register_param(yaml_prefix + "sensors/rgb/depth/rate", &drs_params_.depth_rate, mrs_lib::DynparamMgr::range_t<double>(1.0, 100.0), (std::function<void(const double&)>)std::bind(&FlightforgeSimulator::callbackDepthRate, this, std::placeholders::_1));
+  dynparam_mgr_->register_param(yaml_prefix + "sensors/rgb/depth/rate", &drs_params_.depth_rate, mrs_lib::DynparamMgr::range_t<double>(0.0, 100.0), (std::function<void(const double&)>)std::bind(&FlightforgeSimulator::callbackDepthRate, this, std::placeholders::_1));
 
   dynparam_mgr_->register_param(yaml_prefix + "sensors/stereo/enabled", &drs_params_.stereo_enabled, (std::function<void(const bool&)>)std::bind(&FlightforgeSimulator::callbackStereoEnable, this, std::placeholders::_1));
   dynparam_mgr_->register_param(yaml_prefix + "sensors/stereo/rate", &drs_params_.stereo_rate, mrs_lib::DynparamMgr::range_t<double>(1.0, 30.0), (std::function<void(const double&)>)std::bind(&FlightforgeSimulator::callbackStereoRate, this, std::placeholders::_1));
@@ -1282,14 +1282,21 @@ void FlightforgeSimulator::timerInit() {
   }
 
   {
+
+    if (drs_params_.depth_rate > 0.0) {
       std::function<void()> callback_fcn = std::bind(&FlightforgeSimulator::timerDepth, this);
 
       timer_depth_ = std::make_shared<TimerType>(timer_opts_sensors, rclcpp::Rate(drs_params_.depth_rate, clock_), callback_fcn);
+      if (drs_params_.depth_enabled) {
+        timer_depth_->start();
+      }
+    }else {
+      RCLCPP_WARN(get_logger(), "Rate must be greater than 0. Depth timer was not created");
+    }
   }
 
-  if (drs_params_.depth_enabled) {
-      timer_depth_->start();
-  }
+
+
    //if (drs_params_.rgb_depth_rate > 0) { 
    //    RCLCPP_WARN(node_->get_logger(), "[DEPTH] creating timer");
 
@@ -2355,11 +2362,17 @@ void FlightforgeSimulator::callbackDepthEnable(const bool& param_value) {
 
   RCLCPP_INFO(get_logger(), "callbackDepthEnable()");
 
+  if (timer_depth_ == nullptr) {
+    RCLCPP_WARN(get_logger(), "There is no depth timer");
+    return;
+  }
+
   if (param_value) {
     timer_depth_->start();
   } else {
     timer_depth_->stop();
   }
+  
 }
 
 //}
@@ -2369,6 +2382,25 @@ void FlightforgeSimulator::callbackDepthEnable(const bool& param_value) {
 void FlightforgeSimulator::callbackDepthRate(const double& param_value) {
 
   RCLCPP_INFO(get_logger(), "callbackDepthRate()");
+
+  if (param_value <= 0.0) {
+    RCLCPP_WARN(get_logger(), "Rate must be greater than 0");
+    return;
+  }
+
+  if (timer_depth_ == nullptr)
+  {
+    mrs_lib::TimerHandlerOptions timer_opts_sensors;
+
+    timer_opts_sensors.node           = node_;
+    timer_opts_sensors.callback_group = cbgrp_sensors_;
+    timer_opts_sensors.autostart      = false;
+
+    std::function<void()> callback_fcn = std::bind(&FlightforgeSimulator::timerDepth, this);
+
+    timer_depth_ = std::make_shared<TimerType>(timer_opts_sensors, rclcpp::Rate(param_value, clock_), callback_fcn);
+  }
+
 
   timer_depth_->stop();
 
