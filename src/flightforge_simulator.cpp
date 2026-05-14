@@ -219,6 +219,7 @@ private:
   // how much to add to unreal time to get to our wall time
   double       wall_time_offset_             = 0;
   double       wall_time_offset_drift_slope_ = 0;
+  int          time_sync_failures_           = 0;
   std::mutex   mutex_wall_time_offset_;
   rclcpp::Time last_real_;
 
@@ -955,11 +956,11 @@ void FlightforgeSimulator::timerInit() {
                  API_VERSION_MINOR, api_version_major, api_version_minor);
     RCLCPP_ERROR(node_->get_logger(), "     ");
     RCLCPP_ERROR(node_->get_logger(), " Solution:");
-    RCLCPP_ERROR(node_->get_logger(), "           1. make sure the mrs_uav_unreal_simulation package is up to date");
+    RCLCPP_ERROR(node_->get_logger(), "           1. make sure the mrs_uav_flightforge_simulator package is up to date");
     RCLCPP_ERROR(node_->get_logger(), "              sudo apt update && sudo apt upgrade");
     RCLCPP_ERROR(node_->get_logger(), "     ");
     RCLCPP_ERROR(node_->get_logger(), "           2. make sure you have the right version of the FlightForge Simulator binary 'game'");
-    RCLCPP_ERROR(node_->get_logger(), "              download at: https://github.com/ctu-mrs/mrs_uav_unreal_simulation");
+    RCLCPP_ERROR(node_->get_logger(), "              download at: https://github.com/ctu-mrs/mrs_uav_flightforge_simulator");
     RCLCPP_ERROR(node_->get_logger(), "     ");
 
     rclcpp::shutdown();
@@ -1082,14 +1083,27 @@ void FlightforgeSimulator::timerInit() {
 
     int uav_frame_id = ueds_connector::UavFrameType::Type2IdMesh().at(uav_frame);
 
-    auto [resSpawn, port] = ueds_game_controller_->SpawnDroneAtLocation(pos, uav_frame_id);
+    bool resSpawn = false;
+    int  port     = 0;
 
-    if (!resSpawn) {
-      RCLCPP_ERROR(node_->get_logger(), "failed to spawn %s", uav_names[i].c_str());
-      rclcpp::shutdown();
+    const int max_spawn_attempts = 10;
+    for (int attempt = 0; attempt < max_spawn_attempts; attempt++) {
+      std::tie(resSpawn, port) = ueds_game_controller_->SpawnDroneAtLocation(pos, uav_frame_id);
+      if (resSpawn) {
+        break;
+      }
+
+      RCLCPP_ERROR(node_->get_logger(), "failed to spawn %s (attempt %d/%d), retrying...", uav_names[i].c_str(), attempt + 1, max_spawn_attempts);
+      std::this_thread::sleep_for(std::chrono::seconds(1));
     }
 
-    RCLCPP_INFO(node_->get_logger(), "%s spawned", uav_name.c_str());
+    if (!resSpawn) {
+      RCLCPP_ERROR(node_->get_logger(), "failed to spawn %s after %d attempts", uav_names[i].c_str(), max_spawn_attempts);
+      rclcpp::shutdown();
+      return;
+    }
+
+    RCLCPP_INFO(node_->get_logger(), "%s spawned on port %d", uav_name.c_str(), port);
 
     std::shared_ptr<ueds_connector::UedsConnector> ueds_connector = std::make_shared<ueds_connector::UedsConnector>(_simulator_ip_, port);
 
@@ -1101,6 +1115,7 @@ void FlightforgeSimulator::timerInit() {
 
       RCLCPP_ERROR(node_->get_logger(), "%s - Error connecting to drone controller, connect_result was %d", uav_name.c_str(), connect_result);
       rclcpp::shutdown();
+      return;
 
     } else {
       RCLCPP_INFO(node_->get_logger(), "%s - Connection succeed: %d", uav_name.c_str(), connect_result);
@@ -1464,8 +1479,8 @@ void FlightforgeSimulator::timerStatus() {
   const double fps_filter_const = 0.9;
   flightforge_fps_              = fps_filter_const * flightforge_fps_ + (1.0 - fps_filter_const) * fps;
 
-  // get the currently requires highest sensor rate
-  double highest_fps = 0;
+  // get the currently required highest sensor rate, default to 1 to avoid division by zero
+  double highest_fps = 1;
 
   if (drs_params.rgb_rate > highest_fps) {
     highest_fps = drs_params.rgb_rate;
@@ -1493,7 +1508,13 @@ void FlightforgeSimulator::timerStatus() {
 
   const double flightforge_rtf = flightforge_fps_ / highest_fps;
 
-  const double desired_rtf = (drs_params.dynamic_rtf && flightforge_rtf < drs_params.realtime_factor) ? flightforge_rtf : drs_params.realtime_factor;
+  double desired_rtf = (drs_params.dynamic_rtf && flightforge_rtf < drs_params.realtime_factor) ? flightforge_rtf : drs_params.realtime_factor;
+
+  // Safety check: ensure desired_rtf is valid
+  if (!std::isfinite(desired_rtf) || desired_rtf <= 0.0) {
+    RCLCPP_WARN(node_->get_logger(), "Invalid desired_rtf: %.3f, using 1.0", desired_rtf);
+    desired_rtf = 1.0;
+  }
 
   timer_main_->cancel();
   timer_main_ = node_->create_wall_timer(std::chrono::duration<double>(1.0 / (_clock_rate_ * desired_rtf)), std::bind(&FlightforgeSimulator::timerMain, this),
@@ -1550,9 +1571,18 @@ void FlightforgeSimulator::timerTimeSync() {
   const double sync_end = wall_clock_->now().seconds();
 
   if (!res) {
-    RCLCPP_ERROR(node_->get_logger(), "Failed to get FlightForge's time");
-    rclcpp::shutdown();
+    time_sync_failures_++;
+    RCLCPP_ERROR_THROTTLE(node_->get_logger(), *clock_, 1e9, "Failed to get FlightForge's time (consecutive failures: %d)", time_sync_failures_);
+
+    if (time_sync_failures_ > 15) {
+      RCLCPP_ERROR(node_->get_logger(), "Too many consecutive time-sync failures (%d), shutting down", time_sync_failures_);
+      rclcpp::shutdown();
+    }
+
+    return;
   }
+
+  time_sync_failures_ = 0;
 
   const double true_flightforge_time = flightforge_time - (sync_end - sync_start) / 2.0;
 
@@ -1610,7 +1640,7 @@ void FlightforgeSimulator::timerRangefinder() {
     }
 
     if (!res) {
-      RCLCPP_ERROR_THROTTLE(node_->get_logger(), *node_->get_clock(), 1e9, "[uav%d] - ERROR GetRangefinderData", int(i) + 1);
+      RCLCPP_ERROR_THROTTLE(node_->get_logger(), *clock_, 1e9, "[uav%d] - ERROR GetRangefinderData", int(i) + 1);
       continue;
     }
 
@@ -1650,12 +1680,23 @@ void FlightforgeSimulator::timerLidar() {
 
     {
       std::scoped_lock lock(mutex_flightforge_);
-
-      std::tie(res, lidarData, start) = ueds_connectors_[i]->GetLidarData();
+      try {
+        std::tie(res, lidarData, start) = ueds_connectors_[i]->GetLidarData();
+      } catch (const std::bad_alloc&) {
+        RCLCPP_ERROR_THROTTLE(node_->get_logger(), *clock_, 1e9,
+                              "[uav%d] - bad_alloc in GetLidarData, dropping frame", int(i) + 1);
+        continue;
+      }
     }
 
     if (!res) {
-      RCLCPP_ERROR_THROTTLE(node_->get_logger(), *node_->get_clock(), 1e9, "[uav%d] - ERROR getLidarData", int(i) + 1);
+      RCLCPP_ERROR_THROTTLE(node_->get_logger(), *clock_, 1e9, "[uav%d] - ERROR getLidarData", int(i) + 1);
+      continue;
+    }
+
+    // A normal lidar has at most BeamHorRays * BeamVertRays points.
+    if (lidarData.size() > 500000) {
+      RCLCPP_ERROR_THROTTLE(node_->get_logger(), *clock_, 1e9, "[uav%d] - lidarData size %zu exceeds sanity limit, dropping frame", int(i) + 1, lidarData.size());
       continue;
     }
 
@@ -1811,7 +1852,7 @@ void FlightforgeSimulator::timerSegLidar() {
     }
 
     if (!res) {
-      RCLCPP_ERROR_THROTTLE(node_->get_logger(), *node_->get_clock(), 1e9, "[uav%d] - ERROR getLidarSegData", int(i) + 1);
+      RCLCPP_ERROR_THROTTLE(node_->get_logger(), *clock_, 1e9, "[uav%d] - ERROR getLidarSegData", int(i) + 1);
       continue;
     }
 
@@ -1885,7 +1926,7 @@ void FlightforgeSimulator::timerIntLidar() {
     }
 
     if (!res) {
-      RCLCPP_ERROR_THROTTLE(node_->get_logger(), *node_->get_clock(), 1e9, "[uav%d] - ERROR getLidarIntData", int(i) + 1);
+      RCLCPP_ERROR_THROTTLE(node_->get_logger(), *clock_, 1e9, "[uav%d] - ERROR getLidarIntData", int(i) + 1);
       continue;
     }
 
