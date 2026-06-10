@@ -85,8 +85,8 @@ public:
 
   // | -------------------- service callbacks ------------------- |
 
-  std::tuple<bool, std::string> callbackArming(const bool& request);
-  std::tuple<bool, std::string> callbackOffboard(void);
+  mrs_lib::Task<std::tuple<bool, std::string>> callbackArming(const bool& request);
+  mrs_lib::Task<std::tuple<bool, std::string>> callbackOffboard(void);
 
 private:
   bool is_initialized_ = false;
@@ -357,7 +357,7 @@ mrs_msgs::msg::HwApiCapabilities Api::getCapabilities() {
 
 /* callbackArming() //{ */
 
-std::tuple<bool, std::string> Api::callbackArming([[maybe_unused]] const bool& request) {
+mrs_lib::Task<std::tuple<bool, std::string>> Api::callbackArming([[maybe_unused]] const bool& request) {
 
   std::stringstream ss;
 
@@ -367,7 +367,7 @@ std::tuple<bool, std::string> Api::callbackArming([[maybe_unused]] const bool& r
 
     ss << "armed";
     RCLCPP_INFO_STREAM(node_->get_logger(), "" << ss.str());
-    return std::tuple(true, ss.str());
+    co_return std::tuple(true, ss.str());
 
   } else {
 
@@ -375,7 +375,7 @@ std::tuple<bool, std::string> Api::callbackArming([[maybe_unused]] const bool& r
 
     ss << "disarmed";
     RCLCPP_INFO_STREAM(node_->get_logger(), "" << ss.str());
-    return std::tuple(true, ss.str());
+    co_return std::tuple(true, ss.str());
   }
 }
 
@@ -383,14 +383,14 @@ std::tuple<bool, std::string> Api::callbackArming([[maybe_unused]] const bool& r
 
 /* callbackOffboard() //{ */
 
-std::tuple<bool, std::string> Api::callbackOffboard(void) {
+mrs_lib::Task<std::tuple<bool, std::string>> Api::callbackOffboard(void) {
 
   std::stringstream ss;
 
   if (!armed_) {
     ss << "Cannot switch to offboard, not armed.";
     RCLCPP_INFO(node_->get_logger(), "%s", ss.str().c_str());
-    return {false, ss.str()};
+    co_return {false, ss.str()};
   }
 
   auto last_cmd_time = mrs_lib::get_mutexed(mutex_last_cmd_time_, last_cmd_time_);
@@ -398,14 +398,14 @@ std::tuple<bool, std::string> Api::callbackOffboard(void) {
   if ((clock_->now() - last_cmd_time).seconds() > _input_timeout_) {
     ss << "Cannot switch to offboard, missing control input.";
     RCLCPP_INFO(node_->get_logger(), "%s", ss.str().c_str());
-    return {false, ss.str()};
+    co_return {false, ss.str()};
   }
 
   offboard_ = true;
 
   ss << "Offboard set";
   RCLCPP_INFO(node_->get_logger(), "%s", ss.str().c_str());
-  return {true, ss.str()};
+  co_return {true, ss.str()};
 }
 
 //}
