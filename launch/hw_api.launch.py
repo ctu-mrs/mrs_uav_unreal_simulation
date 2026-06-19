@@ -86,7 +86,7 @@ def generate_launch_description():
         namespace=uav_name,
         name=namespace+'_container',
         package='rclcpp_components',
-        executable='component_container_mt',
+        executable='component_container_events_cbg',
         output="screen",
 
         # prefix=['debug_roslaunch ' + os.ttyname(sys.stdout.fileno())],
