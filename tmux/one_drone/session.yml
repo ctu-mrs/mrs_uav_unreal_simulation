@@ -3,7 +3,7 @@ root: ./
 name: simulation
 socket_name: mrs
 attach: false
-tmux_options: -f /etc/ctu-mrs/tmux.conf
+tmux_options: -f <%= @settings["config"] %>
 # you can modify these
 startup_window: simulator
 pre_window: export UAV_NAME=uav1;

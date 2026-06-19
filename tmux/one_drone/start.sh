@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Absolute path to this script. /home/user/bin/foo.sh
 SCRIPT=$(readlink -f $0)
@@ -10,7 +10,7 @@ export TMUX_SESSION_NAME=simulation
 export TMUX_SOCKET_NAME=mrs
 
 # start tmuxinator
-tmuxinator start -p ./session.yml
+tmuxinator start -p ./session.yml config="$(ros2 pkg prefix mrs_uav_core)/share/mrs_uav_core/config/tmux.conf"
 
 # if we are not in tmux
 if [ -z $TMUX ]; then
