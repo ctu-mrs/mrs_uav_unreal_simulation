@@ -137,13 +137,13 @@ mrs_uav_flightforge_simulator:
 
     rgb:
 
-      enabled: false
+      enabled: true
 
       rate: 30.0 # [Hz]
 
       enable_hdr: true
-      enable_temporal_aa: true
-      enable_raytracing: true
+      enable_temporal_aa: false
+      enable_raytracing: false
 
       width: 640 # [px]
       height: 480 # [px]
@@ -160,9 +160,9 @@ mrs_uav_flightforge_simulator:
         yaw: 0.0 # [deg]
         roll: 0.0 # [deg]
 
-      enable_motion_blur: true
-      motion_blur_amount: 0.5 # [0.0 - 1.0]
-      motion_blur_distortion: 50.0 # [0-100]
+      enable_motion_blur: false
+      motion_blur_amount: 0.0 # [0.0 - 1.0]
+      motion_blur_distortion: 0.0 # [0-100]
 
       rgb_segmented:
         enabled: false
@@ -189,7 +189,7 @@ mrs_uav_flightforge_simulator:
         offset_z: 0.0 # [m]
 
         # TODO which Tait-Bryan convention is it in?
-        rotation_pitch: 20.0 # [deg]
+        rotation_pitch: 40.0 # [deg]
         rotation_yaw: 0.0 # [deg]
         rotation_roll: 0.0 # [deg]
 
@@ -200,7 +200,7 @@ mrs_uav_flightforge_simulator:
         offset_z: 0.0 # [m]
 
         # TODO which Tait-Bryan convention is it in?
-        rotation_pitch: 20.0 # [deg]
+        rotation_pitch: 40.0 # [deg]
         rotation_yaw: 0.0 # [deg]
         rotation_roll: 0.0 # [deg]
 
@@ -277,6 +277,9 @@ publishers:
     enabled: true
 
   imu:
+    enabled: true
+
+  magnetometer:
     enabled: true
 
 frames:

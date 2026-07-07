@@ -1172,12 +1172,12 @@ void FlightforgeSimulator::timerInit() {
       cameraConfig.fov_                    = rgb_fov_;
       cameraConfig.offset_                 = ueds_connector::Coordinates(rgb_offset_x_ * 100.0, -rgb_offset_y_ * 100.0, rgb_offset_z_ * 100.0);
       cameraConfig.orientation_            = ueds_connector::Rotation(-rgb_rotation_pitch_, rgb_rotation_yaw_, rgb_rotation_roll_);
-      cameraConfig.enable_raytracing_      = rgb_enable_raytracing_;
-      cameraConfig.enable_hdr_             = rgb_enable_hdr_;
-      cameraConfig.enable_temporal_aa_     = rgb_enable_temporal_aa_;
-      cameraConfig.enable_motion_blur_     = rgb_enable_motion_blur_;
-      cameraConfig.motion_blur_amount_     = rgb_motion_blur_amount_;
-      cameraConfig.motion_blur_distortion_ = rgb_motion_blur_distortion_;
+      cameraConfig.enable_raytracing_      = drs_params_.rgb_enable_raytracing;
+      cameraConfig.enable_hdr_             = drs_params_.rgb_enable_hdr;
+      cameraConfig.enable_temporal_aa_     = drs_params_.rgb_enable_temporal_aa;
+      cameraConfig.enable_motion_blur_     = drs_params_.rgb_enable_motion_blur;
+      cameraConfig.motion_blur_amount_     = drs_params_.rgb_motion_blur_amount;
+      cameraConfig.motion_blur_distortion_ = drs_params_.rgb_motion_blur_distortion;
 
       const auto res = ueds_connectors_[i]->SetRgbCameraConfig(cameraConfig);
 
